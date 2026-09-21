@@ -1,0 +1,5 @@
+[files]
+extend-exclude = [
+  "**/public/assets/",
+  "**/i18n/**",
+]

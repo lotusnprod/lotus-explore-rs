@@ -1,0 +1,24 @@
+{
+  "activitycontinuation": [
+    {
+      "activities": [
+        {
+          "name": "com.apple.developer.web-browser-activity"
+        }
+      ],
+      "targets": [
+        {
+          "bundleID": "com.apple.mobilesafari",
+          "paths": ["*"]
+        }
+      ]
+    }
+  ],
+  "webcredentials": {
+    "apps": []
+  },
+  "applinks": {
+    "apps": [],
+    "details": []
+  }
+}

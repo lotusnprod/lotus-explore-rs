@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  # ── Pre-commit checks: fast, block every commit/PR ──────────────────────────
+
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false, fetch-depth: 1 }
+      - uses: dtolnay/rust-toolchain@stable
+        with: { components: rustfmt }
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false, fetch-depth: 1 }
+      - uses: dtolnay/rust-toolchain@stable
+        with: { components: clippy }
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - run: cargo clippy -p lotus-explore-rs --features server --locked -- -D warnings
+
+  # ── Pre-push checks: heavy — run on every PR and push ─────────────────────────
+
+  test:
+    name: Test (native)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false, fetch-depth: 1 }
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --workspace --all-targets --locked --quiet
+      - run: cargo test -p lotus-explore-rs --features server --locked --quiet
+
+  doc:
+    name: Docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false, fetch-depth: 1 }
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo doc --workspace --no-deps --locked
+
+  wasm:
+    name: WASM type-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false, fetch-depth: 1 }
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: wasm32-unknown-unknown }
+      - name: Check WASM
+        run: |
+          cargo check -p lotus-explore-rs --target wasm32-unknown-unknown --locked
+
+  supply-chain:
+    name: Supply-chain
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false, fetch-depth: 1 }
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@b6b84cf49ebfe0176417bdce007c624f0db37f20
+        with:
+          tool: |
+            cargo-audit@0.22.2
+            cargo-deny@0.19.4
+      - name: Cargo deny
+        run: cargo deny check advisories bans licenses sources
+      - name: Cargo audit
+        run: cargo audit
+
+  machete:
+    name: Unused dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false, fetch-depth: 1 }
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: taiki-e/install-action@b6b84cf49ebfe0176417bdce007c624f0db37f20
+        with:
+          tool: |
+            cargo-machete@0.9.2
+      - run: cargo machete

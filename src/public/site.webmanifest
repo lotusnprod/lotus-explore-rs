@@ -1,0 +1,97 @@
+{
+  "name": "LOTUS Explore-rs",
+  "short_name": "LOTUS-rs",
+  "description": "Explore LOTUS with taxon filters, structure search, and Wikidata curation workflows.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f8fb",
+  "theme_color": "#0b5cab",
+  "lang": "en",
+  "dir": "ltr",
+  "screenshots": [],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": [
+    "science",
+    "education",
+    "research"
+  ],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Search Compounds",
+      "short_name": "Search",
+      "description": "Search for natural product compounds",
+      "url": "./?tab=search",
+      "icons": [
+        {
+          "src": "/favicon.ico",
+          "sizes": "16x16",
+          "type": "image/x-icon",
+          "purpose": "any"
+        },
+        {
+          "src": "/favicon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml",
+          "purpose": "any"
+        }
+      ]
+    }
+  ]
+}

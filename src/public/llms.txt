@@ -1,0 +1,63 @@
+# LOTUS Explore-rs
+
+> Explore LOTUS with taxon filters, structure search, and Wikidata curation workflows.
+
+## Core information
+
+- **Official name**: LOTUS Explore-rs
+- **Short name**: LOTUS-rs
+- **Purpose**: Interactive exploration of natural-product occurrence data
+- **Data domain**: Natural products, compounds, taxonomy, scientific references
+- **Access model**: Free, web-based, no authentication required
+
+## Features
+
+- Search by taxon filters and structure input (SMILES or Molfile V2000/V3000)
+- Use Ketcher to draw structures, then copy Daylight SMILES or MOL V3000 back into search
+- Filter by mass, year, and formula
+- Browse taxonomy and references
+- Export CSV, JSON, and SPARQL results for downstream analysis
+- Import TSV rows and generate QuickStatements for Wikidata curation
+
+## Links
+
+- [Home page](https://lotusnprod.github.io/lotus-explore-rs/)
+- [Repository](https://github.com/lotusnprod/lotus-explore-rs)
+- [Source path](https://github.com/lotusnprod/lotus-explore-rs)
+- [Paper landing page](https://elifesciences.org/articles/70780)
+- [Paper DOI](https://doi.org/10.7554/eLife.70780)
+- [BibTeX references](/public/docs/references.bib)
+- [LOTUS initiative](https://lotusnprod.github.io)
+- [Agent skills](/.well-known/agent-skills.json)
+- [API catalog](/.well-known/api-catalog.json)
+
+## Data sources
+
+- [Wikidata SPARQL](https://query.wikidata.org/)
+- [QLever](https://qlever.cs.uni-freiburg.de/wikidata)
+- [DOI metadata](https://doi.org/)
+- [LOTUS initiative](https://lotusnprod.github.io)
+
+## Discovery
+
+- [Agent skills](/.well-known/agent-skills.json)
+- [API catalog](/.well-known/api-catalog.json)
+- Structured data: JSON-LD in page head
+- Link headers: advertise llms, robots, security, sitemap
+
+## Citation
+
+- [Paper DOI](https://doi.org/10.7554/eLife.70780)
+- [Paper landing page](https://elifesciences.org/articles/70780)
+- [BibTeX](/public/docs/references.bib)
+
+## Licensing
+
+- [App license](https://www.gnu.org/licenses/agpl-3.0.html) (AGPL-3.0)
+- [Data license](https://creativecommons.org/publicdomain/zero/1.0/) (CC0 1.0)
+- [Source path](https://github.com/lotusnprod/lotus-explore-rs)
+
+## Contact
+
+- [Issues](https://github.com/lotusnprod/lotus-explore-rs/issues)
+- [Discussions](https://github.com/lotusnprod/lotus-explore-rs/discussions)

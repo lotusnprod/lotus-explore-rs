@@ -1,0 +1,163 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
+use super::*;
+use crate::download::DownloadFormat;
+use crate::models::{ElementState, SearchCriteria};
+
+#[test]
+fn parse_criteria_supports_formula_and_halogens() {
+    let mut params = QueryParams::new();
+    params.insert("taxon".into(), "*".into());
+    params.insert("formula_filter".into(), "true".into());
+    params.insert("c_min".into(), "15".into());
+    params.insert("c_max".into(), "25".into());
+    params.insert("o_min".into(), "2".into());
+    params.insert("o_max".into(), "8".into());
+    params.insert("f_state".into(), "required".into());
+    params.insert("cl_state".into(), "required".into());
+    params.insert("br_state".into(), "excluded".into());
+    params.insert("i_state".into(), "excluded".into());
+
+    let crit = parse_criteria_from_params(&params);
+    assert!(crit.formula_enabled);
+    assert_eq!(crit.c_min, 15);
+    assert_eq!(crit.c_max, 25);
+    assert_eq!(crit.o_min, 2);
+    assert_eq!(crit.o_max, 8);
+    assert_eq!(crit.f_state, ElementState::Required);
+    assert_eq!(crit.cl_state, ElementState::Required);
+    assert_eq!(crit.br_state, ElementState::Excluded);
+    assert_eq!(crit.i_state, ElementState::Excluded);
+}
+
+#[test]
+fn parse_criteria_structure_without_explicit_taxon_clears_default_taxon() {
+    let mut params = QueryParams::new();
+    params.insert("structure".into(), "CCO".into());
+
+    let crit = parse_criteria_from_params(&params);
+    assert_eq!(crit.smiles, "CCO");
+    assert!(crit.taxon.is_empty());
+}
+
+#[test]
+fn startup_action_execute_only() {
+    let mut params = QueryParams::new();
+    params.insert("execute".into(), "true".into());
+    let startup = parse_startup_action_from_params(&params);
+    assert!(startup.pending_format.is_none());
+    assert!(startup.pending_invalid_format.is_none());
+    assert!(startup.direct_execute);
+}
+
+#[test]
+fn share_params_roundtrip_for_advanced_filters() {
+    let mut crit = SearchCriteria {
+        taxon: "*".into(),
+        ..SearchCriteria::default()
+    };
+    crit.formula_enabled = true;
+    crit.c_min = 15;
+    crit.c_max = 25;
+    crit.o_min = 2;
+    crit.o_max = 8;
+    crit.f_state = ElementState::Required;
+    crit.cl_state = ElementState::Required;
+    crit.br_state = ElementState::Excluded;
+    crit.i_state = ElementState::Excluded;
+
+    let params: QueryParams = crit.shareable_query_params().into_iter().collect();
+    let reparsed = parse_criteria_from_params(&params);
+    assert_eq!(reparsed.taxon, crit.taxon);
+    assert_eq!(reparsed.c_min, crit.c_min);
+    assert_eq!(reparsed.c_max, crit.c_max);
+    assert_eq!(reparsed.o_min, crit.o_min);
+    assert_eq!(reparsed.o_max, crit.o_max);
+    assert_eq!(reparsed.f_state, crit.f_state);
+    assert_eq!(reparsed.cl_state, crit.cl_state);
+    assert_eq!(reparsed.br_state, crit.br_state);
+    assert_eq!(reparsed.i_state, crit.i_state);
+}
+
+#[test]
+fn share_params_keep_formula_toggle_but_omit_default_formula_bounds() {
+    let crit = SearchCriteria {
+        taxon: "Fungi".into(),
+        formula_enabled: true,
+        ..SearchCriteria::default()
+    };
+
+    let params: QueryParams = crit.shareable_query_params().into_iter().collect();
+    let reparsed = parse_criteria_from_params(&params);
+
+    assert_eq!(params.get("taxon").map(String::as_str), Some("Fungi"));
+    assert_eq!(
+        params.get("formula_filter").map(String::as_str),
+        Some("true")
+    );
+    assert!(!params.contains_key("c_min"));
+    assert!(!params.contains_key("c_max"));
+    assert!(!params.contains_key("cl_state"));
+    assert!(reparsed.formula_enabled);
+    assert_eq!(reparsed.c_min, SearchCriteria::default().c_min);
+    assert_eq!(reparsed.c_max, SearchCriteria::default().c_max);
+    assert_eq!(reparsed.cl_state, SearchCriteria::default().cl_state);
+}
+
+#[test]
+fn startup_action_download_has_priority_over_execute() {
+    let mut params = QueryParams::new();
+    params.insert("download".into(), "yes".into());
+    params.insert("execute".into(), "true".into());
+    params.insert("format".into(), "rdf".into());
+    let startup = parse_startup_action_from_params(&params);
+    assert_eq!(startup.pending_format, Some(DownloadFormat::Rdf));
+    assert!(startup.pending_invalid_format.is_none());
+    assert!(!startup.direct_execute);
+}
+
+#[test]
+fn startup_action_invalid_download_format_is_preserved() {
+    let mut params = QueryParams::new();
+    params.insert("download".into(), "1".into());
+    params.insert("format".into(), "ttl".into());
+
+    let startup = parse_startup_action_from_params(&params);
+    assert!(startup.pending_format.is_none());
+    assert_eq!(startup.pending_invalid_format.as_deref(), Some("ttl"));
+    assert!(!startup.direct_execute);
+}
+
+#[test]
+fn parse_criteria_rejects_non_positive_smiles_threshold() {
+    let mut params = QueryParams::new();
+    params.insert("smiles_threshold".into(), "0".into());
+
+    let crit = parse_criteria_from_params(&params);
+    assert_eq!(
+        crit.smiles_threshold,
+        SearchCriteria::default().smiles_threshold
+    );
+}
+
+#[test]
+fn parse_criteria_clamps_low_positive_smiles_threshold() {
+    let mut params = QueryParams::new();
+    params.insert("smiles_threshold".into(), "0.01".into());
+
+    let crit = parse_criteria_from_params(&params);
+    assert_eq!(crit.smiles_threshold, 0.05);
+}
+
+#[test]
+fn build_shareable_url_encodes_query_pairs() {
+    let mut params = QueryParams::new();
+    params.insert("taxon name".into(), "Gentiana lutea".into());
+    params.insert("structure".into(), "C=C".into());
+
+    let query = encode::build_query_string_for_tests(&params);
+    assert!(query.contains("taxon%20name=Gentiana%20lutea"));
+    assert!(query.contains("structure=C%3DC"));
+    assert!(query.contains('&'));
+}

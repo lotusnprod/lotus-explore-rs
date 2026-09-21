@@ -1,0 +1,133 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/lotus",
+  "crates/lotus-deploy",
+  "src",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97"
+license = "AGPL-3.0-only"
+
+[workspace.dependencies]
+console_log = "1.1"
+dioxus = { version = "=0.7.10", features = ["web"] }
+dioxus-i18n = "0.5"
+futures = "0.3"
+log = "0.4"
+reqwest = { version = "0.13", features = ["gzip"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = { version = "0.11", default-features = false }
+thiserror = "2.0"
+urlencoding = "2.1"
+gloo-timers = { version = "0.3", features = ["futures"] }
+js-sys = "0.3"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = [
+    "Blob", "BlobPropertyBag", "Document", "Element", "HtmlAnchorElement",
+    "HtmlCollection", "HtmlElement", "HtmlFormElement", "HtmlInputElement",
+    "HtmlTextAreaElement", "Location", "MediaQueryList", "Performance",
+    "Url", "Window", "File", "FileList", "FileReader",
+] }
+tempfile = "3.27"
+zip = "8.6"
+axum = "0.8"
+clap = { version = "4", features = ["derive"] }
+env_logger = "0.11"
+flate2 = "1"
+tokio = { version = "1", features = ["net", "time"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["compression-full", "request-id", "trace", "cors"] }
+tracing = "0.1"
+utoipa = "5"
+utoipa-swagger-ui = { version = "9", features = ["axum"] }
+
+[workspace.lints.clippy]
+cargo = { level = "warn", priority = -1 }
+dbg_macro = "deny"
+needless_lifetimes = "warn"
+nursery = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+todo = "warn"
+unimplemented = "warn"
+unnecessary_wraps = "allow"
+use_self = "allow"
+cargo_common_metadata = "warn"
+lint_groups_priority = "warn"
+missing_errors_doc = "warn"
+missing_panics_doc = "warn"
+module_name_repetitions = "warn"
+multiple_crate_versions = "allow"
+must_use_candidate = "warn"
+implicit_clone = "allow"
+similar_names = "warn"
+too_many_lines = "warn"
+wildcard_imports = "warn"
+cast_lossless = "warn"
+cast_possible_truncation = "warn"
+cast_possible_wrap = "warn"
+cast_precision_loss = "warn"
+cast_sign_loss = "warn"
+default_trait_access = "warn"
+derive_partial_eq_without_eq = "warn"
+doc_markdown = "warn"
+duration_suboptimal_units = "warn"
+explicit_iter_loop = "warn"
+float_cmp = "warn"
+fn_params_excessive_bools = "warn"
+format_push_string = "warn"
+future_not_send = "warn"
+if_not_else = "warn"
+ignored_unit_patterns = "warn"
+items_after_statements = "warn"
+large_types_passed_by_value = "warn"
+manual_let_else = "warn"
+manual_string_new = "warn"
+map_unwrap_or = "warn"
+match_same_arms = "warn"
+missing_const_for_fn = "warn"
+needless_pass_by_ref_mut = "warn"
+needless_pass_by_value = "warn"
+needless_raw_string_hashes = "warn"
+no_effect_underscore_binding = "warn"
+option_as_ref_cloned = "warn"
+option_if_let_else = "warn"
+or_fun_call = "warn"
+redundant_clone = "warn"
+redundant_closure_for_method_calls = "warn"
+redundant_pub_crate = "warn"
+semicolon_if_nothing_returned = "warn"
+significant_drop_tightening = "warn"
+single_match_else = "warn"
+single_option_map = "warn"
+struct_excessive_bools = "warn"
+struct_field_names = "warn"
+trivially_copy_pass_by_ref = "warn"
+unchecked_time_subtraction = "warn"
+uninlined_format_args = "warn"
+unnecessary_struct_initialization = "warn"
+unnested_or_patterns = "warn"
+unreadable_literal = "warn"
+unused_async = "warn"
+unused_self = "warn"
+
+[workspace.lints.rust]
+missing_debug_implementations = "warn"
+unsafe_code = "forbid"
+unused_must_use = "deny"
+dead_code = "allow"
+
+[profile.release]
+debug = false
+debug-assertions = false
+overflow-checks = false
+lto = "thin"
+codegen-units = 1
+
+[profile.release.package."*"]
+opt-level = 3

@@ -1,0 +1,55 @@
+# Netlify / Cloudflare Pages / compatible CDN — HTTP security & cache headers
+
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; script-src 'self' 'wasm-unsafe-eval' https://scripts.simpleanalyticscdn.com https://unpkg.com https://tools-static.wmflabs.org; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://qlever.dev https://query.wikidata.org https://www.wikidata.org https://www.simolecule.com https://idsm.elixir-czech.cz https://doi.org https://api.naturalproducts.net https://pubchem.ncbi.nlm.nih.gov https://api.semanticscholar.org https://api.openalex.org https://unpkg.com https://tools-static.wmflabs.org; worker-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types default
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+  Cross-Origin-Resource-Policy: same-origin
+  Link: </llms.txt>; rel="http://llmstxt.org/llms.txt"; type="text/plain"
+  Link: </sitemap.xml>; rel="sitemap"; type="application/xml"
+  Link: </robots.txt>; rel="robots"; type="text/plain"
+  Link: </.well-known/security.txt>; rel="security.txt"; type="text/plain"
+
+# Cache rules for Metadata & Manifest (Must revalidate to deliver updates immediately)
+/.well-known/*
+  Cache-Control: no-cache, must-revalidate
+
+/robots.txt
+  Cache-Control: no-cache, must-revalidate
+
+/sitemap.xml
+  Cache-Control: no-cache, must-revalidate
+
+/llms.txt
+  Cache-Control: no-cache, must-revalidate
+
+/site.webmanifest
+  Cache-Control: no-cache, must-revalidate
+
+/humans.txt
+  Cache-Control: no-cache, must-revalidate
+
+# Favicons & Icons
+/favicon*
+  Cache-Control: no-cache, must-revalidate
+
+/*icon*.png
+  Cache-Control: no-cache, must-revalidate
+
+# Heavy immutable binary assets
+/*.wasm
+  Cache-Control: public, max-age=31536000, immutable
+
+/wasm/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/**/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/index.html
+  No-Vary-Search: key-order, params, except=("locale")

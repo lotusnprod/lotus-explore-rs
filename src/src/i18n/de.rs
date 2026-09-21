@@ -1,0 +1,179 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
+//! German translation table.
+
+use crate::i18n::TextKey;
+
+pub const fn de_t(key: TextKey) -> &'static str {
+    match key {
+        TextKey::Share => "Teilen",
+        TextKey::Copy => "Kopieren",
+        TextKey::Copied => "Kopiert!",
+        TextKey::CopyToClipboard => "In die Zwischenablage kopieren",
+        TextKey::Notice => "Hinweis",
+        TextKey::Error => "Fehler",
+        TextKey::DismissError => "Fehler schließen",
+        TextKey::FiltersShow => "Filter anzeigen",
+        TextKey::FiltersHide => "Filter ausblenden",
+        TextKey::Language => "Sprache",
+        TextKey::PageTitle => "LOTUS Explorer für verknüpfte offene Daten",
+        TextKey::DarkModeToggle => "Thema hell/dunkel umschalten",
+        TextKey::DarkMode => "Dunkel",
+        TextKey::LightMode => "Hell",
+        TextKey::GoToHomepage => "Zur Startseite",
+        TextKey::SkipToResults => "Zum Hauptinhalt springen",
+        TextKey::PageSubtitle => {
+            "Erkunden Sie verknüpfte offene Daten: Naturstoffe, Organismen und wissenschaftliche Literatur."
+        }
+        TextKey::ResolvedTaxon => "Aufgelöstes Taxon",
+        TextKey::QueryHash => "Abfrage-Hash",
+        TextKey::ResultHash => "Ergebnis-Hash",
+        TextKey::CopyTaxonQid => "Taxon-QID kopieren",
+        TextKey::CopyFullQueryHash => "Vollständigen Abfrage-Hash kopieren (SHA-256)",
+        TextKey::CopyFullResultHash => "Vollständigen Ergebnis-Hash kopieren (SHA-256)",
+        TextKey::CopyShareableLink => "Freigabelink kopieren",
+        TextKey::Unique => "Eindeutig",
+        TextKey::LoadingTitle => "Wikidata wird über QLever abgefragt...",
+        TextKey::LoadingHint => "Große Ergebnismengen können einige Sekunden dauern.",
+        TextKey::LoadingResolvingTaxon => "Taxon wird aufgelöst...",
+        TextKey::LoadingFetchingResults => "Ergebnisse werden geladen...",
+        TextKey::LoadingProcessingResults => "Ergebnisanzahlen werden verarbeitet...",
+        TextKey::LoadingRendering => "Tabelle wird gerendert...",
+        TextKey::Retry => "Erneut versuchen",
+        TextKey::ErrorHintValidation => "Bitte Eingaben prüfen, dann erneut versuchen.",
+        TextKey::ErrorHintConfiguration => {
+            "Für diese Umgebung fehlt die erforderliche Dienstkonfiguration."
+        }
+        TextKey::ErrorHintNetwork => "Netzwerkproblem erkannt. Ein erneuter Versuch kann helfen.",
+        TextKey::ErrorHintRateLimit => {
+            "Ratenlimit beim vorgelagerten Dienst erreicht. Bitte etwa eine Minute warten und erneut versuchen."
+        }
+        TextKey::ErrorHintBadRequest => {
+            "Der Server hat die Anfrage abgelehnt. Bitte Suchparameter prüfen."
+        }
+        TextKey::ErrorHintParse => {
+            "Antwort konnte nicht verarbeitet werden. Erneut versuchen oder Abfrage verfeinern."
+        }
+        TextKey::ErrorHintUnknown => "Unerwarteter Fehler. Ein erneuter Versuch kann helfen.",
+        TextKey::WelcomeLeadA => {
+            "Diese Anwendung demonstriert die Leistungsfähigkeit verknüpfter offener Daten durch Verbindung natürlicher Produkte mit Organismen und wissenschaftlicher Literatur. "
+        }
+        TextKey::WelcomeLeadB => {
+            "Das Datenmodell verknüpft Verbindungen, Taxa und Referenzen—aus der "
+        }
+        TextKey::WelcomeLeadC => ", veröffentlicht als verknüpfte offene Daten auf ",
+        TextKey::WelcomeLeadD => " und abgefragt via SPARQL durch ",
+        TextKey::WelcomeLeadE => ".",
+        TextKey::ExampleGentiana => "Taxonname, Wikidata-QID oder * für alle Taxa eingeben",
+        TextKey::ExampleSmilesOnly => "SMILES oder Molfile in das Strukturfeld einfügen",
+        TextKey::ExampleQueryExecute => "Ausführen",
+        TextKey::ExampleQueryTaxon => "CSV herunterladen",
+        TextKey::ExampleQueryStructure => "JSON herunterladen",
+        TextKey::ExampleQueryAdvanced => "RDF herunterladen",
+        TextKey::ExampleApiUrls => "API-URL-Beispiele",
+        TextKey::LabelLanguagePolicy => {
+            "Beschriftungen werden zuerst aus 'mul' und dann 'en' aufgelöst, damit Ergebnisse vergleichbar bleiben."
+        }
+        TextKey::SearchFilters => "Suchfilter",
+        TextKey::Taxon => "Taxon",
+        TextKey::TaxonPlaceholder => "Gentiana lutea - Q34317 - *",
+        TextKey::TaxonHint => "Name, QID oder * für alle Taxa.",
+        TextKey::StructureSmilesOrMol => "SMILES oder Molfile",
+        TextKey::StructurePlaceholder => {
+            "c1ccccc1   - oder einen Molfile-Block (V2000 / V3000) einfügen"
+        }
+        TextKey::Substructure => "Substruktur",
+        TextKey::Similarity => "Ähnlichkeit",
+        TextKey::StructureSearchMode => "Struktursuchmodus",
+        TextKey::EditCopyDaylightSmiles => "Bearbeiten -> Als Daylight SMILES kopieren",
+        TextKey::CopyExtendedSmilesMol => "Als erweiterte SMILES / MOL V3000 kopieren",
+        TextKey::FormulaFilter => "Formelfilter",
+        TextKey::ExactFormula => "Summenformel",
+        TextKey::MinCount => "min",
+        TextKey::MaxCount => "max",
+        TextKey::MinCountAria => "Mindestanzahl",
+        TextKey::MaxCountAria => "Maximalanzahl",
+        TextKey::ElementRequirement => "Anforderung",
+        TextKey::ElementStateAllowed => "erlaubt",
+        TextKey::ElementStateRequired => "erforderlich",
+        TextKey::ElementStateExcluded => "ausgeschlossen",
+        TextKey::Search => "Suchen",
+        TextKey::Searching => "Suche...",
+        TextKey::MolecularMass => "Molekulare Masse (Da)",
+        TextKey::Min => "Min",
+        TextKey::Max => "Max",
+        TextKey::PublicationYear => "Publikationsjahr",
+        TextKey::YearFrom => "Von",
+        TextKey::YearTo => "Bis",
+        TextKey::RunSearch => "Suche starten",
+        TextKey::KetcherSummary => "Struktureditor (Ketcher)",
+        TextKey::KetcherHintA => {
+            "Sie möchten eine Struktur zeichnen oder suchen? Öffnen Sie den Tab "
+        }
+        TextKey::KetcherHintB => " und kopieren Sie dann mit ",
+        TextKey::KetcherHintC => " (oder ",
+        TextKey::KetcherHintD => {
+            ") und verwenden Sie den Inhalt im Strukturfeld der Registerkarte Suche."
+        }
+        TextKey::KetcherIframeTitle => "Ketcher-Struktureditor",
+        TextKey::KetcherClickToLoad => "Klicken Sie, um den Ketcher-Struktureditor zu laden.",
+        TextKey::KindNoteSmiles => "  Wird als einzeiliges SPARQL-Literal gesendet.",
+        TextKey::KindNoteMol2000 => {
+            "  Wird unverändert an SACHEM scoredSubstructureSearch weitergegeben."
+        }
+        TextKey::KindNoteMol3000 => {
+            "  Wird unverändert an SACHEM scoredSubstructureSearch weitergegeben (CTAB v3000)."
+        }
+        TextKey::DatasetStatistics => "Datensatz-Statistiken",
+        TextKey::DownloadResults => "Ergebnisse herunterladen",
+        TextKey::PreparingDownload => "Download wird vorbereitet...",
+        TextKey::StartingCsvDownload => "CSV-Download wird gestartet...",
+        TextKey::PreparingJsonDownload => "JSON-Download wird vorbereitet...",
+        TextKey::PreparingRdfDownload => "RDF-Download wird vorbereitet...",
+        TextKey::DownloadCsvTitle => "Ergebnisse als CSV herunterladen",
+        TextKey::DownloadCsvLabel => "CSV herunterladen",
+        TextKey::DownloadJsonTitle => "Ergebnisse als JSON herunterladen",
+        TextKey::DownloadJsonLabel => "JSON herunterladen",
+        TextKey::DownloadRdfTitle => "Ergebnisse als RDF (Turtle) herunterladen",
+        TextKey::DownloadRdfLabel => "RDF herunterladen",
+        TextKey::DownloadMetadataTitle => "Schema.org-Metadaten herunterladen (JSON-LD)",
+        TextKey::DownloadMetadataLabel => "Metadaten herunterladen",
+        TextKey::OpenInQlever => "In QLever öffnen",
+        TextKey::OpenInQleverTitle => "Diese Abfrage in der QLever-Weboberfläche öffnen",
+        TextKey::OpenInEndpoint => "In Endpoint öffnen",
+        TextKey::OpenInEndpointTitle => "Diese Abfrage in der SPARQL-Endpoint-Weboberfläche öffnen",
+        TextKey::NoResults => "Keine Ergebnisse. Bitte erweitern Sie die Suche.",
+        TextKey::StageTaxonSearch => "Taxon-Auflösung",
+        TextKey::StageResultsQuery => "Ergebnisabruf",
+        TextKey::DisplayCappedHint => {
+            "Aus Speichergründen werden auf diesem Gerät nur die ersten Zeilen angezeigt. Die Gesamtzahlen bleiben exakt."
+        }
+        TextKey::Structure => "Struktur",
+        TextKey::Compound => "Verbindung",
+        TextKey::Mass => "Masse",
+        TextKey::Formula => "Formel",
+        TextKey::TaxonCol => "Taxon",
+        TextKey::Reference => "Referenz",
+        TextKey::Year => "Jahr",
+        TextKey::FooterData => "Daten",
+        TextKey::FooterCitation => "Zitat",
+        TextKey::FooterCode => "Code",
+        TextKey::FooterArchive => "Archiv",
+        TextKey::FooterPrograms => "Programme",
+        TextKey::FooterLicense => "Lizenz",
+        TextKey::FooterForData => " für Daten ",
+        TextKey::FooterForCode => " für Code",
+        TextKey::TableTriplesAria => "Verbindung-Taxon-Referenz-Tripel",
+        TextKey::OpenFullSizeDepiction => "Darstellung in voller Größe öffnen",
+        TextKey::OpenInWikidata => "In Wikidata öffnen",
+        TextKey::OpenInScholia => "In Scholia öffnen",
+        TextKey::OpenInCompoundScholia => "Verbindung in Scholia öffnen",
+        TextKey::OpenInTaxonScholia => "Taxon in Scholia öffnen",
+        TextKey::OpenInReferenceScholia => "Referenz in Scholia öffnen",
+        TextKey::OpenDoi => "DOI öffnen",
+        TextKey::Statement => "Aussage",
+        TextKey::SparqlQuery => "SPARQL-Abfrage",
+        TextKey::CopySparqlQuery => "SPARQL-Abfrage kopieren",
+    }
+}

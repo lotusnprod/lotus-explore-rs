@@ -1,0 +1,263 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
+use super::bootstrap::{AppBootstrap, bootstrap_app};
+use super::view::AppView;
+use crate::app_state::AppState;
+use crate::components::data_curation_page::DataCurationPage;
+use crate::components::layout::footer::Footer;
+use crate::components::layout::header_meta::HeaderMetaSection;
+use crate::components::layout::notices::{ErrorNotice, ShareNotice, TaxonNotice};
+use crate::components::layout::page_header::PageHeader;
+use crate::components::results_viewport::ResultsViewport;
+use crate::components::welcome::WelcomeScreen;
+use crate::document_head::LotusDocumentHead;
+use crate::features::explore::{
+    ExploreInteractions, ExploreState, SearchTaskController, build_shareable_url,
+    initial_url_state, persist_dark_mode_query_param, persist_locale_query_param,
+    persist_view_query_param, use_download_dispatch_effect, use_startup_effect,
+};
+use crate::hooks::LocaleProvider;
+use crate::i18n::{Locale, TextKey, t};
+use crate::models::SearchCriteria;
+use crate::pages::DrawPage;
+use crate::services::AppServices;
+use crate::state::{
+    AppStateContext, FormCriteriaContext, ResultsContext, use_app_selector, use_app_state_context,
+    use_form_criteria_context, use_results_context,
+};
+use crate::ui::a11y_contract::{MAIN_PANEL_ID, PAGE_TITLE_ID, SKIP_TO_RESULTS_HREF};
+use dioxus::prelude::*;
+use std::sync::Arc;
+
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::JsCast;
+
+const fn locale_lang_tag(locale: Locale) -> &'static str {
+    match locale {
+        Locale::En => "en",
+        Locale::Fr => "fr",
+        Locale::De => "de",
+        Locale::It => "it",
+    }
+}
+
+fn resolve_startup_dark_mode(startup: &crate::features::explore::InitialUrlState) -> bool {
+    if startup.dark_mode {
+        return true;
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    let mut startup_dark_mode = false;
+    #[cfg(not(target_arch = "wasm32"))]
+    let startup_dark_mode = false;
+
+    #[cfg(target_arch = "wasm32")]
+    {
+        // Check localStorage first for persisted user preference
+        if let Some(win) = web_sys::window()
+            && let Ok(storage) = js_sys::Reflect::get(&win, &"localStorage".into())
+            && !storage.is_undefined()
+            && let Ok(func) = js_sys::Reflect::get(&storage, &"getItem".into())
+            && let Some(get_item) = func.dyn_ref::<js_sys::Function>()
+            && let Ok(value) = get_item.call1(&storage, &"dark_mode".into())
+            && let Some(value_str) = value.as_string()
+        {
+            startup_dark_mode = value_str == "true";
+        }
+
+        let params = crate::features::explore::url_state::read_url_query_params();
+        if let Some(raw) = params.get("dark_mode") {
+            return crate::features::explore::url_state::is_true_flag(raw);
+        }
+
+        if let Some(win) = web_sys::window()
+            && let Ok(media) = win.match_media("(prefers-color-scheme: dark)")
+            && let Some(media_query) = media
+        {
+            return media_query.matches();
+        }
+    }
+
+    startup_dark_mode
+}
+
+#[component]
+pub fn AppRoot() -> Element {
+    let startup_url_state = initial_url_state();
+    let startup_dark_mode = resolve_startup_dark_mode(&startup_url_state);
+    let AppBootstrap {
+        app_state: initial_app_state,
+        criteria: initial_criteria,
+        criteria_baseline: initial_criteria_baseline,
+        locale: initial_locale,
+        explore: initial_explore,
+    } = bootstrap_app(startup_url_state);
+
+    let app_state: Signal<AppState> = use_signal(move || AppState {
+        dark_mode: startup_dark_mode,
+        ..initial_app_state.clone()
+    });
+    let criteria: Signal<SearchCriteria> = use_signal(move || initial_criteria);
+    let criteria_baseline: Signal<SearchCriteria> = use_signal(move || initial_criteria_baseline);
+    let locale: Signal<Locale> = use_signal(move || initial_locale);
+    let explore: Signal<ExploreState> = use_signal(move || initial_explore);
+
+    let services = use_context_provider(AppServices::new);
+    let repo = services.repository();
+    let _app_state_ctx = use_context_provider(move || AppStateContext::new(app_state));
+    let form_ctx =
+        use_context_provider(move || FormCriteriaContext::new(criteria, criteria_baseline));
+    let _results_ctx = use_context_provider(move || ResultsContext::new(explore));
+    let search_task_controller = use_context_provider(SearchTaskController::new);
+    let _explore_interactions = use_context_provider({
+        let tc = search_task_controller;
+        move || ExploreInteractions::new(criteria, form_ctx, explore, tc, repo)
+    });
+
+    rsx! {
+        LocaleProvider { locale,
+            AppRuntimeEffects {
+                app_state,
+                explore,
+                criteria,
+            }
+            ShellScaffold { lang: locale_lang_tag(*locale.read()).to_string() }
+        }
+    }
+}
+
+#[component]
+fn AppRuntimeEffects(
+    app_state: Signal<AppState>,
+    explore: Signal<ExploreState>,
+    criteria: Signal<SearchCriteria>,
+) -> Element {
+    let locale = crate::hooks::use_locale_signal();
+    let search_task_controller = use_context::<SearchTaskController>();
+    let repo = use_context::<AppServices>().repository();
+
+    use_effect(move || persist_locale_query_param(*locale.read()));
+    use_effect(move || persist_view_query_param(app_state.read().view));
+    use_effect(move || persist_dark_mode_query_param(app_state.read().dark_mode));
+
+    // Sync <html lang> via web_sys directly — doc.eval() is blocked by
+    // the site's Trusted Types CSP policy, so the lang attribute set by
+    // the inline bootstrap script (which runs once at page load) is never
+    // updated when the user selects a different language.
+    use_effect(move || {
+        #[cfg(target_arch = "wasm32")]
+        {
+            let lang = locale_lang_tag(*locale.read());
+            if let Some(doc) = web_sys::window().and_then(|w| w.document())
+                && let Some(html) = doc.document_element()
+            {
+                let _ = html.set_attribute("lang", lang);
+            }
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            let _ = locale.read();
+        }
+    });
+
+    // Sync data-theme="dark|light" on <html> based on dark_mode state.
+    // Uses the app_state value which is persisted to localStorage via the toggle.
+    use_effect(move || {
+        let dark_mode = app_state.read().dark_mode;
+        #[cfg(target_arch = "wasm32")]
+        {
+            if let Some(doc) = web_sys::window().and_then(|w| w.document())
+                && let Some(html) = doc.document_element()
+            {
+                if dark_mode {
+                    let _ = html.set_attribute("data-theme", "dark");
+                } else {
+                    let _ = html.set_attribute("data-theme", "light");
+                }
+            }
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            let _ = dark_mode;
+        }
+    });
+
+    use_startup_effect(app_state, explore, criteria, search_task_controller, repo);
+    use_download_dispatch_effect(app_state, explore);
+
+    rsx! {}
+}
+
+#[component]
+fn ShellScaffold(lang: String) -> Element {
+    let locale = crate::hooks::use_locale();
+    let app_state = use_app_state_context().state;
+    let current_view = *use_app_selector(app_state, |state| state.view).read();
+    rsx! {
+        LotusDocumentHead { lang }
+        a {
+            href: SKIP_TO_RESULTS_HREF,
+            class: "skip-link",
+            "{t(locale, TextKey::SkipToResults)}"
+        }
+        div {
+            class: "app-shell",
+            div {
+                class: "app-layout",
+                main {
+                    id: MAIN_PANEL_ID,
+                    class: "main-content min-w-0 w-full max-w-none",
+                    tabindex: "-1",
+                    aria_labelledby: PAGE_TITLE_ID,
+                    PageHeader {}
+                    RouteContent { current_view }
+                }
+            }
+            footer {
+                class: "flex flex-col shrink-0 w-full bg-panel border-t border-border min-h-[80px]",
+                div {
+                    class: "w-full max-w-[1600px] mx-auto px-5 pt-[3px] pb-[6px] box-border lg:px-8",
+                    Footer {}
+                }
+            }
+        }
+    }
+}
+
+#[component]
+fn RouteContent(current_view: AppView) -> Element {
+    match current_view {
+        AppView::Explore => rsx! { ExplorePage {} },
+        AppView::Curation => rsx! { DataCurationPage {} },
+        AppView::Draw => rsx! { DrawPage {} },
+    }
+}
+
+#[component]
+fn ExplorePage() -> Element {
+    let criteria = use_form_criteria_context().criteria;
+    let searched_once = use_results_context().explore.read().lifecycle.searched_once;
+    let shareable_url =
+        use_memo(move || build_shareable_url(&criteria.read()).map(Arc::<str>::from));
+
+    rsx! {
+        TaxonNotice {}
+        ErrorNotice {}
+        WelcomeScreen {}
+        SearchPanelInline {}
+        if searched_once {
+            ShareNotice { shareable_url }
+            HeaderMetaSection {}
+        }
+        ResultsViewport {}
+    }
+}
+
+#[component]
+fn SearchPanelInline() -> Element {
+    crate::components::search_panel::SearchPanel()
+}
+
+#[cfg(test)]
+mod tests {}

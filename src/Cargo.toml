@@ -1,0 +1,71 @@
+[package]
+name = "lotus-explore-rs"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.97"
+description = "LOTUS Knowledge Explorer — natural product occurrence explorer"
+license = "AGPL-3.0-only"
+keywords = ["dioxus", "lotus", "natural-products", "wasm", "wikidata"]
+categories = ["science", "wasm", "web-programming"]
+build = "build.rs"
+publish = false
+
+[package.metadata.dioxus]
+wasm-opt = 4
+
+[[bin]]
+name = "lotus-explore-rs"
+path = "src/main.rs"
+
+[dependencies]
+console_log = { workspace = true }
+dioxus = { workspace = true }
+dioxus-i18n = { workspace = true }
+futures = { workspace = true }
+log = { workspace = true }
+lotus = { path = "../crates/lotus", version = "0.1" }
+reqwest = { workspace = true, features = ["json"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+urlencoding = { workspace = true }
+
+[dev-dependencies]
+tower = { workspace = true }
+
+[build-dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+axum = { workspace = true, optional = true }
+clap = { workspace = true, features = ["env"], optional = true }
+env_logger = { workspace = true, optional = true }
+flate2 = { workspace = true, optional = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal", "sync"], optional = true }
+tower-http = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true }
+utoipa = { workspace = true, optional = true }
+utoipa-swagger-ui = { workspace = true, optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+gloo-timers = { workspace = true }
+js-sys = { workspace = true }
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
+web-sys = { workspace = true }
+
+[features]
+server = [
+  "dep:axum",
+  "dep:clap",
+  "dep:env_logger",
+  "dep:flate2",
+  "dep:tokio",
+  "dep:tower-http",
+  "dep:tracing",
+  "dep:utoipa",
+  "dep:utoipa-swagger-ui",
+]

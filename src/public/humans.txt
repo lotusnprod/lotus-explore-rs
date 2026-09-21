@@ -1,0 +1,37 @@
+/* Humans are welcome — https://humanstxt.org/ */
+/* Reference: https://specification.website/spec/foundations/ */
+
+/* TEAM */
+  Name: Lotus Initiative contributors
+  GitHub: https://github.com/lotusnprod
+  Location: Switzerland
+  Email: Contact via https://github.com/lotusnprod/lotus-explore-rs/issues
+
+/* THANKS */
+  LOTUS initiative — https://lotusnprod.github.io
+  Wikidata community — https://wikidata.org/
+  Dioxus framework — https://dioxuslabs.com/
+  RDKit.js — https://www.rdkitjs.com/
+  Citation.js — https://citation.js.org/
+
+/* SITE */
+  Product: LOTUS Explore-rs
+  Short name: LOTUS-rs
+  Description: Explore LOTUS with taxon filters, structure search, and Wikidata curation workflows.
+  Language: English with French, German, Italian localizations
+  Standards: HTML5, CSS3, WebAssembly, WCAG 2.1 AA, JSON-LD
+  Components: Rust + Dioxus compiled to WASM
+  Infrastructure: GitHub Pages (https://lotusnprod.github.io/lotus-explore-rs/)
+  Repository: https://github.com/lotusnprod/lotus-explore-rs
+  Search inputs: taxon filters, SMILES, Molfile V2000/V3000
+  Curation: TSV import, QuickStatements generation, structure resolution lookup
+  APIs: Wikidata SPARQL, QLever, DOI, RDKit.js, Citation.js, Ketcher
+  License (app): AGPL-3.0 — https://www.gnu.org/licenses/agpl-3.0.html
+  License (data): CC0 1.0 — https://creativecommons.org/publicdomain/zero/1.0/
+
+/* SPECIFICATION COMPLIANCE */
+  SEO: robots.txt, sitemap.xml, structured data, hreflang
+  Accessibility: semantic HTML, ARIA, keyboard navigation, visible focus
+  Security: HTTPS, CSP, HSTS, security.txt, Permissions-Policy
+  Agent Readiness: llms.txt, agent-skills, API catalog, Link headers
+  Resilience: web app manifest, graceful error handling, offline detection

@@ -1,0 +1,40 @@
+{
+  "apis": [
+    {
+      "name": "Wikidata SPARQL Endpoint",
+      "description": "Query the LOTUS dataset using SPARQL",
+      "url": "https://query.wikidata.org/",
+      "protocol": "SPARQL",
+      "type": "read-only",
+      "documentation": "https://query.wikidata.org/"
+    },
+    {
+      "name": "QLever SPARQL Endpoint",
+      "description": "Fast SPARQL queries over Wikidata with LOTUS data",
+      "url": "https://qlever.cs.uni-freiburg.de/wikidata",
+      "protocol": "SPARQL",
+      "type": "read-only",
+      "documentation": "https://qlever.cs.uni-freiburg.de/"
+    },
+    {
+      "name": "DOI Metadata Service",
+      "description": "Retrieve publication metadata by DOI",
+      "url": "https://doi.org/",
+      "protocol": "HTTP",
+      "accepts": ["text/plain", "application/json", "application/vnd.citationstyles.csl+json"],
+      "type": "read-only",
+      "documentation": "https://www.doi.org/"
+    },
+    {
+      "name": "Wikidata",
+      "description": "Main linked open data repository",
+      "url": "https://www.wikidata.org/",
+      "protocol": "REST",
+      "type": "read-write",
+      "documentation": "https://www.wikidata.org/wiki/Wikidata:Data_access"
+    }
+  ],
+  "description": "LOTUS Explore-rs integrates with multiple external data sources. This catalog lists the primary APIs used.",
+  "last_updated": "2026-06-22",
+  "contact": "https://github.com/lotusnprod/lotus-explore-rs/issues"
+}

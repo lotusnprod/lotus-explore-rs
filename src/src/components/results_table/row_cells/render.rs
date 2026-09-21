@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
+//! Row-level render orchestration.
+
+use crate::i18n::Locale;
+use crate::models::CompoundEntry;
+use dioxus::prelude::*;
+use std::sync::Arc;
+
+use super::PreparedRow;
+use super::cells::{
+    compound_cell, formula_cell, mass_cell, reference_cell, structure_cell, taxon_cell, year_cell,
+};
+use super::row_text::RowText;
+
+pub(in crate::components::results_table) use super::row_text::row_text;
+
+#[component]
+pub(in crate::components::results_table) fn ResultsRowsWindow(
+    locale: Locale,
+    text: RowText,
+    rows: Arc<[CompoundEntry]>,
+    prepared_rows: Arc<[PreparedRow]>,
+    order: Arc<[u32]>,
+    start_row: usize,
+    end_row: usize,
+) -> Element {
+    let start = start_row.min(order.len());
+    let end = end_row.min(order.len()).max(start);
+    rsx! {
+        for i in order[start..end].iter().copied() {
+            {row_view(locale, text, &rows[i as usize], &prepared_rows[i as usize], i)}
+        }
+    }
+}
+
+fn row_view(
+    locale: Locale,
+    text: RowText,
+    entry: &CompoundEntry,
+    prepared: &PreparedRow,
+    row_key: u32,
+) -> Element {
+    let compound_qid = entry.compound_qid.as_ref();
+    let taxon_qid = entry.taxon_qid.as_ref();
+    let reference_qid = entry.reference_qid.as_ref();
+    let name = prepared.display_name.as_ref();
+    rsx! {
+        tr {
+            key: "{row_key}",
+            class: "data-row border-b border-panel-border hover:bg-surface/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2 [contain:layout_paint]",
+            tabindex: "0",
+            {structure_cell(locale, text, prepared.depict_url.clone(), name)}
+            {compound_cell(locale, text, entry, prepared, name, compound_qid)}
+            {mass_cell(entry.mass)}
+            {formula_cell(entry.formula.as_deref())}
+            {taxon_cell(locale, text, entry, taxon_qid)}
+            {reference_cell(locale, text, entry, prepared, reference_qid)}
+            {year_cell(entry.pub_year)}
+        }
+    }
+}

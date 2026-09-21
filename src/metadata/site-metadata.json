@@ -1,0 +1,110 @@
+{
+  "site": {
+    "name": "LOTUS Explore-rs",
+    "short_name": "LOTUS-rs",
+    "description": "Explore LOTUS with taxon filters, structure search, and Wikidata curation workflows.",
+    "base_url": "https://lotusnprod.github.io/lotus-explore-rs/",
+    "repo_url": "https://github.com/lotusnprod/lotus-explore-rs",
+    "issues_url": "https://github.com/lotusnprod/lotus-explore-rs/issues",
+    "discussions_url": "https://github.com/lotusnprod/lotus-explore-rs/discussions",
+    "lotus_home_url": "https://lotusnprod.github.io",
+    "paper_doi_url": "https://doi.org/10.7554/eLife.70780",
+    "paper_landing_url": "https://elifesciences.org/articles/70780",
+    "bibtex_path": "/public/docs/references.bib",
+    "app_license_url": "https://www.gnu.org/licenses/agpl-3.0.html",
+    "data_license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "security_contact_url": "https://github.com/lotusnprod/lotus-explore-rs/security/advisories/new",
+    "security_policy_url": "https://github.com/lotusnprod/lotus-explore-rs/blob/main/SECURITY.md",
+    "source_path": "https://github.com/lotusnprod/lotus-explore-rs"
+  },
+  "manifest": {
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#f6f8fb",
+    "theme_color": "#0b5cab",
+    "lang": "en",
+    "dir": "ltr",
+    "screenshots": [],
+    "categories": ["science", "education", "research"],
+    "prefer_related_applications": false,
+    "icons": [
+      {
+        "src": "/favicon.ico",
+        "sizes": "16x16",
+        "type": "image/x-icon",
+        "purpose": "any"
+      },
+      {
+        "src": "/favicon.ico",
+        "sizes": "32x32",
+        "type": "image/x-icon",
+        "purpose": "any"
+      },
+      {
+        "src": "/apple-touch-icon.png",
+        "sizes": "180x180",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "/favicon-16x16.png",
+        "sizes": "16x16",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "/favicon-32x32.png",
+        "sizes": "32x32",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "/android-chrome-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "/android-chrome-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "/favicon.svg",
+        "sizes": "any",
+        "type": "image/svg+xml",
+        "purpose": "any"
+      },
+      {
+        "src": "/favicon.svg",
+        "sizes": "any",
+        "type": "image/svg+xml",
+        "purpose": "maskable"
+      }
+    ],
+    "shortcuts": [
+      {
+        "name": "Search Compounds",
+        "short_name": "Search",
+        "description": "Search for natural product compounds",
+        "url": "./?tab=search",
+        "icons": [
+          {
+            "src": "/favicon.ico",
+            "sizes": "16x16",
+            "type": "image/x-icon",
+            "purpose": "any"
+          },
+          {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+          }
+        ]
+      }
+    ]
+  }
+}

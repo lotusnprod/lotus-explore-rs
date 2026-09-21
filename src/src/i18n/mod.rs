@@ -1,0 +1,256 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
+//! Minimal i18n helpers for user-facing labels and status text.
+//!
+//! Keep this intentionally small: one locale switch and a couple of
+//! localized labels. It is easy to extend without introducing a full
+//! translation framework.
+//!
+//! Two main systems:
+//! - [`TextKey`] — Enumerated UI labels (returns `&'static str`)
+//!
+//! Translation tables live in per-locale submodules:
+//! - [`en`] — English
+//! - [`fr`] — French (with accents)
+//! - [`de`] — German (with umlauts)
+//! - [`it`] — Italian (with accents)
+
+mod curation;
+pub use curation::*;
+
+mod de;
+mod en;
+mod fr;
+mod it;
+
+use dioxus_i18n::unic_langid::LanguageIdentifier;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Locale {
+    En,
+    Fr,
+    De,
+    It,
+}
+
+impl Locale {
+    fn from_lang_tag(lang_tag: &str) -> Option<Self> {
+        let identifier = lang_tag.trim().parse::<LanguageIdentifier>().ok()?;
+        let normalized = identifier.to_string().to_ascii_lowercase();
+        if normalized.starts_with("fr") {
+            return Some(Self::Fr);
+        }
+        if normalized.starts_with("de") {
+            return Some(Self::De);
+        }
+        if normalized.starts_with("it") {
+            return Some(Self::It);
+        }
+        if normalized.starts_with("en") {
+            return Some(Self::En);
+        }
+        None
+    }
+
+    pub fn detect(lang_hint: &str) -> Self {
+        if let Some(locale) = Self::from_lang_tag(lang_hint) {
+            return locale;
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
+            if let Some(win) = web_sys::window() {
+                let win_js = wasm_bindgen::JsValue::from(win);
+                if let Ok(nav) =
+                    js_sys::Reflect::get(&win_js, &wasm_bindgen::JsValue::from_str("navigator"))
+                    && let Ok(lang) =
+                        js_sys::Reflect::get(&nav, &wasm_bindgen::JsValue::from_str("language"))
+                    && let Some(code) = lang.as_string()
+                    && let Some(locale) = Self::from_lang_tag(&code)
+                {
+                    return locale;
+                }
+            }
+        }
+
+        Self::En
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CountNoun {
+    Compound,
+    Taxon,
+    Reference,
+    Entry,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TextKey {
+    // Generic/meta
+    Share,
+    Copy,
+    Copied,
+    CopyToClipboard,
+    Notice,
+    Error,
+    DismissError,
+    FiltersShow,
+    FiltersHide,
+    Language,
+    // Header
+    PageTitle,
+    DarkModeToggle,
+    DarkMode,
+    LightMode,
+    GoToHomepage,
+    SkipToResults,
+    PageSubtitle,
+    ResolvedTaxon,
+    QueryHash,
+    ResultHash,
+    CopyTaxonQid,
+    CopyFullQueryHash,
+    CopyFullResultHash,
+    CopyShareableLink,
+    Unique,
+    // Loading/welcome
+    LoadingTitle,
+    LoadingHint,
+    LoadingResolvingTaxon,
+    LoadingFetchingResults,
+    LoadingProcessingResults,
+    LoadingRendering,
+    Retry,
+    ErrorHintValidation,
+    ErrorHintConfiguration,
+    ErrorHintNetwork,
+    ErrorHintRateLimit,
+    ErrorHintBadRequest,
+    ErrorHintParse,
+    ErrorHintUnknown,
+    WelcomeLeadA,
+    WelcomeLeadB,
+    WelcomeLeadC,
+    WelcomeLeadD,
+    WelcomeLeadE,
+    ExampleGentiana,
+    ExampleSmilesOnly,
+    ExampleQueryExecute,
+    ExampleApiUrls,
+    ExampleQueryTaxon,
+    ExampleQueryStructure,
+    ExampleQueryAdvanced,
+    LabelLanguagePolicy,
+    // Search panel
+    SearchFilters,
+    Taxon,
+    TaxonPlaceholder,
+    TaxonHint,
+    StructureSmilesOrMol,
+    StructurePlaceholder,
+    Substructure,
+    Similarity,
+    StructureSearchMode,
+    EditCopyDaylightSmiles,
+    CopyExtendedSmilesMol,
+    FormulaFilter,
+    ExactFormula,
+    MinCount,
+    MaxCount,
+    MinCountAria,
+    MaxCountAria,
+    ElementRequirement,
+    ElementStateAllowed,
+    ElementStateRequired,
+    ElementStateExcluded,
+    Search,
+    Searching,
+    MolecularMass,
+    Min,
+    Max,
+    PublicationYear,
+    YearFrom,
+    YearTo,
+    RunSearch,
+    KetcherSummary,
+    KetcherHintA,
+    KetcherHintB,
+    KetcherHintC,
+    KetcherHintD,
+    KetcherIframeTitle,
+    KetcherClickToLoad,
+    KindNoteSmiles,
+    KindNoteMol2000,
+    KindNoteMol3000,
+    // Error stage labels (used in transport error messages)
+    StageTaxonSearch,
+    StageResultsQuery,
+    // Table/export
+    DatasetStatistics,
+    DownloadResults,
+    PreparingDownload,
+    StartingCsvDownload,
+    PreparingJsonDownload,
+    PreparingRdfDownload,
+    DownloadCsvTitle,
+    DownloadCsvLabel,
+    DownloadJsonTitle,
+    DownloadJsonLabel,
+    DownloadRdfTitle,
+    DownloadRdfLabel,
+    DownloadMetadataTitle,
+    DownloadMetadataLabel,
+    OpenInQlever,
+    OpenInQleverTitle,
+    OpenInEndpoint,
+    OpenInEndpointTitle,
+    NoResults,
+    DisplayCappedHint,
+    // Columns
+    Structure,
+    Compound,
+    Mass,
+    Formula,
+    TaxonCol,
+    Reference,
+    Year,
+    // Footer
+    FooterData,
+    FooterCitation,
+    FooterCode,
+    FooterArchive,
+    FooterPrograms,
+    FooterLicense,
+    FooterForData,
+    FooterForCode,
+    TableTriplesAria,
+    OpenFullSizeDepiction,
+    OpenInWikidata,
+    OpenInScholia,
+    OpenInCompoundScholia,
+    OpenInTaxonScholia,
+    OpenInReferenceScholia,
+    OpenDoi,
+    Statement,
+    SparqlQuery,
+    CopySparqlQuery,
+}
+
+/// Resolve a [`TextKey`] for the given [`Locale`].
+///
+/// Delegates to the per-locale submodule functions so each translation table
+/// lives in its own file and can be edited independently.
+pub fn t(locale: Locale, key: TextKey) -> &'static str {
+    match locale {
+        Locale::En => en::en_t(key),
+        Locale::Fr => fr::fr_t(key),
+        Locale::De => de::de_t(key),
+        Locale::It => it::it_t(key),
+    }
+}
+
+mod helpers;
+
+pub use helpers::*;

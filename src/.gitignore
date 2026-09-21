@@ -1,0 +1,11 @@
+# Ketcher assets (downloaded by fetch-ketcher)
+public/assets/ketcher/
+
+# Build artifacts
+target/
+
+# Cargo
+Cargo.lock
+
+# Node
+node_modules/

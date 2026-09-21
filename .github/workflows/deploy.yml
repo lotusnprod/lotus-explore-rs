@@ -1,0 +1,91 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app: lotus-explore-rs
+            path: "/${REPONAME}"
+            dir: "src"
+            pkg: "lotus-explore-rs"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6
+        with:
+          key: ${{ matrix.app }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ matrix.app }}-cargo-
+
+      - uses: cargo-bins/cargo-binstall@e00d2c94cc0067b77737821097a62d91c0301baa
+
+      - name: Install dioxus-cli
+        run: cargo binstall dioxus-cli --version 0.7.10 --locked --no-confirm
+
+      - name: Fetch Ketcher
+        run: cargo run --release -p lotus-deploy --bin fetch-ketcher
+        working-directory: ${{ matrix.dir }}
+
+      - name: Build App
+        run: |
+          REPONAME="${GITHUB_REPOSITORY#*/}"
+          EVAL_PATH=$(eval echo "${{ matrix.path }}")
+          dx build --release --platform web --debug-symbols false --base-path "$EVAL_PATH" --package ${{ matrix.pkg }}
+        working-directory: ${{ matrix.dir }}
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: app-${{ matrix.app }}
+          path: target/dx/${{ matrix.pkg }}/release/web/public
+
+  deploy:
+    needs: build-app
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          path: _site
+
+      - name: Structure _site directory
+        run: |
+          mkdir -p _final_site
+
+          # Move base index contents to root of final site directory
+          cp -r _site/app-index/* _final_site/
+          rm -rf _site/app-index
+
+          # Move remaining apps to subdirectories
+          for dir in _site/app-*; do
+            app_name="${dir#_site/app-}"
+            mv "$dir" "_final_site/$app_name"
+          done
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+        with:
+          path: _final_site
+
+      - uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346
+        id: deployment

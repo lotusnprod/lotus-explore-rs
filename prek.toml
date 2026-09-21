@@ -1,0 +1,57 @@
+# Configuration file for `prek`, a git hook framework written in Rust.
+# See https://prek.j178.dev for more information.
+#:schema https://www.schemastore.org/prek.json
+#
+# All Rust check recipes are defined once in the `justfile`; these hooks delegate
+# to them (`just <recipe>`) to keep a single source of truth and avoid the
+# drift that happened when prek and justfile each hardcoded the cargo flags.
+
+default_stages = ["pre-commit"]
+fail_fast = false
+
+# ── Pre-commit hooks: fast, block every commit ────────────────────────────────
+
+[[repos]]
+repo = "https://github.com/pre-commit/pre-commit-hooks"
+rev = "v6.0.0"
+hooks = [{ id = "check-added-large-files", args = ["--maxkb=2048"] }, { id = "check-case-conflict" }, { id = "check-merge-conflict" }, { id = "check-symlinks" }, { id = "check-executables-have-shebangs" }, { id = "check-shebang-scripts-are-executable" }, { id = "check-toml" }, { id = "check-json" }, { id = "check-yaml" }, { id = "end-of-file-fixer", exclude = "(public/assets/)" }, { id = "mixed-line-ending" }, { id = "trailing-whitespace", exclude = "(public/assets/)" }]
+
+[[repos]]
+repo = "https://github.com/crate-ci/typos"
+rev = "v1"
+hooks = [{ id = "typos" }]
+
+[[repos]]
+repo = "local"
+hooks = [
+  # ── Fast Rust checks (pre-commit) — delegate to justfile ───────────────────
+  { id = "cargo-fmt-check", name = "cargo-fmt-check", language = "system", entry = "just fmt", pass_filenames = false, always_run = true, files = "(?!.*public/assets/).*$" },
+  { id = "cargo-check", name = "cargo-check", language = "system", entry = "just check", pass_filenames = false, always_run = true, files = "(?!.*public/assets/).*$" },
+  { id = "cargo-clippy", name = "cargo-clippy", language = "system", entry = "just clippy", pass_filenames = false, always_run = true, files = "(?!.*public/assets/).*$" },
+
+  # ── Heavy Rust checks (pre-push only) — delegate to justfile ───────────────
+  { id = "cargo-test", name = "cargo-test", language = "system", entry = "just test", pass_filenames = false, always_run = true, stages = ["pre-push"] },
+  # Per-app WASM checks (NOT `--workspace --target wasm32`, which fails on
+  # crates/upload's wasm-incompatible unit patterns in download.rs).
+  { id = "cargo-check-wasm", name = "cargo-check-wasm", language = "system", entry = "just wasm", pass_filenames = false, always_run = true, stages = ["pre-push"] },
+  { id = "cargo-doc", name = "cargo-doc", language = "system", entry = "just doc", pass_filenames = false, always_run = true, stages = ["pre-push"] },
+
+  # ── Supply chain (pre-push only) ───────────────────────────────────────────
+  { id = "cargo-machete", name = "cargo-machete", language = "system", entry = "just machete", pass_filenames = false, always_run = true, stages = ["pre-push"] },
+  { id = "cargo-audit", name = "cargo-audit", language = "system", entry = "just audit", pass_filenames = false, always_run = true, stages = ["pre-push"] },
+  { id = "cargo-deny", name = "cargo-deny", language = "system", entry = "just deny", pass_filenames = false, always_run = true, stages = ["pre-push"] },
+  { id = "cargo-outdated", name = "cargo-outdated", language = "system", entry = "just outdated", pass_filenames = false, always_run = true, stages = ["pre-push"] },
+
+  # ── README verification (pre-push only) ────────────────────────────────────
+  { id = "cargo-readme-panache", name = "cargo-readme-panache", language = "system", entry = "just readme", pass_filenames = false, always_run = true, stages = ["pre-push"] },
+]
+
+[[repos]]
+repo = "https://github.com/tombi-toml/tombi-pre-commit"
+rev = "v1.5.5"
+hooks = [{ id = "tombi-format" }, { id = "tombi-lint" }]
+
+[[repos]]
+repo = "https://github.com/jolars/panache-pre-commit"
+rev = "v3.11.0"
+hooks = [{ id = "panache-format" }, { id = "panache-lint" }]

@@ -1,0 +1,285 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
+//! Data Transfer Objects (DTOs) for the LOTUS API client.
+//!
+//! Defines the serializable request payloads sent to the backend and the
+//! deserializable response shapes received. Internal domain types are kept
+//! separate; conversion happens at the edge via [`From`] implementations.
+
+use crate::{
+    models::{CompoundEntry, DatasetStats, ElementState, SearchCriteria, SmilesSearchType},
+    queries,
+};
+use lotus::models::WIKIDATA_STATEMENT_BASE;
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "lowercase")]
+enum ApiSmilesSearchType {
+    Substructure,
+    Similarity,
+}
+
+impl From<SmilesSearchType> for ApiSmilesSearchType {
+    fn from(value: SmilesSearchType) -> Self {
+        match value {
+            SmilesSearchType::Substructure => Self::Substructure,
+            SmilesSearchType::Similarity => Self::Similarity,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "lowercase")]
+enum ApiElementState {
+    Allowed,
+    Required,
+    Excluded,
+}
+
+impl From<ElementState> for ApiElementState {
+    fn from(value: ElementState) -> Self {
+        match value {
+            ElementState::Allowed => Self::Allowed,
+            ElementState::Required => Self::Required,
+            ElementState::Excluded => Self::Excluded,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct SearchRequest {
+    taxon: Option<String>,
+    smiles: Option<String>,
+    smiles_search_type: Option<ApiSmilesSearchType>,
+    smiles_threshold: Option<f64>,
+    mass_min: Option<f64>,
+    mass_max: Option<f64>,
+    year_min: Option<u16>,
+    year_max: Option<u16>,
+    formula_exact: Option<String>,
+    c_min: Option<u16>,
+    c_max: Option<u16>,
+    h_min: Option<u16>,
+    h_max: Option<u16>,
+    n_min: Option<u16>,
+    n_max: Option<u16>,
+    o_min: Option<u16>,
+    o_max: Option<u16>,
+    p_min: Option<u16>,
+    p_max: Option<u16>,
+    s_min: Option<u16>,
+    s_max: Option<u16>,
+    f_state: Option<ApiElementState>,
+    cl_state: Option<ApiElementState>,
+    br_state: Option<ApiElementState>,
+    i_state: Option<ApiElementState>,
+    limit: Option<usize>,
+    include_counts: Option<bool>,
+}
+
+impl SearchRequest {
+    pub fn from_criteria(criteria: &SearchCriteria, limit: usize, include_counts: bool) -> Self {
+        let taxon = criteria.taxon.trim();
+        let smiles = normalize_structure_for_api(&criteria.smiles);
+        let has_smiles = !smiles.is_empty();
+        let formula_exact = criteria.formula_exact.trim();
+
+        Self {
+            taxon: (!taxon.is_empty()).then(|| taxon.to_string()),
+            smiles: has_smiles.then_some(smiles),
+            smiles_search_type: has_smiles.then_some(criteria.smiles_search_type.into()),
+            smiles_threshold: (criteria.smiles_search_type == SmilesSearchType::Similarity
+                && has_smiles)
+                .then_some(criteria.smiles_threshold),
+            mass_min: criteria.has_mass_filter().then_some(criteria.mass_min),
+            mass_max: criteria.has_mass_filter().then_some(criteria.mass_max),
+            year_min: criteria.has_year_filter().then_some(criteria.year_min),
+            year_max: criteria.has_year_filter().then_some(criteria.year_max),
+            formula_exact: (!formula_exact.is_empty()).then(|| formula_exact.to_string()),
+            c_min: criteria.formula_enabled.then_some(criteria.c_min),
+            c_max: criteria.formula_enabled.then_some(criteria.c_max),
+            h_min: criteria.formula_enabled.then_some(criteria.h_min),
+            h_max: criteria.formula_enabled.then_some(criteria.h_max),
+            n_min: criteria.formula_enabled.then_some(criteria.n_min),
+            n_max: criteria.formula_enabled.then_some(criteria.n_max),
+            o_min: criteria.formula_enabled.then_some(criteria.o_min),
+            o_max: criteria.formula_enabled.then_some(criteria.o_max),
+            p_min: criteria.formula_enabled.then_some(criteria.p_min),
+            p_max: criteria.formula_enabled.then_some(criteria.p_max),
+            s_min: criteria.formula_enabled.then_some(criteria.s_min),
+            s_max: criteria.formula_enabled.then_some(criteria.s_max),
+            f_state: criteria.formula_enabled.then_some(criteria.f_state.into()),
+            cl_state: criteria.formula_enabled.then_some(criteria.cl_state.into()),
+            br_state: criteria.formula_enabled.then_some(criteria.br_state.into()),
+            i_state: criteria.formula_enabled.then_some(criteria.i_state.into()),
+            limit: Some(limit),
+            include_counts: Some(include_counts),
+        }
+    }
+}
+
+fn normalize_structure_for_api(value: &str) -> String {
+    // Normalize CRLF → LF first, then bare CR → LF, to avoid double-converting.
+    let normalized = if value.contains('\r') {
+        value.replace("\r\n", "\n").replace('\r', "\n")
+    } else {
+        value.to_string()
+    };
+    match queries::classify_structure(&normalized) {
+        queries::StructureKind::MolfileV2000 | queries::StructureKind::MolfileV3000 => normalized,
+        _ => normalized.trim().to_string(),
+    }
+}
+
+fn normalize_statement(value: Option<String>) -> Option<String> {
+    let value = value?;
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    Some(
+        trimmed
+            .strip_prefix(WIKIDATA_STATEMENT_BASE)
+            .unwrap_or(trimmed)
+            .to_string(),
+    )
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SearchResponse {
+    pub resolved_taxon_qid: Option<String>,
+    pub warning: Option<String>,
+    pub query: String,
+    pub rows: Vec<RowDto>,
+    pub total_matches: usize,
+    pub stats: SearchStats,
+}
+
+#[cfg(target_arch = "wasm32")]
+#[derive(Debug, Clone, Deserialize)]
+pub struct ExportUrlResponse {
+    pub csv_url: String,
+    pub json_url: String,
+    pub rdf_url: String,
+    #[serde(default)]
+    pub csv_gz_url: Option<String>,
+    #[serde(default)]
+    pub json_gz_url: Option<String>,
+    #[serde(default)]
+    pub rdf_gz_url: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SearchStats {
+    pub n_compounds: usize,
+    pub n_taxa: usize,
+    pub n_references: usize,
+    #[serde(default)]
+    pub n_entries: Option<usize>,
+    #[serde(default)]
+    pub n_entries_unique: Option<usize>,
+}
+
+impl From<SearchStats> for DatasetStats {
+    fn from(value: SearchStats) -> Self {
+        let n_entries = value.n_entries.unwrap_or(0);
+        Self {
+            n_compounds: value.n_compounds,
+            n_taxa: value.n_taxa,
+            n_references: value.n_references,
+            n_entries,
+            n_entries_unique: value.n_entries_unique.unwrap_or(n_entries),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct RowDto {
+    pub compound_qid: String,
+    pub name: String,
+    pub inchikey: Option<String>,
+    pub smiles: Option<String>,
+    pub mass: Option<f64>,
+    pub formula: Option<String>,
+    pub taxon_qid: String,
+    pub taxon_name: String,
+    pub reference_qid: String,
+    pub ref_title: Option<String>,
+    pub ref_doi: Option<String>,
+    pub pub_year: Option<i16>,
+    pub statement: Option<String>,
+}
+
+impl From<RowDto> for CompoundEntry {
+    fn from(value: RowDto) -> Self {
+        Self {
+            compound_qid: Arc::<str>::from(value.compound_qid),
+            name: Arc::<str>::from(value.name),
+            inchikey: value.inchikey.map(Arc::<str>::from),
+            smiles: value.smiles.map(Arc::<str>::from),
+            mass: value.mass,
+            formula: value.formula.map(Arc::<str>::from),
+            taxon_qid: Arc::<str>::from(value.taxon_qid),
+            taxon_name: Arc::<str>::from(value.taxon_name),
+            reference_qid: Arc::<str>::from(value.reference_qid),
+            ref_title: value.ref_title.map(Arc::<str>::from),
+            ref_doi: value.ref_doi.map(Arc::<str>::from),
+            pub_year: value.pub_year,
+            statement: normalize_statement(value.statement).map(Arc::<str>::from),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn request_builder_keeps_large_formula_ranges() {
+        let mut criteria = SearchCriteria {
+            taxon: "*".into(),
+            ..SearchCriteria::default()
+        };
+        criteria.formula_enabled = true;
+        criteria.c_max = 300;
+        criteria.h_max = 900;
+
+        let request = SearchRequest::from_criteria(&criteria, 123, true);
+        assert_eq!(request.c_max, Some(300));
+        assert_eq!(request.h_max, Some(900));
+        assert_eq!(request.limit, Some(123));
+        assert_eq!(request.include_counts, Some(true));
+    }
+
+    #[test]
+    fn request_builder_preserves_multiline_molfile_whitespace() {
+        let criteria = SearchCriteria {
+            taxon: "*".into(),
+            smiles: "\n  Mrv\n\n  0  0  0  0  0  0            999 V3000\nM  END\n".into(),
+            ..SearchCriteria::default()
+        };
+
+        let request = SearchRequest::from_criteria(&criteria, 10, false);
+        let smiles = request.smiles.expect("smiles payload");
+        assert!(smiles.starts_with('\n'));
+        assert!(smiles.contains("V3000"));
+    }
+
+    #[test]
+    fn normalize_statement_strips_wikidata_prefix() {
+        assert_eq!(
+            normalize_statement(Some(
+                "http://www.wikidata.org/entity/statement/S123".to_string()
+            )),
+            Some("S123".to_string())
+        );
+        assert_eq!(
+            normalize_statement(Some("S124".to_string())),
+            Some("S124".to_string())
+        );
+        assert_eq!(normalize_statement(Some("   ".to_string())), None);
+    }
+}

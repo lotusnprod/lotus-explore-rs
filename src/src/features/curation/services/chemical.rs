@@ -1,0 +1,233 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
+use super::*;
+#[cfg(not(target_arch = "wasm32"))]
+use futures::try_join;
+
+#[derive(Debug, Deserialize)]
+pub(super) struct ConvertFormatsResponse {
+    pub(super) canonical_smiles: String,
+    pub(super) isomeric_smiles: String,
+    pub(super) inchi: String,
+    pub(super) inchikey: String,
+}
+
+#[cfg(target_arch = "wasm32")]
+#[derive(Debug, Deserialize)]
+struct RdkitConvertResponse {
+    canonicalsmiles: String,
+    isomericsmiles: String,
+    inchi: String,
+    inchikey: String,
+}
+
+pub(super) async fn convert_smiles(smiles: &str) -> Result<ConvertFormatsResponse, CurationError> {
+    #[cfg(target_arch = "wasm32")]
+    {
+        return convert_with_rdkit(smiles).await;
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let (canonical_smiles, isomeric_smiles, inchi, inchikey) = try_join!(
+            convert_with_batch_direct(smiles, "canonicalsmiles"),
+            convert_with_batch_direct(smiles, "isomericsmiles"),
+            convert_with_batch_direct(smiles, "inchi"),
+            convert_with_batch_direct(smiles, "inchikey"),
+        )?;
+
+        Ok(ConvertFormatsResponse {
+            canonical_smiles,
+            isomeric_smiles,
+            inchi,
+            inchikey,
+        })
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn convert_with_rdkit(smiles: &str) -> Result<ConvertFormatsResponse, CurationError> {
+    let value = rdkit_bridge_call("convert", smiles.trim()).await?;
+    let parsed = js_value_to_json(value)?;
+    let converted = serde_json::from_value::<RdkitConvertResponse>(parsed)
+        .map_err(|e| CurationError::Parse(format!("rdkit.js convert parse error: {e}")))?;
+    Ok(ConvertFormatsResponse {
+        canonical_smiles: converted.canonicalsmiles,
+        isomeric_smiles: converted.isomericsmiles,
+        inchi: converted.inchi,
+        inchikey: converted.inchikey,
+    })
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+async fn convert_with_batch_direct(
+    smiles: &str,
+    output_format: &str,
+) -> Result<String, CurationError> {
+    let url = format!("{NATPROD_API_BASE}/convert/batch?output_format={output_format}");
+    let payload = serde_json::json!({
+        "inputs": [{ "value": smiles.trim(), "input_format": "smiles" }]
+    });
+    let response = natprod_client()?
+        .post(url)
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| {
+            CurationError::Http(format!("naturalproducts convert/batch request error: {e}"))
+        })?;
+    if !response.status().is_success() {
+        return Err(CurationError::Http(format!(
+            "naturalproducts convert/batch failed with HTTP {}",
+            response.status().as_u16()
+        )));
+    }
+    let parsed = response.json::<BatchConvertResponse>().await.map_err(|e| {
+        CurationError::Parse(format!("naturalproducts convert/batch parse error: {e}"))
+    })?;
+    extract_batch_convert_output(parsed)
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn extract_batch_convert_output(parsed: BatchConvertResponse) -> Result<String, CurationError> {
+    let Some(first) = parsed.results.first() else {
+        return Err(CurationError::Parse(
+            "naturalproducts convert/batch returned no result rows".to_string(),
+        ));
+    };
+    if !first.success {
+        return Err(CurationError::InvalidInput(format!(
+            "naturalproducts conversion failed: {}",
+            first.error
+        )));
+    }
+    Ok(first.output.clone())
+}
+
+pub fn extract_exact_mass_from_json(value: &Value) -> Option<f64> {
+    if let Some(v) = value
+        .get("exact_molecular_weight")
+        .and_then(parse_exact_mass_scalar)
+    {
+        return Some(v);
+    }
+    if let Some(obj) = value.as_object() {
+        for nested in obj.values() {
+            if let Some(v) = extract_exact_mass_from_json(nested) {
+                return Some(v);
+            }
+        }
+    }
+    if let Some(arr) = value.as_array() {
+        for nested in arr {
+            if let Some(v) = extract_exact_mass_from_json(nested) {
+                return Some(v);
+            }
+        }
+    }
+    None
+}
+
+fn parse_exact_mass_scalar(value: &Value) -> Option<f64> {
+    if let Some(v) = value.as_f64() {
+        return Some(v);
+    }
+    if let Some(v) = value.as_i64() {
+        return Some(v as f64);
+    }
+    if let Some(v) = value.as_u64() {
+        return Some(v as f64);
+    }
+    value
+        .as_str()
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .and_then(|s| s.replace(',', "").parse::<f64>().ok())
+}
+
+pub(super) async fn descriptor_mass(smiles: &str) -> Result<f64, CurationError> {
+    descriptor_mass_via_rdkit(smiles).await
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn descriptor_mass_via_rdkit(smiles: &str) -> Result<f64, CurationError> {
+    let value = rdkit_bridge_call("exactMass", smiles.trim()).await?;
+    value.as_f64().ok_or_else(|| {
+        CurationError::Parse("rdkit.js exactMass did not return a number".to_string())
+    })
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+async fn descriptor_mass_via_rdkit(_smiles: &str) -> Result<f64, CurationError> {
+    // For non-WASM environments (e.g., server-side), use a reasonable default or error
+    // Since the app is browser-based, this shouldn't be called in production
+    Err(CurationError::Parse(
+        "RDKit JS not available in non-browser environment".to_string(),
+    ))
+}
+
+pub(super) async fn resolve_exact_mass(
+    input_smiles: &str,
+    canonical_smiles: &str,
+) -> MassResolution {
+    match descriptor_mass(canonical_smiles).await {
+        Ok(value) => MassResolution {
+            exact_mass: Some(value),
+            warning: None,
+        },
+        Err(canonical_err) => {
+            if canonical_smiles.trim() != input_smiles.trim() {
+                return match descriptor_mass(input_smiles).await {
+                    Ok(value) => MassResolution {
+                        exact_mass: Some(value),
+                        warning: None,
+                    },
+                    Err(_input_err) => MassResolution {
+                        exact_mass: None,
+                        warning: Some(format!("Mass unavailable - service limit: {canonical_err}")),
+                    },
+                };
+            }
+            MassResolution {
+                exact_mass: None,
+                warning: Some(format!("Mass unavailable - {canonical_err}")),
+            }
+        }
+    }
+}
+
+pub(super) async fn has_undefined_stereo(smiles: &str) -> bool {
+    if has_stereo_marks(smiles) {
+        return false;
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    {
+        return rdkit_bridge_call("hasUndefinedStereo", smiles.trim())
+            .await
+            .ok()
+            .and_then(|value| value.as_bool())
+            .unwrap_or(false);
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let url = format!(
+            "{NATPROD_API_BASE}/chem/stereoisomers?smiles={}",
+            urlencoding::encode(smiles.trim())
+        );
+        let Ok(client) = natprod_client() else {
+            return false;
+        };
+        let Ok(response) = client.get(url).send().await else {
+            return false;
+        };
+        let Ok(json) = response.json::<Value>().await else {
+            return false;
+        };
+        json.get("stereoisomers")
+            .and_then(Value::as_array)
+            .is_some_and(|a| a.len() > 1)
+    }
+}

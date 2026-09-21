@@ -1,0 +1,9 @@
+# Netlify / Cloudflare Pages / compatible CDN — HTTP redirect rules
+# Reference: https://specification.website/spec/seo/
+# Reference: https://specification.website/spec/seo/redirects/
+
+# Ensure canonical URL: strip trailing slash on non-root paths (optional)
+# Ensure www → non-www redirect is handled at DNS/CDN level
+
+# Redirect any 404 back to index.html so the WASM SPA can handle routing
+/*  /index.html  200
