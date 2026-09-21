@@ -73,15 +73,11 @@ jobs:
         run: |
           mkdir -p _final_site
 
-          # Move base index contents to root of final site directory
-          cp -r _site/app-index/* _final_site/
-          rm -rf _site/app-index
-
-          # Move remaining apps to subdirectories
-          for dir in _site/app-*; do
-            app_name="${dir#_site/app-}"
-            mv "$dir" "_final_site/$app_name"
-          done
+          # Copy the single app's build output to the root of the final site
+          # (GitHub Pages serves this repo at /${REPONAME}, matching the
+          # --base-path set during dx build).
+          cp -r _site/app-${{ matrix.app }}/* _final_site/
+          rm -rf _site/app-${{ matrix.app }}
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:

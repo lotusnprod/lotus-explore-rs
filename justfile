@@ -3,7 +3,7 @@
 #
 # Web apps (use `just serve`/`just build` with one of these):
 #	cxsmiles-yoga  index  json-count-rs  lipid-selecto-rs
-#	mgf-precursor-erro-rs  smellfish-rs
+#	mgf-precursor-error-rs  smellfish-rs
 
 # ── Workspace gate (mirrors .github/workflows/ci.yml) ─────────────────────────
 
@@ -69,6 +69,6 @@ outdated:
 readme:
 	@command -v cargo-readme >/dev/null 2>&1 || { echo "cargo-readme not installed; skipping"; exit 0; }
 	@command -v panache >/dev/null 2>&1 || { echo "panache not installed; skipping"; exit 0; }
-	@for d in src; do \
+	@for d in src/; do \
 	(cd $$d && cargo readme -t README.tpl -o /tmp/readme_panache.md 2>/dev/null && panache lint /tmp/readme_panache.md && diff -q /tmp/readme_panache.md README.md > /dev/null 2>&1 || { echo "README.md out of date for $$d — run: (cd $$d && cargo readme -t README.tpl -o README.md)"; exit 1; }) || exit 1; \
 	done
