@@ -1,9 +1,5 @@
-# Root task runner for the dioxus workspace.
+# Root task runner for the lotus-explore-rs repository.
 # Run `just --list` to see available recipes.
-#
-# Web apps (use `just serve`/`just build` with one of these):
-#	cxsmiles-yoga  index  json-count-rs  lipid-selecto-rs
-#	mgf-precursor-error-rs  smellfish-rs
 
 # ── Workspace gate (mirrors .github/workflows/ci.yml) ─────────────────────────
 
@@ -63,12 +59,11 @@ deny:
 outdated:
 	@command -v cargo-outdated >/dev/null 2>&1 && cargo outdated --workspace --exit-code 1 || echo "cargo-outdated not installed; skipping"
 
-# README sync: regenerate each app/crate README from README.tpl + source `//!`
-# doc comments, lint, and diff against the checked-in README.md. If it reports
-# "out of date", fix the source doc comments, then `just readme` to regenerate.
+# README sync: regenerate each crate README from README.tpl + source `//!`
+# doc comments, lint, and diff against the checked-in README.md.
 readme:
 	@command -v cargo-readme >/dev/null 2>&1 || { echo "cargo-readme not installed; skipping"; exit 0; }
 	@command -v panache >/dev/null 2>&1 || { echo "panache not installed; skipping"; exit 0; }
-	@for d in src/; do \
+	@for d in crates/lotus/; do \
 	(cd $$d && cargo readme -t README.tpl -o /tmp/readme_panache.md 2>/dev/null && panache lint /tmp/readme_panache.md && diff -q /tmp/readme_panache.md README.md > /dev/null 2>&1 || { echo "README.md out of date for $$d — run: (cd $$d && cargo readme -t README.tpl -o README.md)"; exit 1; }) || exit 1; \
 	done

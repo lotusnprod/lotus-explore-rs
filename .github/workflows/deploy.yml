@@ -75,9 +75,10 @@ jobs:
 
           # Copy the single app's build output to the root of the final site
           # (GitHub Pages serves this repo at /${REPONAME}, matching the
-          # --base-path set during dx build).
-          cp -r _site/app-${{ matrix.app }}/* _final_site/
-          rm -rf _site/app-${{ matrix.app }}
+          # --base-path set during dx build). The download step creates a
+          # subdirectory named after the artifact (app-<app-name>).
+          cp -r _site/app-*/* _final_site/
+          rm -rf _site/app-*
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
