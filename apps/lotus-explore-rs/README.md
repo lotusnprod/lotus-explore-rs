@@ -54,9 +54,9 @@ npm install
 npm run build:css  # Build CSS once, or run 'npm run watch:css' during development
 ```
 
-The `Dioxus.toml` pre-build hook automatically runs `build:css` during `dx serve`
-and `dx build`, so manual CSS rebuilds are only needed for local development
-outside the Dioxus build pipeline.
+The `Dioxus.toml` pre-build hook automatically runs `build:css` during
+`dx serve` and `dx build`, so manual CSS rebuilds are only needed for local
+development outside the Dioxus build pipeline.
 
 ### Ketcher (115 MB)
 
