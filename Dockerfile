@@ -8,7 +8,7 @@ WORKDIR /build
 # resolves the entire workspace, so every member's manifest must be present.
 COPY Cargo.toml Cargo.lock ./
 COPY crates/ crates/
-COPY src/ src/
+COPY apps/ apps/
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config libssl-dev \

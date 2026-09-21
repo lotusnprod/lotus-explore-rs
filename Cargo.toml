@@ -1,9 +1,9 @@
 [workspace]
 resolver = "2"
 members = [
+  "apps/lotus-explore-rs",
   "crates/lotus",
   "crates/lotus-deploy",
-  "src",
 ]
 
 [workspace.package]

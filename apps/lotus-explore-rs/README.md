@@ -31,15 +31,6 @@ Without the server, the explorer falls back to direct QLever/SPARQL queries.
 See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the full architectural
 overview.
 
-## Engineering skills
-
-- [`SKILLS.md`](./SKILLS.md)
-- [`docs/skills/SUGGESTIONS.md`](./docs/skills/SUGGESTIONS.md)
-
-## Curation share links
-
-- [`docs/CURATION_SHARE_LINKS.md`](./docs/CURATION_SHARE_LINKS.md)
-
 ## Development testing
 
 Run logging format tests during telemetry work:
@@ -63,8 +54,9 @@ npm install
 npm run build:css  # Build CSS once, or run 'npm run watch:css' during development
 ```
 
-For detailed guidance on using Tailwind with Dioxus, see
-[`TAILWIND_MIGRATION.md`](./TAILWIND_MIGRATION.md).
+The `Dioxus.toml` pre-build hook automatically runs `build:css` during `dx serve`
+and `dx build`, so manual CSS rebuilds are only needed for local development
+outside the Dioxus build pipeline.
 
 ### Ketcher (115 MB)
 

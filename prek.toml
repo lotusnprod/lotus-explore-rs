@@ -14,7 +14,7 @@ fail_fast = false
 [[repos]]
 repo = "https://github.com/pre-commit/pre-commit-hooks"
 rev = "v6.0.0"
-hooks = [{ id = "end-of-file-fixer", exclude = "(src/public/assets/)" }, { id = "check-case-conflict" }, { id = "check-merge-conflict" }, { id = "check-symlinks" }, { id = "check-executables-have-shebangs" }, { id = "check-shebang-scripts-are-executable" }, { id = "check-toml" }, { id = "check-json" }, { id = "check-yaml" }, { id = "mixed-line-ending" }, { id = "trailing-whitespace", exclude = "(src/public/assets/)" }]
+hooks = [{ id = "end-of-file-fixer", exclude = "(apps/lotus-explore-rs/public/assets/)" }, { id = "check-case-conflict" }, { id = "check-merge-conflict" }, { id = "check-symlinks" }, { id = "check-executables-have-shebangs" }, { id = "check-shebang-scripts-are-executable" }, { id = "check-toml" }, { id = "check-json" }, { id = "check-yaml" }, { id = "mixed-line-ending" }, { id = "trailing-whitespace", exclude = "(apps/lotus-explore-rs/public/assets/)" }]
 
 [[repos]]
 repo = "https://github.com/crate-ci/typos"

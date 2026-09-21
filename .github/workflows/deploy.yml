@@ -40,13 +40,13 @@ jobs:
 
       - name: Fetch Ketcher
         run: cargo run --release -p lotus-deploy --bin fetch-ketcher
-        working-directory: src
+        working-directory: apps/lotus-explore-rs
 
       - name: Build App
         run: |
           REPONAME="${GITHUB_REPOSITORY#*/}"
           dx build --release --platform web --debug-symbols false --base-path "/${REPONAME}" --package lotus-explore-rs
-        working-directory: src
+        working-directory: apps/lotus-explore-rs
 
       - name: Deploy to GitHub Pages
         shell: bash -e {0}

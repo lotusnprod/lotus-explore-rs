@@ -23,7 +23,7 @@ dioxus = { workspace = true }
 dioxus-i18n = { workspace = true }
 futures = { workspace = true }
 log = { workspace = true }
-lotus = { path = "../crates/lotus", version = "0.1" }
+lotus = { path = "../../crates/lotus", version = "0.1" }
 reqwest = { workspace = true, features = ["json"] }
 serde = { workspace = true }
 serde_json = { workspace = true }

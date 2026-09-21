@@ -204,7 +204,7 @@ pub fn DocumentHead(props: DocumentHeadProps) -> Element {
         }
 
         // CSS is loaded as external <link> tags in the custom index.html template
-        // (src/public/index.html), no longer injected inline here.
+        // (public/index.html), no longer injected inline here.
 
         // Inline JavaScript — wrapped in an IIFE so `const`/`let` declarations
         // don't leak into the global scope (which causes

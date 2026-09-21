@@ -2,7 +2,7 @@
 
 [![AGPL-3.0
 license](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
-[![Tests](https://img.shields.io/badge/tests-365-brightgreen)](https://github.com/adafede/lotus-explore-rs/actions)
+[![Tests](https://img.shields.io/badge/tests-365-brightgreen)](https://github.com/lotusnprod/lotus-explore-rs/actions)
 
 `lotus-explore-rs` --- LOTUS Knowledge Explorer.
 
@@ -13,7 +13,8 @@ crate and the QLever SPARQL endpoint.
 ## Quick start
 
 ```bash
-dx serve --package lotus-explore-rs
+cd apps/lotus-explore-rs
+dx serve
 ```
 
 To also run the optional API:
@@ -31,43 +32,50 @@ Without the server, the explorer falls back to direct QLever/SPARQL queries.
 ```
 lotus-explore-rs/
 ├── Cargo.toml                ← workspace root
-├── crates/
+├── rust-toolchain.toml       ← pinned compiler, components, target
+├── crates/                   ← shared library crates
 │   ├── lotus/                ← SPARQL client, LOTUS models, transport, export
 │   └── lotus-deploy/         ← Host-only deploy helpers (Ketcher fetch, HTML baking)
-└── src/                      ← Main app: WASM client + optional native server
-    ├── Cargo.toml            ← lotus-explore-rs crate
-    ├── Dioxus.toml            ← Dioxus CLI config
-    ├── build.rs               ← Generates metadata files (llms.txt, robots.txt, etc.)
-    ├── index.html
-    ├── tailwind/
-    │   └── styles.css         ← Tailwind input
-    ├── public/                ← Static assets (favicons, site.webmanifest, etc.)
-    │   └── assets/
-    │       └── lotus-explore.css  ← Compiled Tailwind CSS
-    └── src/
-        ├── main.rs
-        ├── document_head.rs
-        ├── app/
-        ├── components/
-        ├── features/
-        ├── server/
-        ├── state/
-        ├── ui/
-        └── utils/
+├── apps/                     ← application crates
+│   └── lotus-explore-rs/     ← Main app: WASM client + optional native server
+│       ├── Cargo.toml
+│       ├── Dioxus.toml       ← Dioxus CLI config
+│       ├── build.rs          ← Generates metadata files (llms.txt, robots.txt, etc.)
+│       ├── index.html
+│       ├── tailwind/
+│       │   └── styles.css    ← Tailwind input
+│       ├── public/           ← Static assets (favicons, site.webmanifest, etc.)
+│       │   └── assets/
+│       │       └── lotus-explore.css  ← Compiled Tailwind CSS
+│       └── src/
+│           ├── main.rs
+│           ├── document_head.rs
+│           ├── app/
+│           ├── components/
+│           ├── features/
+│           ├── server/
+│           ├── state/
+│           ├── ui/
+│           └── utils/
 ```
 
 ## Prerequisites
 
+The repo pins Rust 1.97, `clippy`, `rustfmt`, and `wasm32-unknown-unknown` in
+`rust-toolchain.toml`. Running any `cargo` command will auto-download the pinned
+toolchain via `rustup`.
+
+To serve or build the WASM app, also install the Dioxus CLI:
+
 ```bash
-rustup toolchain install 1.97 --profile minimal
-rustup target add wasm32-unknown-unknown
 cargo install dioxus-cli --version 0.7.10 --locked
 ```
 
-Install Tailwind CSS dependencies (for local CSS rebuilds):
+For local CSS rebuilds (optional --- the `Dioxus.toml` pre-build hook runs this
+automatically during `dx serve`/`dx build`):
 
 ```bash
-cd src/
+cd apps/lotus-explore-rs
 npm install
 npm run build:css  # Build CSS once, or run 'npm run watch:css' during development
 ```
