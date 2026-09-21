@@ -103,13 +103,19 @@ fn main() -> Result<(), Box<dyn Error>> {
     )?;
 
     // Copy public folder to output directory for static asset serving
-    let out_dir = manifest_dir
-        .join("target")
-        .join("dx")
-        .join("lotus-explore-rs")
-        .join("wasm32-unknown-unknown")
-        .join("release");
-    if out_dir.exists() {
+    // Walk up from OUT_DIR to find the workspace target/ directory.
+    let out_dir = std::env::var("OUT_DIR").ok().and_then(|out| {
+        let path = PathBuf::from(out);
+        path.ancestors()
+            .find(|p| p.file_name().is_some_and(|name| name == "target"))
+            .map(|p| {
+                p.join("dx")
+                    .join("lotus-explore-rs")
+                    .join("wasm32-unknown-unknown")
+                    .join("release")
+            })
+    });
+    if let Some(ref out_dir) = out_dir {
         let out_public = out_dir.join("public");
         if out_public.exists() {
             fs::remove_dir_all(&out_public)?;
