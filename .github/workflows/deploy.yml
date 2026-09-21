@@ -15,27 +15,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-app:
+  deploy:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - app: lotus-explore-rs
-            path: "/${REPONAME}"
-            dir: "src"
-            pkg: "lotus-explore-rs"
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false, fetch-depth: 1 }
 
       - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
+        with: { targets: wasm32-unknown-unknown }
 
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6
         with:
-          key: ${{ matrix.app }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: lotus-explore-rs-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ matrix.app }}-cargo-
+            lotus-explore-rs-cargo-
 
       - uses: cargo-bins/cargo-binstall@e00d2c94cc0067b77737821097a62d91c0301baa
 
@@ -44,46 +40,23 @@ jobs:
 
       - name: Fetch Ketcher
         run: cargo run --release -p lotus-deploy --bin fetch-ketcher
-        working-directory: ${{ matrix.dir }}
+        working-directory: src
 
       - name: Build App
         run: |
           REPONAME="${GITHUB_REPOSITORY#*/}"
-          EVAL_PATH=$(eval echo "${{ matrix.path }}")
-          dx build --release --platform web --debug-symbols false --base-path "$EVAL_PATH" --package ${{ matrix.pkg }}
-        working-directory: ${{ matrix.dir }}
+          dx build --release --platform web --debug-symbols false --base-path "/${REPONAME}" --package lotus-explore-rs
+        working-directory: src
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-        with:
-          name: app-${{ matrix.app }}
-          path: target/dx/${{ matrix.pkg }}/release/web/public
-
-  deploy:
-    needs: build-app
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
-        with:
-          path: _site
-
-      - name: Structure _site directory
+      - name: Deploy to GitHub Pages
+        shell: bash -e {0}
         run: |
+          # dx build outputs the web bundle to target/dx/lotus-explore-rs/release/web/public/
+          # (relative to the workspace root). GitHub Pages serves this repo at
+          # /${REPONAME}, which matches the --base-path above.
+          # Copy the bundle contents directly to _final_site for pages deployment.
           mkdir -p _final_site
-
-          # Copy the single app's build output to the root of the final site
-          # (GitHub Pages serves this repo at /${REPNAME}, matching the
-          # --base-path set during dx build). The download step creates a
-          # subdirectory named after the artifact (app-<app-name>).
-          app_dir=$(ls -d _site/app-*/ 2>/dev/null | head -1)
-          if [ -z "$app_dir" ]; then
-            echo "Error: No app artifact directory found in _site/"
-            exit 1
-          fi
-          cp -r "${app_dir}"* _final_site/
-          rm -rf "$app_dir"
+          cp -r target/dx/lotus-explore-rs/release/web/public/* _final_site/
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
