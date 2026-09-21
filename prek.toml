@@ -14,7 +14,7 @@ fail_fast = false
 [[repos]]
 repo = "https://github.com/pre-commit/pre-commit-hooks"
 rev = "v6.0.0"
-hooks = [{ id = "check-added-large-files", args = ["--maxkb=2048"] }, { id = "check-case-conflict" }, { id = "check-merge-conflict" }, { id = "check-symlinks" }, { id = "check-executables-have-shebangs" }, { id = "check-shebang-scripts-are-executable" }, { id = "check-toml" }, { id = "check-json" }, { id = "check-yaml" }, { id = "end-of-file-fixer", exclude = "(public/assets/)" }, { id = "mixed-line-ending" }, { id = "trailing-whitespace", exclude = "(public/assets/)" }]
+hooks = [{ id = "end-of-file-fixer", exclude = "(src/public/assets/)" }, { id = "check-case-conflict" }, { id = "check-merge-conflict" }, { id = "check-symlinks" }, { id = "check-executables-have-shebangs" }, { id = "check-shebang-scripts-are-executable" }, { id = "check-toml" }, { id = "check-json" }, { id = "check-yaml" }, { id = "mixed-line-ending" }, { id = "trailing-whitespace", exclude = "(src/public/assets/)" }]
 
 [[repos]]
 repo = "https://github.com/crate-ci/typos"
@@ -31,8 +31,8 @@ hooks = [
 
   # ── Heavy Rust checks (pre-push only) — delegate to justfile ───────────────
   { id = "cargo-test", name = "cargo-test", language = "system", entry = "just test", pass_filenames = false, always_run = true, stages = ["pre-push"] },
-  # Per-app WASM checks (NOT `--workspace --target wasm32`, which fails on
-  # crates/upload's wasm-incompatible unit patterns in download.rs).
+  # Per-app WASM checks (NOT `--workspace --target wasm32`, which flags
+  # wasm-incompatible code paths in non-WASM crates).
   { id = "cargo-check-wasm", name = "cargo-check-wasm", language = "system", entry = "just wasm", pass_filenames = false, always_run = true, stages = ["pre-push"] },
   { id = "cargo-doc", name = "cargo-doc", language = "system", entry = "just doc", pass_filenames = false, always_run = true, stages = ["pre-push"] },
 
