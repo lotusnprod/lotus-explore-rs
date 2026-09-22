@@ -15,6 +15,14 @@
   Link: </robots.txt>; rel="robots"; type="text/plain"
   Link: </.well-known/security.txt>; rel="security.txt"; type="text/plain"
 
+# Ketcher editor iframe (served from /assets/ketcher/):
+# allow same-origin framing, since the SPA embeds it in an <iframe>.
+# The wildcard `/*` rule above sets X-Frame-Options: DENY + frame-ancestors 'none',
+# which would block the iframe — this more-specific rule overrides both.
+/assets/ketcher/*
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; frame-ancestors 'self'; img-src 'self' data: blob: https:; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https:; font-src 'self' data:; object-src 'none'
+
 # Cache rules for Metadata & Manifest (Must revalidate to deliver updates immediately)
 /.well-known/*
   Cache-Control: no-cache, must-revalidate
