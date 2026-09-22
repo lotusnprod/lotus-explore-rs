@@ -44,14 +44,14 @@ docker run -p 8080:8787 lotus-explore-rs
 
 Environment variables:
 
-| Variable | Default | Description |
-|---|---|---|
-| `HOST` | `0.0.0.0` | Bind address |
-| `PORT` | `8787` | Listen port |
-| `PUBLIC_DIR` | `/app/public` | Static files directory |
-| `LOTUS_API_BASE` | _(none)_ | Upstream SPARQL/API base URL |
-| `APP_ENV` | `development` | Use `production` with `CORS_ALLOWED_ORIGINS` |
-| `CORS_ALLOWED_ORIGINS` | _(none)_ | Comma-separated allowed origins (required when `APP_ENV=production`) |
+  | Variable               | Default       | Description                                                          |
+  | ---------------------- | ------------- | -------------------------------------------------------------------- |
+  | `HOST`                 | `0.0.0.0`     | Bind address                                                         |
+  | `PORT`                 | `8787`        | Listen port                                                          |
+  | `PUBLIC_DIR`           | `/app/public` | Static files directory                                               |
+  | `LOTUS_API_BASE`       | *(none)*      | Upstream SPARQL/API base URL                                         |
+  | `APP_ENV`              | `development` | Use `production` with `CORS_ALLOWED_ORIGINS`                         |
+  | `CORS_ALLOWED_ORIGINS` | *(none)*      | Comma-separated allowed origins (required when `APP_ENV=production`) |
 
 ## Architecture
 

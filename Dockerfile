@@ -11,7 +11,7 @@ COPY crates/ crates/
 COPY apps/ apps/
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    pkg-config libssl-dev \
+    curl pkg-config libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # --locked ensures Cargo.lock is respected exactly (no silent upgrades)

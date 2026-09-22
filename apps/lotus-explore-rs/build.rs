@@ -321,6 +321,13 @@ fn build_headers_txt() -> String {
     \x20 Link: </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\"\n\
     \x20 Link: </robots.txt>; rel=\"robots\"; type=\"text/plain\"\n\
     \x20 Link: </.well-known/security.txt>; rel=\"security.txt\"; type=\"text/plain\"\n\n\
+    \n\
+    # Ketcher editor iframe (served from /assets/ketcher/): allow same-origin framing.\n\
+    # The wildcard /* rule above sets X-Frame-Options: DENY + frame-ancestors 'none',\n\
+    # which would block the iframe — this more-specific rule overrides both.\n\
+    /assets/ketcher/*\n\
+     \x20 X-Frame-Options: SAMEORIGIN\n\
+     \x20 Content-Security-Policy: default-src 'self'; base-uri 'self'; frame-ancestors 'self'; img-src 'self' data: blob: https:; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https:; font-src 'self' data:; object-src 'none'\n\n\
     # Cache rules for Metadata & Manifest (Must revalidate to deliver updates immediately)\n\
     /.well-known/*\n\
     \x20 Cache-Control: no-cache, must-revalidate\n\n\
