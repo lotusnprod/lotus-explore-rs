@@ -26,10 +26,15 @@ WORKDIR /build
 # Each FROM rust:1.97 image has its own cargo/rustup home at /usr/local/.
 COPY --from=builder /build/target /build/target
 
+# Install system deps (nodejs for Tailwind, curl for dioxus-cli download)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nodejs npm curl pkg-config libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install dioxus-cli and the wasm target for building the WASM web bundle
 RUN rustup default 1.97.0 && \
     rustup target add wasm32-unknown-unknown && \
-    wget -q -O /tmp/cargo-binstall.tar.gz \
+    curl -fsSL -o /tmp/cargo-binstall.tar.gz \
       https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tar.gz && \
     tar -xzf /tmp/cargo-binstall.tar.gz -C /usr/local/bin/ && \
     chmod +x /usr/local/bin/cargo-binstall && \
@@ -38,10 +43,6 @@ RUN rustup default 1.97.0 && \
 COPY Cargo.toml Cargo.lock ./
 COPY crates/ crates/
 COPY apps/ apps/
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    nodejs npm pkg-config libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
 
 # Fetch Ketcher (115 MB) then build the WASM web bundle
 RUN cargo run --release -p lotus-deploy --bin fetch-ketcher && \

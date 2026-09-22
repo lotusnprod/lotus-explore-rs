@@ -16,7 +16,7 @@
 //!
 //! # Environment
 //!
-//! * `KETCHER_VERSION` — release tag (default `3.17.0`).
+//! * `KETCHER_VERSION` — release tag (default `3.18.0`).
 //! * `KETCHER_DIR` — output directory (default `public/assets/ketcher`).
 //! * `KETCHER_URL` — fully override the release URL.
 
@@ -29,7 +29,7 @@ use std::path::{Path, PathBuf};
 use reqwest::blocking::Client;
 use zip::ZipArchive;
 
-const DEFAULT_VERSION: &str = "3.17.0";
+const DEFAULT_VERSION: &str = "3.18.0";
 const OWNER_REPO: &str = "epam/ketcher";
 const DEFAULT_DIR: &str = "public/assets/ketcher";
 
@@ -54,7 +54,7 @@ fn is_unused_entry(name: &str) -> bool {
 }
 
 /// macOS zip metadata that must never be extracted: the `__MACOSX/` tree and
-/// `._`-prefixed resource forks. The ketcher 3.17.0 release zip ships these
+/// `._`-prefixed resource forks. The ketcher release zip ships these
 /// (it was archived on macOS), and dioxus-cli's asset copier aborts on them
 /// with "stream did not contain valid UTF-8" / esbuild `Unexpected "\x00"`.
 /// The original shell helper avoided this implicitly via `cp -r standalone/*`;
@@ -219,7 +219,7 @@ mod tests {
 
     #[test]
     fn classifies_macos_junk() {
-        // The real ketcher 3.17.0 zip ships these (it was archived on macOS).
+        // The real ketcher zip ships these (it was archived on macOS).
         assert!(is_macos_junk("__MACOSX"));
         assert!(is_macos_junk("__MACOSX/standalone/._index.html"));
         assert!(is_macos_junk(
@@ -235,8 +235,8 @@ mod tests {
     #[test]
     fn release_url_points_at_github_releases() {
         assert_eq!(
-            release_url("3.17.0"),
-            "https://github.com/epam/ketcher/releases/download/v3.17.0/ketcher-standalone-3.17.0.zip"
+            release_url("3.18.0"),
+            "https://github.com/epam/ketcher/releases/download/v3.18.0/ketcher-standalone-3.18.0.zip"
         );
         assert_eq!(
             release_url("3.10.0"),
