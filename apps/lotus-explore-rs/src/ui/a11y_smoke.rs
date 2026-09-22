@@ -33,7 +33,10 @@ mod tests {
     fn page_header_exposes_single_home_link_and_heading_id() {
         let header_src = include_str!("../components/layout/page_header.rs");
         assert!(header_src.contains("h1 { id: PAGE_TITLE_ID"));
-        assert!(header_src.contains("class: \"text-inherit no-underline hover:no-underline\""));
+        assert!(
+            header_src
+                .contains("class: \"break-words text-inherit no-underline hover:no-underline\"")
+        );
         // Home link uses visible text as accessible name (no redundant aria_label)
         assert!(header_src.contains("\"{t(locale, TextKey::PageTitle)}\""));
     }
