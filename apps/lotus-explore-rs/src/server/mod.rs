@@ -53,6 +53,7 @@ use handlers::{export_file, export_urls, health, metrics, search};
 use tower_http::{
     compression::CompressionLayer,
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
+    services::ServeDir,
     trace::{DefaultMakeSpan, DefaultOnFailure, DefaultOnRequest, DefaultOnResponse, TraceLayer},
 };
 use tracing::Level;
@@ -98,7 +99,7 @@ const X_REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
 struct ApiDoc;
 
 pub fn build_router(max_body_bytes: usize, config: &AppConfig, state: AppState) -> Router {
-    Router::new()
+    let mut router = Router::new()
         .route("/health", get(health))
         .route("/metrics", get(metrics))
         .route("/v1/search", post(search))
@@ -114,7 +115,17 @@ pub fn build_router(max_body_bytes: usize, config: &AppConfig, state: AppState) 
                 .on_response(DefaultOnResponse::new().level(Level::INFO))
                 .on_failure(DefaultOnFailure::new().level(Level::WARN)),
         )
-        .layer(PropagateRequestIdLayer::new(X_REQUEST_ID))
+        .layer(PropagateRequestIdLayer::new(X_REQUEST_ID));
+
+    // Optionally serve the Dioxus WASM build output as static files.
+    if let Some(public_dir) = &config.public_dir {
+        router = router.fallback_service(ServeDir::new(public_dir));
+    }
+
+    router
+        .layer(SetRequestIdLayer::new(X_REQUEST_ID, MakeRequestUuid))
+        .layer(CompressionLayer::new())
+        .layer(build_cors_layer(config))
         .layer(SetRequestIdLayer::new(X_REQUEST_ID, MakeRequestUuid))
         .layer(middleware::from_fn(add_security_headers))
         .layer(CompressionLayer::new())

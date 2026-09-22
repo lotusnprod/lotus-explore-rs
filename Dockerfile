@@ -17,8 +17,48 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # --locked ensures Cargo.lock is respected exactly (no silent upgrades)
 RUN cargo build --release --locked --features server -p lotus-explore-rs
 
-# ── Stage 2: runtime ──────────────────────────────────────────────────────────
-FROM debian:bookworm-slim
+# ── Stage 2: WASM client (with Ketcher) ──────────────────────────────────────
+FROM rust:1.97.0-slim-bookworm AS wasm-builder
+
+WORKDIR /build
+
+COPY --from=builder /build/target /build/target
+COPY --from=builder /root/.cargo /root/.cargo
+COPY --from=builder /root/.rustup /root/.rustup
+
+ENV PATH="/root/.cargo/bin:${PATH}"
+ENV CARGO_HOME="/root/.cargo"
+ENV RUSTUP_HOME="/root/.rustup"
+
+# Install dioxus-cli and the wasm target for building the WASM web bundle
+RUN rustup target add wasm32-unknown-unknown && \
+    wget -q -O /tmp/cargo-binstall.tar.gz \
+      https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tar.gz && \
+    tar -xzf /tmp/cargo-binstall.tar.gz -C /usr/local/bin/ && \
+    chmod +x /usr/local/bin/cargo-binstall && \
+    cargo binstall dioxus-cli --version 0.7.10 --locked --no-confirm
+
+COPY Cargo.toml Cargo.lock ./
+COPY crates/ crates/
+COPY apps/ apps/
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    pkg-config libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Fetch Ketcher (115 MB) then build the WASM web bundle
+RUN cargo run --release -p lotus-deploy --bin fetch-ketcher && \
+    dx build --release --platform web --base-path "/" --package lotus-explore-rs
+
+# ── Stage 3: export (for CI artifact extraction) ────────────────────────────────
+# Exposes the built web bundle via a scratch image so CI can extract it with
+# `docker buildx build --target export --output _final_site .` without needing
+# a full runtime stage.
+FROM scratch AS export
+COPY --from=wasm-builder /build/target/dx/lotus-explore-rs/release/web/public /
+
+# ── Stage 4: runtime ────────────────────────────────────────────────────────────
+FROM debian:bookworm-slim AS runtime
 
 # ── OCI image labels ─────────────────────────────────────────────────────────
 LABEL org.opencontainers.image.title="lotus-explore-rs" \
@@ -36,11 +76,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Run as a non-root user — principle of least privilege
 RUN adduser --system --no-create-home --uid 1001 appuser
 
+# Copy server binary and WASM web bundle
 COPY --from=builder /build/target/release/lotus-explore-rs /usr/local/bin/lotus-explore-rs
+COPY --from=wasm-builder /build/target/dx/lotus-explore-rs/release/web/public /app/public
 
 # Bind to all interfaces by default when running in a container
 ENV HOST=0.0.0.0
 ENV PORT=8787
+ENV PUBLIC_DIR=/app/public
 
 EXPOSE 8787
 

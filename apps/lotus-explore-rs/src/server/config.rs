@@ -20,6 +20,7 @@ pub struct AppConfig {
     pub(crate) max_concurrency: usize,
     pub(crate) max_body_bytes: usize,
     pub(crate) cors_allowed_origins: Option<Vec<HeaderValue>>,
+    pub(crate) public_dir: Option<std::path::PathBuf>,
 }
 
 /// Command-line and environment configuration for the in-package `lotus-explore-rs` server.
@@ -53,6 +54,8 @@ struct Cli {
     app_env: String,
     #[arg(long, env = "CORS_ALLOWED_ORIGINS")]
     cors_allowed_origins: Option<String>,
+    #[arg(long, env = "PUBLIC_DIR")]
+    public_dir: Option<std::path::PathBuf>,
 }
 
 impl Cli {
@@ -69,6 +72,11 @@ impl Cli {
             "MAX_BODY_BYTES" => Some(self.max_body_bytes.clone()),
             "APP_ENV" => Some(self.app_env.clone()),
             "CORS_ALLOWED_ORIGINS" => self.cors_allowed_origins.clone(),
+            "PUBLIC_DIR" => self
+                .public_dir
+                .as_ref()
+                .and_then(|p| p.to_str())
+                .map(String::from),
             _ => None,
         }
     }
@@ -115,6 +123,8 @@ impl AppConfig {
             return Err("APP_ENV=production requires CORS_ALLOWED_ORIGINS to be configured".into());
         }
 
+        let public_dir = get("PUBLIC_DIR").map(std::path::PathBuf::from);
+
         Ok(Self {
             host,
             port,
@@ -123,6 +133,7 @@ impl AppConfig {
             max_concurrency,
             max_body_bytes,
             cors_allowed_origins,
+            public_dir,
         })
     }
 
