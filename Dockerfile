@@ -18,37 +18,46 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN cargo build --release --locked --features server -p lotus-explore-rs
 
 # ── Stage 2: WASM client (with Ketcher) ──────────────────────────────────────
-FROM rust:1.97.0-slim-bookworm AS wasm-builder
+# Uses ubuntu:24.04 (glibc 2.39) because the pre-built `dx` binary from
+# Dioxus releases requires glibc >= 2.39 (Debian Bookworm only has 2.36).
+# Rust toolchain is copied from the builder stage (forward-compatible).
+FROM ubuntu:24.04 AS wasm-builder
+
+# Reuse the Rust toolchain and compiled deps from the builder stage.
+COPY --from=builder /usr/local/rustup /usr/local/rustup
+COPY --from=builder /usr/local/cargo /usr/local/cargo
+COPY --from=builder /build/target /build/target
+ENV RUSTUP_HOME=/usr/local/rustup
+ENV CARGO_HOME=/usr/local/cargo
+ENV PATH="/usr/local/cargo/bin:/usr/local/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin:${PATH}"
 
 WORKDIR /build
 
-# Reuse compiled dependencies from the builder stage (target/ only).
-# Each FROM rust:1.97 image has its own cargo/rustup home at /usr/local/.
-COPY --from=builder /build/target /build/target
-
-# Install system deps (nodejs for Tailwind, curl for dioxus-cli download)
+# System deps: nodejs/npm (for Tailwind pre-build), curl (for dx download)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nodejs npm curl pkg-config libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install dioxus-cli and the wasm target for building the WASM web bundle.
-# Use --target x86_64-unknown-linux-musl to get a statically-linked dx binary
-# that doesn't depend on a specific glibc version (bookworm has glibc 2.36,
-# but the GNU release needs 2.39).
+# Add the wasm target, then download the pre-built `dx` binary directly
+# from the Dioxus GitHub release (GNU variant — works on ubuntu:24.04 glibc 2.39).
+# This avoids the slow `cargo install dioxus-cli` from source.
 RUN rustup default 1.97.0 && \
     rustup target add wasm32-unknown-unknown && \
-    curl -fsSL -o /tmp/cargo-binstall.tgz \
-      https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz && \
-    tar -xzf /tmp/cargo-binstall.tgz -C /usr/local/bin/ && \
-    chmod +x /usr/local/bin/cargo-binstall && \
-    cargo binstall --target x86_64-unknown-linux-musl dioxus-cli --version 0.7.10 --locked --no-confirm
+    curl -fsSL -o /tmp/dx.tar.gz \
+      https://github.com/DioxusLabs/dioxus/releases/download/v0.7.10/dx-x86_64-unknown-linux-gnu.tar.gz && \
+    tar -xzf /tmp/dx.tar.gz -C /usr/local/bin/ && \
+    chmod +x /usr/local/bin/dx && \
+    dx --version
 
 COPY Cargo.toml Cargo.lock ./
 COPY crates/ crates/
 COPY apps/ apps/
 
-# Fetch Ketcher (115 MB) then build the WASM web bundle
-RUN cargo run --release -p lotus-deploy --bin fetch-ketcher && \
+# Fetch Ketcher (115 MB) then build the WASM web bundle.
+# fetch-ketcher runs from apps/lotus-explore-rs/ so the relative
+# `public/assets/ketcher` lands inside the app crate's public/ dir.
+RUN cd apps/lotus-explore-rs && \
+    cargo run --release -p lotus-deploy --bin fetch-ketcher && \
     dx build --release --platform web --base-path "/" --package lotus-explore-rs
 
 # ── Stage 3: export (for CI artifact extraction) ────────────────────────────────

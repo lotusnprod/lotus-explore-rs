@@ -38,13 +38,16 @@ wasm:
 	cargo check -p lotus-explore-rs --target wasm32-unknown-unknown --locked
 
 # ── Per-app dev servers / production builds ───────────────────────────────────
+# fetch-ketcher must run from the app crate dir so the relative
+# `public/assets/ketcher` default lands inside apps/<app>/public,
+# not at the repo-root public/.
 
 serve app:
-	cargo run -p lotus-deploy --bin fetch-ketcher
+	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
 	dx serve --package {{app}}
 
 build app:
-	cargo run -p lotus-deploy --bin fetch-ketcher
+	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
 	dx build --release --package {{app}}
 
 # ── Supply-chain hygiene (skip gracefully if a tool is not installed) ─────────

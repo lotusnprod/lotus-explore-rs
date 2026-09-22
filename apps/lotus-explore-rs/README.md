@@ -90,7 +90,15 @@ development outside the Dioxus build pipeline.
 Ketcher must be fetched before serving or deploying:
 
 ```bash
-cargo run --release -p lotus-deploy --bin fetch-ketcher
+cd apps/lotus-explore-rs   # from repo root
+cargo run -p lotus-deploy --bin fetch-ketcher
+```
+
+Or simply use the `just` recipes, which fetch Ketcher automatically:
+
+```bash
+just build lotus-explore-rs   # fetches Ketcher + dx build --release
+just serve lotus-explore-rs   # fetches Ketcher + dx serve
 ```
 
 ## Citation
