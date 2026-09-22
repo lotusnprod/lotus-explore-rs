@@ -26,7 +26,7 @@
 - [Source path](https://github.com/lotusnprod/lotus-explore-rs)
 - [Paper landing page](https://elifesciences.org/articles/70780)
 - [Paper DOI](https://doi.org/10.7554/eLife.70780)
-- [BibTeX references](/public/docs/references.bib)
+- [BibTeX references](/docs/references.bib)
 - [LOTUS initiative](https://lotusnprod.github.io)
 - [Agent skills](/.well-known/agent-skills.json)
 - [API catalog](/.well-known/api-catalog.json)
@@ -49,7 +49,7 @@
 
 - [Paper DOI](https://doi.org/10.7554/eLife.70780)
 - [Paper landing page](https://elifesciences.org/articles/70780)
-- [BibTeX](/public/docs/references.bib)
+- [BibTeX](/docs/references.bib)
 
 ## Licensing
 

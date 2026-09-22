@@ -188,7 +188,7 @@ fn FooterCitationRow(locale: Locale) -> Element {
                     class: "shrink-0",
                     a {
                         class: "no-underline text-ui leading-[1.45] min-h-[34px] inline-flex items-center px-2 py-1 rounded-xl hover:underline hover:bg-current/8 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2 max-[480px]:px-1.5 max-[480px]:py-[3px] max-[480px]:text-micro max-[480px]:min-h-[32px] font-medium text-wd-compound",
-                        href: "/docs/references.bib",
+                        href: asset!("/public/docs/references.bib"),
                         download: "references.bib",
                         "BibTeX"
                     }
