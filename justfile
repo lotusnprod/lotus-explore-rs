@@ -53,7 +53,7 @@ build app:
 # ── Supply-chain hygiene (skip gracefully if a tool is not installed) ─────────
 
 machete:
-	@command -v cargo-machete >/dev/null 2>&1 && cargo machete check --workspace || echo "cargo-machete not installed; skipping"
+	@command -v cargo-machete >/dev/null 2>&1 && cargo machete || echo "cargo-machete not installed; skipping"
 
 audit:
 	@command -v cargo-audit >/dev/null 2>&1 && cargo audit || echo "cargo-audit not installed; skipping"
