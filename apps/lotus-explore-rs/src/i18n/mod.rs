@@ -24,8 +24,6 @@ mod en;
 mod fr;
 mod it;
 
-use dioxus_i18n::unic_langid::LanguageIdentifier;
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Locale {
     En,
@@ -36,21 +34,20 @@ pub enum Locale {
 
 impl Locale {
     fn from_lang_tag(lang_tag: &str) -> Option<Self> {
-        let identifier = lang_tag.trim().parse::<LanguageIdentifier>().ok()?;
-        let normalized = identifier.to_string().to_ascii_lowercase();
-        if normalized.starts_with("fr") {
-            return Some(Self::Fr);
+        // Extract the language subtag: "fr-CA" → "fr", "de_DE" → "de", "en-US" → "en"
+        let lang = lang_tag
+            .trim()
+            .split(['-', '_'])
+            .next()?
+            .trim()
+            .to_ascii_lowercase();
+        match lang.as_str() {
+            "fr" => Some(Self::Fr),
+            "de" => Some(Self::De),
+            "it" => Some(Self::It),
+            "en" => Some(Self::En),
+            _ => None,
         }
-        if normalized.starts_with("de") {
-            return Some(Self::De);
-        }
-        if normalized.starts_with("it") {
-            return Some(Self::It);
-        }
-        if normalized.starts_with("en") {
-            return Some(Self::En);
-        }
-        None
     }
 
     pub fn detect(lang_hint: &str) -> Self {

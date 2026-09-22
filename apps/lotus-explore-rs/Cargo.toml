@@ -20,7 +20,6 @@ path = "src/main.rs"
 [dependencies]
 console_log = { workspace = true }
 dioxus = { workspace = true }
-dioxus-i18n = { workspace = true }
 futures = { workspace = true }
 log = { workspace = true }
 lotus = { path = "../../crates/lotus", version = "0.1" }
