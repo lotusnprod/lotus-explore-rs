@@ -29,7 +29,12 @@ pub fn current_year() -> u16 {
     *CURRENT_YEAR_CACHE.get_or_init(|| {
         #[cfg(target_arch = "wasm32")]
         {
-            js_sys::Date::new_0().get_full_year().min(u16::MAX as u32) as u16
+            u16::try_from(
+                js_sys::Date::new_0()
+                    .get_full_year()
+                    .min(u32::from(u16::MAX)),
+            )
+            .unwrap_or(u16::MAX)
         }
         #[cfg(not(target_arch = "wasm32"))]
         {
