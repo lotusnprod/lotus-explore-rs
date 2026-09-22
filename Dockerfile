@@ -18,33 +18,33 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN cargo build --release --locked --features server -p lotus-explore-rs
 
 # ── Stage 2: WASM client (with Ketcher) ──────────────────────────────────────
-# Uses ubuntu:24.04 (glibc 2.39) because the pre-built `dx` binary from
-# Dioxus releases requires glibc >= 2.39 (Debian Bookworm only has 2.36).
-# Rust toolchain is copied from the builder stage (forward-compatible).
-FROM ubuntu:24.04 AS wasm-builder
+# Uses rust:1.97.0-slim-trixie (glibc 2.40) because the pre-built `dx` binary
+# from Dioxus releases requires glibc >= 2.39 (Debian Bookworm only has 2.36).
+# Same Rust 1.97.0 toolchain as the builder stage, so cached deps are reusable.
+FROM rust:1.97.0-slim-trixie AS wasm-builder
 
-# Reuse the Rust toolchain and compiled deps from the builder stage.
-COPY --from=builder /usr/local/rustup /usr/local/rustup
-COPY --from=builder /usr/local/cargo /usr/local/cargo
+# Reuse compiled dependencies from the builder stage (same Rust version).
 COPY --from=builder /build/target /build/target
-ENV RUSTUP_HOME=/usr/local/rustup
-ENV CARGO_HOME=/usr/local/cargo
-ENV PATH="/usr/local/cargo/bin:/usr/local/rustup/toolchains/1.97.0-x86_64-unknown-linux-gnu/bin:${PATH}"
 
 WORKDIR /build
 
-# System deps: nodejs/npm (for Tailwind pre-build), curl (for dx download)
+# System deps: nodejs/npm (for Tailwind pre-build), curl (for dx download),
+# gcc (C linker for native build scripts), pkg-config + libssl-dev (crypto crates)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    nodejs npm curl pkg-config libssl-dev \
+    nodejs npm curl gcc pkg-config libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Add the wasm target, then download the pre-built `dx` binary directly
-# from the Dioxus GitHub release (GNU variant — works on ubuntu:24.04 glibc 2.39).
-# This avoids the slow `cargo install dioxus-cli` from source.
-RUN rustup default 1.97.0 && \
-    rustup target add wasm32-unknown-unknown && \
+# Download the pre-built `dx` binary matching the host architecture
+# (aarch64 on Apple Silicon, x86_64 on Intel/AMD). This avoids the slow
+# `cargo install dioxus-cli` from source.
+RUN arch=$(uname -m) && \
+    case "$arch" in \
+      aarch64) dx_arch="aarch64" ;; \
+      x86_64)  dx_arch="x86_64" ;; \
+      *) echo "unsupported arch: $arch" && exit 1 ;; \
+    esac && \
     curl -fsSL -o /tmp/dx.tar.gz \
-      https://github.com/DioxusLabs/dioxus/releases/download/v0.7.10/dx-x86_64-unknown-linux-gnu.tar.gz && \
+      https://github.com/DioxusLabs/dioxus/releases/download/v0.7.10/dx-${dx_arch}-unknown-linux-gnu.tar.gz && \
     tar -xzf /tmp/dx.tar.gz -C /usr/local/bin/ && \
     chmod +x /usr/local/bin/dx && \
     dx --version
