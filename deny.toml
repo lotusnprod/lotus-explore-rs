@@ -67,8 +67,6 @@ skip = [
   { name = "thiserror-impl" },
   { name = "windows-sys" },
   { name = "winnow" },
-  { name = "zstd" },
-  { name = "zstd-safe" },
 ]
 
 # ── Source policy ─────────────────────────────────────────────────────────────

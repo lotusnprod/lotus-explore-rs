@@ -30,6 +30,9 @@ use crate::ui::a11y_contract::{MAIN_PANEL_ID, PAGE_TITLE_ID, SKIP_TO_RESULTS_HRE
 use dioxus::prelude::*;
 use std::sync::Arc;
 
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen::JsCast;
+
 fn resolve_startup_dark_mode(startup: &crate::features::explore::InitialUrlState) -> bool {
     if startup.dark_mode {
         return true;
@@ -129,45 +132,24 @@ fn AppRuntimeEffects(
     use_effect(move || persist_view_query_param(app_state.read().view));
     use_effect(move || persist_dark_mode_query_param(app_state.read().dark_mode));
 
-    // Sync <html lang> via web_sys directly — doc.eval() is blocked by
-    // the site's Trusted Types CSP policy, so the lang attribute set by
-    // the inline bootstrap script (which runs once at page load) is never
-    // updated when the user selects a different language.
+    // Sync <html lang> and <html data-theme> in a single effect to batch DOM
+    // reads (document_element) and writes (set_attribute) — avoids interleaved
+    // read-write-reflow patterns that cause forced synchronous layout.
     use_effect(move || {
         #[cfg(target_arch = "wasm32")]
         {
             let lang = locale.read().lang_code();
+            let dark_mode = app_state.read().dark_mode;
             if let Some(doc) = web_sys::window().and_then(|w| w.document())
                 && let Some(html) = doc.document_element()
             {
                 let _ = html.set_attribute("lang", lang);
+                let _ = html.set_attribute("data-theme", if dark_mode { "dark" } else { "light" });
             }
         }
         #[cfg(not(target_arch = "wasm32"))]
         {
-            let _ = locale.read();
-        }
-    });
-
-    // Sync data-theme="dark|light" on <html> based on dark_mode state.
-    // Uses the app_state value which is persisted to localStorage via the toggle.
-    use_effect(move || {
-        let dark_mode = app_state.read().dark_mode;
-        #[cfg(target_arch = "wasm32")]
-        {
-            if let Some(doc) = web_sys::window().and_then(|w| w.document())
-                && let Some(html) = doc.document_element()
-            {
-                if dark_mode {
-                    let _ = html.set_attribute("data-theme", "dark");
-                } else {
-                    let _ = html.set_attribute("data-theme", "light");
-                }
-            }
-        }
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            let _ = dark_mode;
+            let _ = (locale.read(), app_state.read().dark_mode);
         }
     });
 

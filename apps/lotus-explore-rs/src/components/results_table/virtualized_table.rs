@@ -75,20 +75,14 @@ pub(super) fn VirtualizedResultsTable(
                             }
                         }
                     }
-                    {
-                        {
-                            rsx! {
-                                ResultsRowsWindow {
-                                    locale,
-                                    text,
-                                    rows: entries_ref.0.clone(),
-                                    prepared_rows: render_model.prepared_rows.clone(),
-                                    order: render_model.sorted_indices.clone(),
-                                    start_row: render_model.start_row,
-                                    end_row: render_model.end_row,
-                                }
-                            }
-                        }
+                    ResultsRowsWindow {
+                        locale,
+                        text,
+                        rows: entries_ref.0.clone(),
+                        prepared_rows: render_model.prepared_rows.clone(),
+                        order: render_model.sorted_indices.clone(),
+                        start_row: render_model.start_row,
+                        end_row: render_model.end_row,
                     }
                     if render_model.has_bottom_spacer() {
                         tr { aria_hidden: "true",

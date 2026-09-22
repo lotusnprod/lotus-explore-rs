@@ -9,11 +9,6 @@
 use dioxus::document::document;
 use dioxus::prelude::*;
 
-fn sync_document_lang(lang: &str) {
-    let doc = document();
-    doc.eval(format!("document.documentElement.lang = {lang:?};"));
-}
-
 /// Properties for [`DocumentHead`].
 #[derive(Clone, Props, PartialEq)]
 pub struct DocumentHeadProps {
@@ -61,9 +56,6 @@ pub struct DocumentHeadProps {
 #[component]
 pub fn DocumentHead(props: DocumentHeadProps) -> Element {
     let title = props.title.clone();
-    let lang = props.lang.trim().to_string();
-    let lang_for_hook = lang.clone();
-    let lang_for_effect = lang.clone();
     let description = props.description.clone();
     let og_type = props
         .og_type
@@ -80,7 +72,6 @@ pub fn DocumentHead(props: DocumentHeadProps) -> Element {
     use_hook(move || {
         let doc = document();
         doc.set_title(title.clone());
-        sync_document_lang(&lang_for_hook);
 
         // <meta name="description"> + og:description
         if let Some(desc) = &description {
@@ -224,8 +215,6 @@ pub fn DocumentHead(props: DocumentHeadProps) -> Element {
             );
         }
     });
-
-    use_effect(move || sync_document_lang(&lang_for_effect));
 
     VNode::empty()
 }

@@ -34,14 +34,14 @@ pub fn PageHeader() -> Element {
                     dangerous_inner_html: LOTUS_LOGO_SVG,
                 }
                 div {
-                    h1 { id: PAGE_TITLE_ID,
-                        class: "text-display font-bold truncate max-w-full min-w-0 break-words",
-                        a {
-                            href: "/lotus-explore-rs/",
-                            class: "text-inherit no-underline hover:no-underline",
-                            "{t(locale, TextKey::PageTitle)}"
-                        }
+                h1 { id: PAGE_TITLE_ID,
+                    class: "text-display font-bold max-w-full min-w-0 break-words overflow-hidden",
+                    a {
+                        href: "/lotus-explore-rs/",
+                        class: "text-inherit no-underline hover:no-underline",
+                        "{t(locale, TextKey::PageTitle)}"
                     }
+                }
                 }
                 div {
                     class: "flex flex-wrap items-center gap-2 min-w-0 max-w-full",

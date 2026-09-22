@@ -237,11 +237,13 @@ pub fn DownloadActionsGroup() -> Element {
 
     let sparql_query_value = snapshot.sparql_query.clone();
     let metadata_json_value = snapshot.metadata_json.clone();
-    let export_available = toolbar_model.read().export_available;
-    let ui_url = toolbar_model.read().ui_url.clone();
-    let endpoint_name = toolbar_model.read().sparql_endpoint_ui.to_string();
+    let toolbar = toolbar_model.read();
+    let export_available = toolbar.export_available;
+    let ui_url = toolbar.ui_url.clone();
+    let endpoint_name = toolbar.sparql_endpoint_ui.to_string();
     let ui_url_for_click = ui_url.clone();
     drop(snapshot);
+    drop(toolbar);
 
     rsx! {
         nav { class: "flex w-full min-w-0 flex-wrap items-center justify-center gap-3 py-1 mb-3", aria_label: "{download_results_label}",
