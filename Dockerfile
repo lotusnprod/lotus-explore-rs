@@ -27,7 +27,8 @@ WORKDIR /build
 COPY --from=builder /build/target /build/target
 
 # Install dioxus-cli and the wasm target for building the WASM web bundle
-RUN rustup target add wasm32-unknown-unknown && \
+RUN rustup default 1.97.0 && \
+    rustup target add wasm32-unknown-unknown && \
     wget -q -O /tmp/cargo-binstall.tar.gz \
       https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tar.gz && \
     tar -xzf /tmp/cargo-binstall.tar.gz -C /usr/local/bin/ && \
@@ -39,7 +40,7 @@ COPY crates/ crates/
 COPY apps/ apps/
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    pkg-config libssl-dev \
+    nodejs npm pkg-config libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Fetch Ketcher (115 MB) then build the WASM web bundle
