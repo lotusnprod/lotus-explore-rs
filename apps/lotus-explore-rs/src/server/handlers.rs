@@ -429,7 +429,7 @@ pub async fn export_file(
         ApiError::bad_request("Export link expired or is unknown. Regenerate the export URL.")
     })?;
 
-    let upstream_url = export::build_upstream_export_url(&cached.query, format);
+    let upstream_url = export::qlever_export_url(&cached.query, format);
     let raw_bytes = timeout(
         state.request_timeout,
         lotus::transport::fetch_url_bytes(&upstream_url),

@@ -69,6 +69,37 @@ WHERE {{
     )
 }
 
+/// Build the compound query with an optional taxon ancestry filter.
+/// When `taxon_qid` is `Some`, adds the `P171*` transitive-closure filter.
+fn query_compounds_inner(taxon_qid: Option<&str>) -> String {
+    let ancestry = taxon_qid
+        .map(|qid| format!("\n          ?t (wdt:P171*) wd:{qid}."))
+        .unwrap_or_default();
+    let compound_select = compound_select_clause();
+    format!(
+        r"{PREFIXES}
+{compound_select}
+WHERE {{
+  {{
+    SELECT
+      {COMPOUND_ENRICHED_VARS}
+    WHERE {{
+      {{
+        SELECT {COMPOUND_CORE_VARS}
+        WHERE {{
+          {COMPOUND_IDENTIFIERS}
+          {TAXON_REFERENCE_ASSOCIATION}
+          {ancestry}
+        }}
+      }}
+      {REFERENCE_METADATA_OPTIONAL}
+      {PROPERTIES_OPTIONAL}
+    }}
+  }}
+}}"
+    )
+}
+
 /// Query compounds found in a specific taxon and all descendants.
 ///
 /// Uses a three-level SELECT/subquery pattern:
@@ -80,57 +111,14 @@ WHERE {{
 /// innermost subquery so `QLever` only enriches matching rows.
 #[must_use]
 pub fn query_compounds_by_taxon(taxon_qid: &str) -> String {
-    let compound_select = compound_select_clause();
-    format!(
-        r"{PREFIXES}
-{compound_select}
-WHERE {{
-  {{
-    SELECT
-      {COMPOUND_ENRICHED_VARS}
-    WHERE {{
-      {{
-        SELECT {COMPOUND_CORE_VARS}
-        WHERE {{
-          {COMPOUND_IDENTIFIERS}
-          {TAXON_REFERENCE_ASSOCIATION}
-          ?t (wdt:P171*) wd:{taxon_qid}.
-        }}
-      }}
-      {REFERENCE_METADATA_OPTIONAL}
-      {PROPERTIES_OPTIONAL}
-    }}
-  }}
-}}"
-    )
+    query_compounds_inner(Some(taxon_qid))
 }
 
 /// Query all compounds from all organisms/taxa in LOTUS.
 ///
 /// Same three-level scaffolding as [`query_compounds_by_taxon`] but without the
-/// ancestry filter.  Large result sets should be paginated via LIMIT.
+/// ancestry filter. Large result sets should be paginated via LIMIT.
 #[must_use]
 pub fn query_all_compounds() -> String {
-    let compound_select = compound_select_clause();
-    format!(
-        r"{PREFIXES}
-{compound_select}
-WHERE {{
-  {{
-    SELECT
-      {COMPOUND_ENRICHED_VARS}
-    WHERE {{
-      {{
-        SELECT {COMPOUND_CORE_VARS}
-        WHERE {{
-          {COMPOUND_IDENTIFIERS}
-          {TAXON_REFERENCE_ASSOCIATION}
-        }}
-      }}
-      {REFERENCE_METADATA_OPTIONAL}
-      {PROPERTIES_OPTIONAL}
-    }}
-  }}
-}}"
-    )
+    query_compounds_inner(None)
 }

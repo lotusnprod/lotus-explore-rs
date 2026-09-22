@@ -7,9 +7,7 @@ use crate::models::SearchCriteria;
 use crate::perf;
 use crate::repositories::is_wdqs_fallback_used;
 use lotus::queries::transform_query_for_wdqs;
-use lotus::transport::{
-    QLEVER_WIKIDATA, ResponseFormat as LotusResponseFormat, WDQS_SCHOLARLY, WDQS_WIKIDATA,
-};
+use lotus::transport::{QLEVER_WIKIDATA, WDQS_SCHOLARLY, WDQS_WIKIDATA};
 use std::sync::Arc;
 
 pub(super) async fn execute_download_wasm(
@@ -93,7 +91,7 @@ async fn execute_download_wasm_wdqs(
     let prepared_query = format.prepared_query(&wdqs_query);
 
     // Determine the WDQS response format
-    let response_format = wdqs_response_format(format);
+    let response_format = format.wdqs_response_format();
 
     // Fetch results from WDQS using POST with proper Accept header.
     // WDQS GET URL doesn't support format negotiation for CSV/Turtle.
@@ -137,15 +135,6 @@ async fn execute_download_wasm_wdqs(
         Some(trigger_elapsed),
     );
     Ok(())
-}
-
-/// Maps DownloadFormat to WDQS ResponseFormat for content negotiation.
-fn wdqs_response_format(format: DownloadFormat) -> LotusResponseFormat {
-    match format {
-        DownloadFormat::Csv => LotusResponseFormat::Csv,
-        DownloadFormat::Json => LotusResponseFormat::SparqlJson,
-        DownloadFormat::Rdf => LotusResponseFormat::Turtle,
-    }
 }
 
 /// Returns the MIME type for downloaded file content.

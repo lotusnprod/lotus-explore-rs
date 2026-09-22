@@ -44,28 +44,7 @@ async fn execute_download_with_fallback(
 
     match result {
         Ok(body) => {
-            let fetch_elapsed = perf::end_timer(format.timer_label(), dl_timer);
-            perf::log_timing(
-                "download",
-                &format!(
-                    "event=download format={} phase=fetch state=success source=direct body_bytes={}",
-                    format.log_name(),
-                    body.len()
-                ),
-                Some(fetch_elapsed),
-            );
-
-            let trigger_timer = perf::start_timer(&format.trigger_timer_label());
-            trigger_download(&filename, format.content_type(), &body);
-            let trigger_elapsed = perf::end_timer(&format.trigger_timer_label(), trigger_timer);
-            perf::log_timing(
-                "download",
-                &format!(
-                    "event=download format={} phase=trigger state=success source=direct",
-                    format.log_name()
-                ),
-                Some(trigger_elapsed),
-            );
+            finalize_download(format, "direct", &body, dl_timer, &filename);
             Ok(())
         }
         Err(e) => {
@@ -84,6 +63,26 @@ async fn execute_download_with_fallback(
     }
 }
 
+/// Execute a download against a WDQS endpoint with the given query and endpoint.
+async fn execute_download_wdqs_endpoint(
+    format: DownloadFormat,
+    query: &str,
+    endpoint: &str,
+    filename: &str,
+    dl_timer: perf::TimerHandle,
+) -> Result<(), String> {
+    let prepared = format.prepared_query(query);
+    execute_sparql_with_format_download(
+        format,
+        &prepared,
+        endpoint,
+        format.wdqs_response_format(),
+        filename,
+        dl_timer,
+    )
+    .await
+}
+
 async fn execute_download_wdqs(
     format: DownloadFormat,
     query: Arc<str>,
@@ -97,107 +96,35 @@ async fn execute_download_wdqs(
             format.log_name()
         );
         let query_without_prefix = query.replace("{CURATION_SPARQL_PREFIXES}\n", "");
-        return match format {
-            DownloadFormat::Csv => {
-                execute_sparql_with_format_download(
-                    format,
-                    &query_without_prefix,
-                    WDQS_SCHOLARLY,
-                    LotusResponseFormat::Csv,
-                    &filename,
-                    dl_timer,
-                )
-                .await
-            }
-            DownloadFormat::Json => {
-                execute_sparql_with_format_download(
-                    format,
-                    &query_without_prefix,
-                    WDQS_SCHOLARLY,
-                    LotusResponseFormat::SparqlJson,
-                    &filename,
-                    dl_timer,
-                )
-                .await
-            }
-            DownloadFormat::Rdf => {
-                // For Turtle format, SELECT must be wrapped in CONSTRUCT
-                let construct_query = format.prepared_query(&query_without_prefix);
-                execute_sparql_with_format_download(
-                    format,
-                    &construct_query,
-                    WDQS_SCHOLARLY,
-                    LotusResponseFormat::Turtle,
-                    &filename,
-                    dl_timer,
-                )
-                .await
-            }
-        };
+        return execute_download_wdqs_endpoint(
+            format,
+            &query_without_prefix,
+            WDQS_SCHOLARLY,
+            &filename,
+            dl_timer,
+        )
+        .await;
     }
 
     // For complex queries, apply transformation and use regular WDQS
     let wdqs_query = transform_query_for_wdqs(&query);
-
-    match format {
-        DownloadFormat::Csv => {
-            execute_sparql_with_format_download(
-                format,
-                &wdqs_query,
-                WDQS_WIKIDATA,
-                LotusResponseFormat::Csv,
-                &filename,
-                dl_timer,
-            )
-            .await
-        }
-        DownloadFormat::Json => {
-            execute_sparql_with_format_download(
-                format,
-                &wdqs_query,
-                WDQS_WIKIDATA,
-                LotusResponseFormat::SparqlJson,
-                &filename,
-                dl_timer,
-            )
-            .await
-        }
-        DownloadFormat::Rdf => {
-            // For Turtle format, SELECT queries must be wrapped in CONSTRUCT
-            // (WDQS can't return Turtle for SELECT queries)
-            let construct_query = format.prepared_query(&wdqs_query);
-            execute_sparql_with_format_download(
-                format,
-                &construct_query,
-                WDQS_WIKIDATA,
-                LotusResponseFormat::Turtle,
-                &filename,
-                dl_timer,
-            )
-            .await
-        }
-    }
+    execute_download_wdqs_endpoint(format, &wdqs_query, WDQS_WIKIDATA, &filename, dl_timer).await
 }
 
-async fn execute_sparql_with_format_download(
+/// Logs fetch timing, triggers the browser download, and logs trigger timing.
+/// Shared between the QLever and WDQS download paths.
+fn finalize_download(
     format: DownloadFormat,
-    query: &str,
-    endpoint: &str,
-    response_format: LotusResponseFormat,
-    filename: &str,
+    source: &str,
+    body: &str,
     dl_timer: perf::TimerHandle,
-) -> Result<(), String> {
-    use lotus::transport::execute_sparql_with_format as shared_execute;
-
-    let body = shared_execute(query, endpoint, response_format)
-        .await
-        .map_err(|e| e.to_string())?;
-
+    filename: &str,
+) {
     let fetch_elapsed = perf::end_timer(format.timer_label(), dl_timer);
     perf::log_timing(
         "download",
         &format!(
-            "event=download format={} phase=fetch state=success source=wdqs body_bytes={}",
+            "event=download format={} phase=fetch state=success source={source} body_bytes={}",
             format.log_name(),
             body.len()
         ),
@@ -205,17 +132,16 @@ async fn execute_sparql_with_format_download(
     );
 
     let trigger_timer = perf::start_timer(&format.trigger_timer_label());
-    trigger_download(filename, format.content_type(), &body);
+    trigger_download(filename, format.content_type(), body);
     let trigger_elapsed = perf::end_timer(&format.trigger_timer_label(), trigger_timer);
     perf::log_timing(
         "download",
         &format!(
-            "event=download format={} phase=trigger state=success source=wdqs",
+            "event=download format={} phase=trigger state=success source={source}",
             format.log_name()
         ),
         Some(trigger_elapsed),
     );
-    Ok(())
 }
 
 fn handle_download_error(
@@ -258,6 +184,24 @@ async fn execute_download_direct(format: DownloadFormat, query: &str) -> Result<
                 .map_err(|e| e.to_string())
         }
     }
+}
+
+async fn execute_sparql_with_format_download(
+    format: DownloadFormat,
+    query: &str,
+    endpoint: &str,
+    response_format: LotusResponseFormat,
+    filename: &str,
+    dl_timer: perf::TimerHandle,
+) -> Result<(), String> {
+    use lotus::transport::execute_sparql_with_format as shared_execute;
+
+    let body = shared_execute(query, endpoint, response_format)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    finalize_download(format, "wdqs", &body, dl_timer, filename);
+    Ok(())
 }
 
 pub(super) fn trigger_download(filename: &str, mime: &str, content: &str) {

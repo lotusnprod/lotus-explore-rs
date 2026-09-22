@@ -69,10 +69,19 @@ pub(super) const TAXON_REFERENCE_ASSOCIATION: &str = r"
 ";
 
 /// Reference metadata: title (P1476), DOI (P356), publication date (P577).
+/// Uses ` ?r` variable — matched by [`TAXON_REFERENCE_ASSOCIATION`].
 pub(super) const REFERENCE_METADATA_OPTIONAL: &str = r"
   OPTIONAL { ?r wdt:P1476 ?ref_title. }
   OPTIONAL { ?r wdt:P356 ?ref_doi. }
   OPTIONAL { ?r wdt:P577 ?ref_date. }
+";
+
+/// Reference metadata: title (P1476), DOI (P356), publication date (P577).
+/// Uses ` ?ref` variable — matched by reference resolution queries.
+pub(super) const REFERENCE_METADATA_OPTIONAL_REF: &str = r"
+  OPTIONAL { ?ref wdt:P1476 ?ref_title. }
+  OPTIONAL { ?ref wdt:P356 ?ref_doi. }
+  OPTIONAL { ?ref wdt:P577 ?ref_date. }
 ";
 
 /// Core variables projected from the innermost (Level-1) SELECT.
@@ -129,18 +138,6 @@ pub(super) const REFERENCE_METADATA_SERVICE_REF: &str = r"
 /// provides enhanced access to bibliographic data.
 #[must_use]
 pub fn transform_query_for_wdqs(query: &str) -> String {
-    // Pattern with ?r variable (established in TAXON_REFERENCE_ASSOCIATION)
-    let ref_optional_r = r"
-  OPTIONAL { ?r wdt:P1476 ?ref_title. }
-  OPTIONAL { ?r wdt:P356 ?ref_doi. }
-  OPTIONAL { ?r wdt:P577 ?ref_date. }
-";
-    // Pattern with ?ref variable (used in resolve_reference_qid)
-    let ref_optional_ref = r"
-  OPTIONAL { ?ref wdt:P1476 ?ref_title. }
-  OPTIONAL { ?ref wdt:P356 ?ref_doi. }
-  OPTIONAL { ?ref wdt:P577 ?ref_date. }
-";
     // Check if this is a simple reference lookup query (just SELECT ?ref)
     let is_simple_ref_query = query.contains("SELECT ?ref WHERE {")
         && query.contains("wdt:P356")
@@ -155,12 +152,15 @@ pub fn transform_query_for_wdqs(query: &str) -> String {
         format!(
             "SERVICE <https://query-scholarly.wikidata.org/sparql> {{\n  {query_body}\n}}\nLIMIT 1"
         )
-    } else if query.contains("OPTIONAL { ?ref wdt:P1476 ?ref_title. }") {
+    } else if query.contains(REFERENCE_METADATA_OPTIONAL_REF) {
         // Replace ?ref variable with SERVICE
-        query.replace(ref_optional_ref, REFERENCE_METADATA_SERVICE_REF)
-    } else if query.contains("OPTIONAL { ?r wdt:P1476 ?ref_title. }") {
+        query.replace(
+            REFERENCE_METADATA_OPTIONAL_REF,
+            REFERENCE_METADATA_SERVICE_REF,
+        )
+    } else if query.contains(REFERENCE_METADATA_OPTIONAL) {
         // Replace ?r variable with SERVICE
-        query.replace(ref_optional_r, REFERENCE_METADATA_SERVICE)
+        query.replace(REFERENCE_METADATA_OPTIONAL, REFERENCE_METADATA_SERVICE)
     } else {
         query.to_string()
     }

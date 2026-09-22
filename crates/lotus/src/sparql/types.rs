@@ -287,11 +287,6 @@ pub fn normalize_doi_value(value: &str) -> Option<&str> {
     }
 }
 
-/// Execute a LOTUS query on the default Wikidata `QLever` endpoint.
-///
-/// # Errors
-/// Returns [`FetchError`] for transport/HTTP failures, empty responses, or
-/// invalid UTF-8 payloads.
 /// Read a trimmed UTF-8 string from a CSV byte record at an optional column index.
 ///
 /// Returns `""` (not `None`) when the column is absent or non-UTF-8, so

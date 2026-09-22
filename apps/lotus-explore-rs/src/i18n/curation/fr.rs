@@ -139,9 +139,7 @@ pub(super) fn msg_curation_failed(detail: &str) -> String {
 }
 
 pub(super) const fn msg_curation_rate_limited() -> &'static str {
-    {
-        "Limite de débit atteinte sur un service de métadonnées amont (HTTP 429). Attendez environ 60 s puis réessayez."
-    }
+    "Limite de débit atteinte sur un service de métadonnées amont (HTTP 429). Attendez environ 60 s puis réessayez."
 }
 
 pub(super) fn msg_prerequisites_pending(count: usize) -> String {
@@ -151,9 +149,7 @@ pub(super) fn msg_prerequisites_pending(count: usize) -> String {
 }
 
 pub(super) const fn msg_two_step_hint() -> &'static str {
-    {
-        "Flux en deux étapes : exécutez d'abord les prérequis, créez/fusionnez ces éléments dans Wikidata, puis cliquez à nouveau sur Générer les QuickStatements pour que le bloc principal utilise directement les QID résolus."
-    }
+    "Flux en deux étapes : exécutez d'abord les prérequis, créez/fusionnez ces éléments dans Wikidata, puis cliquez à nouveau sur Générer les QuickStatements pour que le bloc principal utilise directement les QID résolus."
 }
 
 pub(super) const fn button_second_pass() -> &'static str {
@@ -165,9 +161,7 @@ pub(super) const fn msg_second_pass_running() -> &'static str {
 }
 
 pub(super) const fn msg_second_pass_done() -> &'static str {
-    {
-        "Seconde passe terminée. Les QuickStatements principaux sont rafraîchis avec les QID résolus lorsque disponibles."
-    }
+    "Seconde passe terminée. Les QuickStatements principaux sont rafraîchis avec les QID résolus lorsque disponibles."
 }
 
 pub(super) fn msg_second_pass_still_pending_count(count: usize) -> String {
@@ -193,9 +187,7 @@ pub(super) const fn curation_mass_warning_title() -> &'static str {
 }
 
 pub(super) const fn msg_delay_advice() -> &'static str {
-    {
-        "Conseil : Wikidata et les points d'accès de requête peuvent nécessiter 30 à 120 secondes pour exposer les nouveaux éléments."
-    }
+    "Conseil : Wikidata et les points d'accès de requête peuvent nécessiter 30 à 120 secondes pour exposer les nouveaux éléments."
 }
 
 pub(super) const fn curation_qs_dev_label() -> &'static str {
@@ -203,9 +195,7 @@ pub(super) const fn curation_qs_dev_label() -> &'static str {
 }
 
 pub(super) const fn curation_qs_dev_prereq_hint() -> &'static str {
-    {
-        "Ouvrez QS-Dev, collez le bloc de prérequis, exécutez-le, créez ou fusionnez les nouveaux éléments dans Wikidata, attendez un instant, puis revenez ici pour la seconde passe."
-    }
+    "Ouvrez QS-Dev, collez le bloc de prérequis, exécutez-le, créez ou fusionnez les nouveaux éléments dans Wikidata, attendez un instant, puis revenez ici pour la seconde passe."
 }
 
 pub(super) const fn curation_qs_dev_main_hint() -> &'static str {

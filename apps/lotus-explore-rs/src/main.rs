@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(dead_code, unused_imports, unused)]
+// This crate compiles Dioxus WASM-client code alongside native-server code in
+// a single compilation unit.  On native targets (no `server` feature) main()
+// just prints a hint and never launches the Dioxus renderer, so all UI/i18n
+// modules are technically unreachable — hence `allow(dead_code)`.
+#![allow(dead_code)]
 
 //! `lotus-explore-rs` — LOTUS Knowledge Explorer.
 //!
@@ -131,6 +135,7 @@ mod utils;
 #[cfg(all(feature = "server", not(target_arch = "wasm32")))]
 mod server;
 
+#[cfg(target_arch = "wasm32")]
 use dioxus::prelude::*;
 
 #[cfg(test)]

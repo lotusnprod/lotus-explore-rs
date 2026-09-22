@@ -32,6 +32,23 @@ impl std::fmt::Display for SparqlEndpoint {
     }
 }
 
+impl SparqlEndpoint {
+    pub fn info(self) -> (&'static str, &'static str, &'static str) {
+        match self {
+            Self::Qlever => (
+                QLEVER_ENDPOINT,
+                "QLever Wikidata",
+                "Fast SPARQL endpoint for Wikidata (QLever)",
+            ),
+            Self::Wdqs => (
+                WDQS_ENDPOINT,
+                "Wikidata Query Service",
+                "Wikidata Query Service (fell back from QLever 502)",
+            ),
+        }
+    }
+}
+
 #[derive(Serialize)]
 struct Organization<'a> {
     #[serde(rename = "@type")]
@@ -313,21 +330,13 @@ pub fn build_metadata_json(inp: MetadataInputs<'_>) -> String {
         ],
         search_parameters: Value::Object(search_params),
         chemical_search_service,
-        sparql_endpoint: SparqlEndpointInfo {
-            url: match inp.endpoint {
-                SparqlEndpoint::Qlever => QLEVER_ENDPOINT.to_string(),
-                SparqlEndpoint::Wdqs => WDQS_ENDPOINT.to_string(),
-            },
-            name: match inp.endpoint {
-                SparqlEndpoint::Qlever => "QLever Wikidata".to_string(),
-                SparqlEndpoint::Wdqs => "Wikidata Query Service".to_string(),
-            },
-            description: match inp.endpoint {
-                SparqlEndpoint::Qlever => "Fast SPARQL endpoint for Wikidata (QLever)".to_string(),
-                SparqlEndpoint::Wdqs => {
-                    "Wikidata Query Service (fell back from QLever 502)".to_string()
-                }
-            },
+        sparql_endpoint: {
+            let (url, name, description) = inp.endpoint.info();
+            SparqlEndpointInfo {
+                url: url.to_string(),
+                name: name.to_string(),
+                description: description.to_string(),
+            }
         },
         provenance: Provenance {
             query_hash: HashInfo {

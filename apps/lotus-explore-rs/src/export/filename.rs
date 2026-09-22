@@ -1,24 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-use crate::models::{SearchCriteria, SmilesSearchType};
+use crate::models::SearchCriteria;
 
 fn export_search_type_suffix(criteria: &SearchCriteria) -> Option<&'static str> {
-    if criteria.smiles.trim().is_empty() {
-        None
-    } else {
-        Some(match criteria.smiles_search_type {
-            SmilesSearchType::Substructure => "substructure",
-            SmilesSearchType::Similarity => "similarity",
-        })
-    }
+    (!criteria.smiles.trim().is_empty()).then(|| criteria.smiles_search_type.as_str())
 }
 
 pub fn now_iso8601() -> String {
     #[cfg(target_arch = "wasm32")]
     {
-        let s: String = js_sys::Date::new_0().to_iso_string().into();
-        s
+        js_sys::Date::new_0().to_iso_string().into()
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
@@ -102,6 +94,7 @@ pub fn generate_filename(criteria: &SearchCriteria, ext: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::models::SmilesSearchType;
 
     #[test]
     fn export_filename_taxon_only_has_no_filtered_suffix() {

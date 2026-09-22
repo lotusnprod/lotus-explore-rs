@@ -148,7 +148,7 @@ fn normalized_structure_preserves_multiline_molfile() {
 #[test]
 fn rdf_export_url_uses_construct_query_with_normalized_formula_binding() {
     let select = lotus::queries::query_compounds_by_taxon("Q2382443");
-    let url = export::build_upstream_export_url(&select, ExportFormat::Rdf);
+    let url = export::qlever_export_url(&select, ExportFormat::Rdf);
 
     assert!(url.contains("action=turtle_export"));
 

@@ -15,6 +15,7 @@
 #[cfg(any(test, target_arch = "wasm32"))]
 mod cache_impl {
     use lotus::transport::ResponseBody;
+    #[cfg(target_arch = "wasm32")]
     use std::cell::RefCell;
     use std::collections::HashMap;
 

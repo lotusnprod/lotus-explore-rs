@@ -73,6 +73,15 @@ impl Locale {
 
         Self::En
     }
+
+    pub const fn lang_code(self) -> &'static str {
+        match self {
+            Self::En => "en",
+            Self::Fr => "fr",
+            Self::De => "de",
+            Self::It => "it",
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

@@ -131,10 +131,8 @@ pub(super) fn msg_running_checks() -> String {
 }
 
 pub(super) fn msg_done_review_copy() -> String {
-    {
-        "Fertig. Prüfen Sie die erzeugten Zeilen und kopieren Sie den QuickStatements-Block."
-            .to_string()
-    }
+    "Fertig. Prüfen Sie die erzeugten Zeilen und kopieren Sie den QuickStatements-Block."
+        .to_string()
 }
 
 pub(super) fn msg_curation_failed(detail: &str) -> String {
@@ -142,9 +140,7 @@ pub(super) fn msg_curation_failed(detail: &str) -> String {
 }
 
 pub(super) const fn msg_curation_rate_limited() -> &'static str {
-    {
-        "Ratenlimit bei einem vorgelagerten Metadatendienst erreicht (HTTP 429). Warten Sie etwa 60 Sekunden und versuchen Sie es erneut."
-    }
+    "Ratenlimit bei einem vorgelagerten Metadatendienst erreicht (HTTP 429). Warten Sie etwa 60 Sekunden und versuchen Sie es erneut."
 }
 
 pub(super) fn msg_prerequisites_pending(count: usize) -> String {
@@ -154,9 +150,7 @@ pub(super) fn msg_prerequisites_pending(count: usize) -> String {
 }
 
 pub(super) const fn msg_two_step_hint() -> &'static str {
-    {
-        "Zweistufiger Ablauf: Führen Sie zuerst die Voraussetzungen aus, erstellen/vereinigen Sie diese Einträge in Wikidata und klicken Sie dann erneut auf QuickStatements erzeugen, damit der Hauptblock direkt aufgelöste QIDs verwendet."
-    }
+    "Zweistufiger Ablauf: Führen Sie zuerst die Voraussetzungen aus, erstellen/vereinigen Sie diese Einträge in Wikidata und klicken Sie dann erneut auf QuickStatements erzeugen, damit der Hauptblock direkt aufgelöste QIDs verwendet."
 }
 
 pub(super) const fn button_second_pass() -> &'static str {
@@ -168,9 +162,7 @@ pub(super) const fn msg_second_pass_running() -> &'static str {
 }
 
 pub(super) const fn msg_second_pass_done() -> &'static str {
-    {
-        "Zweiter Durchlauf abgeschlossen. Haupt-QuickStatements wurden mit aufgelösten QIDs aktualisiert, sofern verfügbar."
-    }
+    "Zweiter Durchlauf abgeschlossen. Haupt-QuickStatements wurden mit aufgelösten QIDs aktualisiert, sofern verfügbar."
 }
 
 pub(super) fn msg_second_pass_still_pending_count(count: usize) -> String {
@@ -196,9 +188,7 @@ pub(super) const fn curation_mass_warning_title() -> &'static str {
 }
 
 pub(super) const fn msg_delay_advice() -> &'static str {
-    {
-        "Hinweis: Wikidata und Abfrage-Endpunkte benötigen oft 30-120 Sekunden, bis neu erstellte Einträge sichtbar sind."
-    }
+    "Hinweis: Wikidata und Abfrage-Endpunkte benötigen oft 30-120 Sekunden, bis neu erstellte Einträge sichtbar sind."
 }
 
 pub(super) const fn curation_qs_dev_label() -> &'static str {
@@ -206,15 +196,11 @@ pub(super) const fn curation_qs_dev_label() -> &'static str {
 }
 
 pub(super) const fn curation_qs_dev_prereq_hint() -> &'static str {
-    {
-        "Öffnen Sie QS-Dev, fügen Sie den Voraussetzungen-Block ein, führen Sie ihn aus, erstellen oder vereinigen Sie die neuen Einträge in Wikidata, warten Sie kurz und kehren Sie dann für den zweiten Durchlauf hierher zurück."
-    }
+    "Öffnen Sie QS-Dev, fügen Sie den Voraussetzungen-Block ein, führen Sie ihn aus, erstellen oder vereinigen Sie die neuen Einträge in Wikidata, warten Sie kurz und kehren Sie dann für den zweiten Durchlauf hierher zurück."
 }
 
 pub(super) const fn curation_qs_dev_main_hint() -> &'static str {
-    {
-        "Öffnen Sie QS-Dev, fügen Sie den Hauptblock ein, prüfen Sie die Befehle und führen Sie sie dann aus."
-    }
+    "Öffnen Sie QS-Dev, fügen Sie den Hauptblock ein, prüfen Sie die Befehle und führen Sie sie dann aus."
 }
 
 pub(super) const fn curation_note_existing_complete() -> &'static str {

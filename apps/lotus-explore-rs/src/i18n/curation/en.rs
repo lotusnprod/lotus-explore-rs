@@ -145,9 +145,7 @@ pub(super) fn msg_prerequisites_pending(count: usize) -> String {
 }
 
 pub(super) const fn msg_two_step_hint() -> &'static str {
-    {
-        "Two-step workflow: run prerequisites first, create/merge those items in Wikidata, then click Generate QuickStatements again so the main block uses resolved QIDs directly."
-    }
+    "Two-step workflow: run prerequisites first, create/merge those items in Wikidata, then click Generate QuickStatements again so the main block uses resolved QIDs directly."
 }
 
 pub(super) const fn button_second_pass() -> &'static str {
@@ -159,9 +157,7 @@ pub(super) const fn msg_second_pass_running() -> &'static str {
 }
 
 pub(super) const fn msg_second_pass_done() -> &'static str {
-    {
-        "Second pass complete. Main QuickStatements are refreshed with resolved QIDs where available."
-    }
+    "Second pass complete. Main QuickStatements are refreshed with resolved QIDs where available."
 }
 
 pub(super) fn msg_second_pass_still_pending_count(count: usize) -> String {
@@ -187,9 +183,7 @@ pub(super) const fn curation_mass_warning_title() -> &'static str {
 }
 
 pub(super) const fn msg_delay_advice() -> &'static str {
-    {
-        "Advice: Wikidata and query endpoints may need 30-120 seconds to expose newly created items."
-    }
+    "Advice: Wikidata and query endpoints may need 30-120 seconds to expose newly created items."
 }
 
 pub(super) const fn curation_qs_dev_label() -> &'static str {
@@ -197,9 +191,7 @@ pub(super) const fn curation_qs_dev_label() -> &'static str {
 }
 
 pub(super) const fn curation_qs_dev_prereq_hint() -> &'static str {
-    {
-        "Open QS-Dev, paste the prerequisites block, run it, create or merge the new items in Wikidata, wait briefly, then return here for the second pass."
-    }
+    "Open QS-Dev, paste the prerequisites block, run it, create or merge the new items in Wikidata, wait briefly, then return here for the second pass."
 }
 
 pub(super) const fn curation_qs_dev_main_hint() -> &'static str {

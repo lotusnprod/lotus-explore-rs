@@ -30,18 +30,6 @@ use crate::ui::a11y_contract::{MAIN_PANEL_ID, PAGE_TITLE_ID, SKIP_TO_RESULTS_HRE
 use dioxus::prelude::*;
 use std::sync::Arc;
 
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::JsCast;
-
-const fn locale_lang_tag(locale: Locale) -> &'static str {
-    match locale {
-        Locale::En => "en",
-        Locale::Fr => "fr",
-        Locale::De => "de",
-        Locale::It => "it",
-    }
-}
-
 fn resolve_startup_dark_mode(startup: &crate::features::explore::InitialUrlState) -> bool {
     if startup.dark_mode {
         return true;
@@ -122,7 +110,7 @@ pub fn AppRoot() -> Element {
                 explore,
                 criteria,
             }
-            ShellScaffold { lang: locale_lang_tag(*locale.read()).to_string() }
+            ShellScaffold { lang: locale.read().lang_code().to_string() }
         }
     }
 }
@@ -148,7 +136,7 @@ fn AppRuntimeEffects(
     use_effect(move || {
         #[cfg(target_arch = "wasm32")]
         {
-            let lang = locale_lang_tag(*locale.read());
+            let lang = locale.read().lang_code();
             if let Some(doc) = web_sys::window().and_then(|w| w.document())
                 && let Some(html) = doc.document_element()
             {

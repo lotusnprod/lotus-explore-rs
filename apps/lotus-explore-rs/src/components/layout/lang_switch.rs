@@ -25,7 +25,7 @@ pub fn LangSwitch() -> Element {
             aria_label: t(locale, TextKey::Language).to_string(),
             SegmentedControl {
                 aria_label: t(locale, TextKey::Language).to_string(),
-                selected_value: locale_code(locale).to_string(),
+                selected_value: locale.lang_code().to_string(),
                 dark: dark_mode,
                 wrap: false,
                 items: vec![
@@ -48,14 +48,5 @@ pub fn LangSwitch() -> Element {
                 },
             }
         }
-    }
-}
-
-fn locale_code(locale: Locale) -> &'static str {
-    match locale {
-        Locale::En => "en",
-        Locale::Fr => "fr",
-        Locale::De => "de",
-        Locale::It => "it",
     }
 }

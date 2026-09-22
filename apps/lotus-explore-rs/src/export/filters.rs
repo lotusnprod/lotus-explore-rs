@@ -12,10 +12,7 @@ pub fn criteria_to_filters_value(criteria: &SearchCriteria) -> Value {
         cs.insert("smiles".into(), Value::String(criteria.smiles.clone()));
         cs.insert(
             "search_type".into(),
-            Value::String(match criteria.smiles_search_type {
-                SmilesSearchType::Substructure => "substructure".into(),
-                SmilesSearchType::Similarity => "similarity".into(),
-            }),
+            Value::String(criteria.smiles_search_type.as_str().into()),
         );
         if criteria.smiles_search_type == SmilesSearchType::Similarity {
             cs.insert(

@@ -7,7 +7,7 @@
 //! This module is the single source of truth for the CSV/JSON/RDF export
 //! enum and its mapping to `action=` strings ("`csv_export`",
 //! "`qlever_json_export`", "`turtle_export`").  Apps import `ExportFormat`
-//! and call `qlever_export_url` / `build_upstream_export_url` instead of
+//! and call `qlever_export_url` / `qlever_export_url_with_action` instead of
 //! re-implementing the mapping.
 
 #![allow(clippy::module_name_repetitions)]
@@ -31,17 +31,11 @@ impl ExportFormat {
     /// Returns `None` for unrecognized formats.
     #[must_use]
     pub fn parse(s: &str) -> Option<Self> {
-        let normalized = s.trim();
-        if normalized.eq_ignore_ascii_case("csv") {
-            Some(Self::Csv)
-        } else if normalized.eq_ignore_ascii_case("json")
-            || normalized.eq_ignore_ascii_case("ndjson")
-        {
-            Some(Self::Json)
-        } else if normalized.eq_ignore_ascii_case("rdf") {
-            Some(Self::Rdf)
-        } else {
-            None
+        match s.trim().to_ascii_lowercase().as_str() {
+            "csv" => Some(Self::Csv),
+            "json" | "ndjson" => Some(Self::Json),
+            "rdf" => Some(Self::Rdf),
+            _ => None,
         }
     }
 
@@ -110,6 +104,16 @@ impl ExportFormat {
     pub fn trigger_timer_label(self) -> String {
         format!("{}_trigger", self.timer_label())
     }
+
+    /// `ResponseFormat` for content-negotiation against the WDQS endpoint.
+    #[must_use]
+    pub const fn wdqs_response_format(self) -> crate::transport::ResponseFormat {
+        match self {
+            Self::Csv => crate::transport::ResponseFormat::Csv,
+            Self::Json => crate::transport::ResponseFormat::SparqlJson,
+            Self::Rdf => crate::transport::ResponseFormat::Turtle,
+        }
+    }
 }
 
 /// Builds a `QLever` export URL for the given query and format.
@@ -118,15 +122,10 @@ impl ExportFormat {
 /// `SELECT` rows; CSV and JSON go straight to `QLever`'s native export actions.
 #[must_use]
 pub fn qlever_export_url(query: &str, format: ExportFormat) -> String {
-    let prepared_query = if format == ExportFormat::Rdf {
-        crate::queries::query_construct_from_select(query)
-    } else {
-        query.to_string()
-    };
     format!(
         "{}?query={}&action={}",
         crate::transport::QLEVER_WIKIDATA,
-        urlencoding::encode(&prepared_query),
+        urlencoding::encode(&format.prepared_query(query)),
         format.qlever_action()
     )
 }
@@ -149,16 +148,6 @@ pub fn qlever_export_url_with_action(query: &str, action: &str) -> String {
 #[must_use]
 pub fn api_export_file_url(cache_key: &str, format: ExportFormat) -> String {
     format!("/v1/export-file/{cache_key}/{}", format.extension())
-}
-
-/// Builds the upstream `QLever` export URL for a given query and format,
-/// choosing the appropriate action string.
-///
-/// For RDF, the query is first wrapped in a `CONSTRUCT` template via
-/// [`crate::queries::query_construct_from_select`].
-#[must_use]
-pub fn build_upstream_export_url(query: &str, format: ExportFormat) -> String {
-    qlever_export_url(query, format)
 }
 
 /// Sanitizes a filename for safe browser download.
@@ -324,15 +313,6 @@ mod tests {
     }
 
     #[test]
-    fn build_upstream_export_url_delegates_to_qlever_export_url() {
-        let query = "SELECT ?s WHERE { ?s ?p ?o }";
-        assert_eq!(
-            build_upstream_export_url(query, ExportFormat::Csv),
-            qlever_export_url(query, ExportFormat::Csv)
-        );
-    }
-
-    #[test]
     fn qlever_export_url_with_action_uses_custom_action() {
         let url = qlever_export_url_with_action("SELECT ?s WHERE { ?s ?p ?o }", "custom_action");
         assert!(url.starts_with(crate::transport::QLEVER_WIKIDATA));
@@ -344,6 +324,23 @@ mod tests {
         assert_eq!(
             api_export_file_url("key123", ExportFormat::Rdf),
             "/v1/export-file/key123/rdf"
+        );
+    }
+
+    #[test]
+    fn wdqs_response_format_maps_all_variants() {
+        use crate::transport::ResponseFormat;
+        assert_eq!(
+            ExportFormat::Csv.wdqs_response_format(),
+            ResponseFormat::Csv
+        );
+        assert_eq!(
+            ExportFormat::Json.wdqs_response_format(),
+            ResponseFormat::SparqlJson
+        );
+        assert_eq!(
+            ExportFormat::Rdf.wdqs_response_format(),
+            ResponseFormat::Turtle
         );
     }
 }

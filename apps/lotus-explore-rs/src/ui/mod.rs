@@ -13,8 +13,6 @@ pub mod segmented_control;
 pub use common::ContentPhase;
 
 pub mod prelude {
-    pub use super::a11y_contract::*;
-    pub use super::common::*;
     pub use super::document::*;
     pub use super::notice::*;
     pub use super::segmented_control::*;
