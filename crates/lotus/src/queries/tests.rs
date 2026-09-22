@@ -8,8 +8,8 @@ use crate::queries::consts::SUBSCRIPT_DIGIT_MAPPINGS;
 use crate::queries::formula::{normalize_digits_expr, normalize_formula_digits};
 use crate::queries::{
     StructureKind, classify_structure, query_all_compounds, query_compounds_by_taxon,
-    query_construct_from_select, query_counts_from_base, query_sachem, query_with_limit,
-    query_with_server_filters,
+    query_construct_from_select, query_counts_from_base, query_sachem, query_sachem_batch,
+    query_with_limit, query_with_server_filters,
 };
 
 #[test]
@@ -285,4 +285,17 @@ fn classify_structure_detects_formats() {
         classify_structure("CHEMBL123     2.5V2000\n  12 34 0 0 0 0 0 0 0 0 0 0\nM  END"),
         StructureKind::MolfileV2000
     );
+}
+
+#[test]
+fn sachem_single_and_batch_share_no_taxon_body() {
+    // Both entry points must route a taxon-less Sachem search through the same
+    // shared OPTIONAL reference block (regression guard for the extracted body).
+    let single = query_sachem("c1ccccc1", SmilesSearchType::Substructure, 0.8, None);
+    let batch = query_sachem_batch(&["c1ccccc1"], SmilesSearchType::Substructure, 0.8, None);
+    for q in [&single, &batch] {
+        assert!(q.contains("OPTIONAL {"));
+        assert!(q.contains("prov:wasDerivedFrom ?ref ."));
+        assert!(q.contains("?t wdt:P225 ?taxon_name"));
+    }
 }

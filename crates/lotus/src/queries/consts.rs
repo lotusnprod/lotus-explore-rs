@@ -138,17 +138,16 @@ pub(super) const REFERENCE_METADATA_SERVICE_REF: &str = r"
 /// provides enhanced access to bibliographic data.
 #[must_use]
 pub fn transform_query_for_wdqs(query: &str) -> String {
-    // Check if this is a simple reference lookup query (just SELECT ?ref)
-    let is_simple_ref_query = query.contains("SELECT ?ref WHERE {")
-        && query.contains("wdt:P356")
+    // A simple reference lookup is a `?ref` query that also has no SERVICE or
+    // OPTIONAL blocks — otherwise we'd wrap an already-SERVICE-wrapped query.
+    let is_simple_ref_query = is_scholarly_reference_query(query)
         && !query.contains("SERVICE")
         && !query.contains("OPTIONAL");
 
     // Try ?ref pattern first, then ?r pattern
     if is_simple_ref_query {
         // For simple reference queries, wrap SELECT in SERVICE while keeping PREFIXES outside
-        let query_without_prefix_placeholder = query.replace("{CURATION_SPARQL_PREFIXES}\n", "");
-        let query_body = query_without_prefix_placeholder.replace(" LIMIT 1", "");
+        let query_body = strip_curation_prefixes(query).replace(" LIMIT 1", "");
         format!(
             "SERVICE <https://query-scholarly.wikidata.org/sparql> {{\n  {query_body}\n}}\nLIMIT 1"
         )
@@ -163,5 +162,112 @@ pub fn transform_query_for_wdqs(query: &str) -> String {
         query.replace(REFERENCE_METADATA_OPTIONAL, REFERENCE_METADATA_SERVICE)
     } else {
         query.to_string()
+    }
+}
+
+/// True for curation reference-lookup queries (`SELECT ?ref WHERE { … wdt:P356`),
+/// shared by the WDQS download/dispatch paths and `transform_query_for_wdqs`.
+#[must_use]
+pub fn is_scholarly_reference_query(query: &str) -> bool {
+    query.contains("SELECT ?ref WHERE {") && query.contains("wdt:P356")
+}
+
+/// Remove the `{CURATION_SPARQL_PREFIXES}` placeholder (and its trailing newline)
+/// that curation query templates embed before substitution.
+#[must_use]
+fn strip_curation_prefixes(query: &str) -> String {
+    query.replace("{CURATION_SPARQL_PREFIXES}\n", "")
+}
+
+/// Choose the WDQS endpoint and the query to execute for a download/fallback path.
+///
+/// Reference-lookup queries ([`is_scholarly_reference_query`]) go straight to the
+/// scholarly subgraph endpoint with the curation-prefix placeholder stripped; all
+/// other queries are rewritten via [`transform_query_for_wdqs`] for the regular
+/// WDQS endpoint. The returned query still needs
+/// [`crate::export::ExportFormat::prepared_query`] before execution.
+#[must_use]
+pub fn wdqs_download_query(query: &str) -> (&'static str, String) {
+    use crate::transport::{WDQS_SCHOLARLY, WDQS_WIKIDATA};
+    if is_scholarly_reference_query(query) {
+        (WDQS_SCHOLARLY, strip_curation_prefixes(query))
+    } else {
+        (WDQS_WIKIDATA, transform_query_for_wdqs(query))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::transport::{WDQS_SCHOLARLY, WDQS_WIKIDATA};
+
+    #[test]
+    fn scholarly_predicate_detects_reference_queries() {
+        assert!(is_scholarly_reference_query(
+            "SELECT ?ref WHERE { ?r wdt:P356 \"x\" }"
+        ));
+        // Missing the P356 property → not a reference lookup.
+        assert!(!is_scholarly_reference_query(
+            "SELECT ?ref WHERE { ?r wdt:P1476 ?t }"
+        ));
+        // A different SELECT variable is not the reference lookup shape.
+        assert!(!is_scholarly_reference_query(
+            "SELECT ?compound WHERE { ?c wdt:P356 \"x\" }"
+        ));
+    }
+
+    #[test]
+    fn wdqs_download_query_routes_reference_lookups_to_scholarly() {
+        let q = "{CURATION_SPARQL_PREFIXES}\nSELECT ?ref WHERE { ?r wdt:P356 \"10.1/x\" }";
+        let (endpoint, prepared) = wdqs_download_query(q);
+        assert_eq!(endpoint, WDQS_SCHOLARLY);
+        // The curation-prefix placeholder is stripped for the scholarly endpoint.
+        assert!(!prepared.contains("{CURATION_SPARQL_PREFIXES}"));
+        assert!(prepared.contains("SELECT ?ref WHERE"));
+        assert!(!prepared.contains("TRANSFORM"));
+    }
+
+    #[test]
+    fn wdqs_download_query_transforms_ordinary_queries() {
+        let q = "SELECT ?s WHERE { ?s ?p ?o }";
+        let (endpoint, prepared) = wdqs_download_query(q);
+        assert_eq!(endpoint, WDQS_WIKIDATA);
+        // A plain query that `transform_query_for_wdqs` leaves untouched.
+        assert_eq!(prepared, q);
+    }
+
+    #[test]
+    fn transform_wraps_simple_ref_query_in_scholarly_service() {
+        let q = "{CURATION_SPARQL_PREFIXES}\nSELECT ?ref WHERE { ?r wdt:P356 \"10.1/x\" } LIMIT 1";
+        let out = transform_query_for_wdqs(q);
+        assert!(out.starts_with("SERVICE <https://query-scholarly.wikidata.org/sparql>"));
+        assert!(!out.contains("{CURATION_SPARQL_PREFIXES}"));
+        assert!(out.contains("SELECT ?ref WHERE { ?r wdt:P356 \"10.1/x\" }"));
+        assert!(out.ends_with("LIMIT 1"));
+        // The trailing display LIMIT must be stripped from the inner body.
+        assert!(!out.contains(" LIMIT 1"));
+    }
+
+    #[test]
+    fn transform_replaces_ref_optional_with_service() {
+        let q =
+            format!("SELECT ?c WHERE {{ ?c wdt:P356 \"x\". {REFERENCE_METADATA_OPTIONAL_REF} }}");
+        let out = transform_query_for_wdqs(&q);
+        assert!(out.contains(REFERENCE_METADATA_SERVICE_REF));
+        assert!(!out.contains(REFERENCE_METADATA_OPTIONAL_REF));
+    }
+
+    #[test]
+    fn transform_replaces_r_optional_with_service() {
+        let q = format!("SELECT ?c WHERE {{ ?c wdt:P356 \"x\". {REFERENCE_METADATA_OPTIONAL} }}");
+        let out = transform_query_for_wdqs(&q);
+        assert!(out.contains(REFERENCE_METADATA_SERVICE));
+        assert!(!out.contains(REFERENCE_METADATA_OPTIONAL));
+    }
+
+    #[test]
+    fn transform_passthrough_for_unrelated_query() {
+        let q = "SELECT ?s WHERE { ?s ?p ?o }";
+        assert_eq!(transform_query_for_wdqs(q), q);
     }
 }

@@ -13,6 +13,29 @@ use crate::queries::consts::{
 };
 use crate::queries::structure::escape_structure_literal;
 
+/// SPARQL body for a Sachem search with no taxon filter: the reference/taxon
+/// association is wrapped in `OPTIONAL` so compounds lacking occurrence data are
+/// still returned. Shared verbatim by [`query_sachem`] and [`query_sachem_batch`].
+fn sachem_body_no_taxon(sachem_clause: &str) -> String {
+    format!(
+        r"
+  {sachem_clause}
+  {COMPOUND_IDENTIFIERS}
+
+  OPTIONAL {{
+    ?c p:P703 ?statement .
+    ?statement ps:P703 ?t ;
+               prov:wasDerivedFrom ?ref .
+    ?ref pr:P248 ?r .
+    ?t wdt:P225 ?taxon_name .
+    {REFERENCE_METADATA_OPTIONAL}
+  }}
+
+  {PROPERTIES_OPTIONAL}
+"
+    )
+}
+
 /// Structure similarity/substructure search query via IDSM/Sachem service.
 ///
 /// # Arguments
@@ -79,25 +102,7 @@ pub fn query_sachem(
     );
 
     let body = taxon_qid.map_or_else(
-        || {
-            format!(
-                r"
-  {sachem_clause}
-  {COMPOUND_IDENTIFIERS}
-
-  OPTIONAL {{
-    ?c p:P703 ?statement .
-    ?statement ps:P703 ?t ;
-               prov:wasDerivedFrom ?ref .
-    ?ref pr:P248 ?r .
-    ?t wdt:P225 ?taxon_name .
-    {REFERENCE_METADATA_OPTIONAL}
-  }}
-
-  {PROPERTIES_OPTIONAL}
-"
-            )
-        },
+        || sachem_body_no_taxon(&sachem_clause),
         |qid| {
             format!(
                 r"
@@ -162,25 +167,7 @@ pub fn query_sachem_batch(
     };
 
     let body = taxon_qid.map_or_else(
-        || {
-            format!(
-                r"
-  {sachem_clause}
-  {COMPOUND_IDENTIFIERS}
-
-  OPTIONAL {{
-    ?c p:P703 ?statement .
-    ?statement ps:P703 ?t ;
-               prov:wasDerivedFrom ?ref .
-    ?ref pr:P248 ?r .
-    ?t wdt:P225 ?taxon_name .
-    {REFERENCE_METADATA_OPTIONAL}
-  }}
-
-  {PROPERTIES_OPTIONAL}
-"
-            )
-        },
+        || sachem_body_no_taxon(&sachem_clause),
         |qid| {
             format!(
                 r"
