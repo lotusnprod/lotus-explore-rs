@@ -40,9 +40,11 @@ wasm:
 # ── Per-app dev servers / production builds ───────────────────────────────────
 
 serve app:
+	cargo run -p lotus-deploy --bin fetch-ketcher
 	dx serve --package {{app}}
 
 build app:
+	cargo run -p lotus-deploy --bin fetch-ketcher
 	dx build --release --package {{app}}
 
 # ── Supply-chain hygiene (skip gracefully if a tool is not installed) ─────────
