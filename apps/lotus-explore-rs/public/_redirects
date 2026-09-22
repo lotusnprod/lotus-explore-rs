@@ -5,5 +5,17 @@
 # Ensure canonical URL: strip trailing slash on non-root paths (optional)
 # Ensure www → non-www redirect is handled at DNS/CDN level
 
-# Redirect any 404 back to index.html so the WASM SPA can handle routing
+# SPA fallback: redirect unknown routes to index.html (200 = rewrite, not 301).
+# Excludes static asset paths so the Ketcher iframe and WASM bundle load directly.
+!/assets/*
+!/wasm/*
+!/favicon*
+!/apple-touch-icon*
+!/android-chrome*
+!/site.webmanifest
+!/robots.txt
+!/sitemap.xml
+!/llms.txt
+!/humans.txt
+!/.well-known/*
 /*  /index.html  200
