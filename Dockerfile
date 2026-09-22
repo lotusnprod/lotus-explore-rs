@@ -31,14 +31,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nodejs npm curl pkg-config libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install dioxus-cli and the wasm target for building the WASM web bundle
+# Install dioxus-cli and the wasm target for building the WASM web bundle.
+# Use --target x86_64-unknown-linux-musl to get a statically-linked dx binary
+# that doesn't depend on a specific glibc version (bookworm has glibc 2.36,
+# but the GNU release needs 2.39).
 RUN rustup default 1.97.0 && \
     rustup target add wasm32-unknown-unknown && \
     curl -fsSL -o /tmp/cargo-binstall.tgz \
       https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz && \
     tar -xzf /tmp/cargo-binstall.tgz -C /usr/local/bin/ && \
     chmod +x /usr/local/bin/cargo-binstall && \
-    cargo binstall dioxus-cli --version 0.7.10 --locked --no-confirm
+    cargo binstall --target x86_64-unknown-linux-musl dioxus-cli --version 0.7.10 --locked --no-confirm
 
 COPY Cargo.toml Cargo.lock ./
 COPY crates/ crates/
