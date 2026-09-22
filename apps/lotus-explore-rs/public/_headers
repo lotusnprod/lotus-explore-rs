@@ -11,6 +11,8 @@
   Cross-Origin-Embedder-Policy: credentialless
   Cross-Origin-Resource-Policy: same-origin
   Link: </llms.txt>; rel="http://llmstxt.org/llms.txt"; type="text/plain"
+  Link: </.well-known/agent-skills.json>; rel="https://specification.website/rel/agent-skills"; type="application/json"
+  Link: </.well-known/api-catalog.json>; rel="https://specification.website/rel/api-catalog"; type="application/json"
   Link: </sitemap.xml>; rel="sitemap"; type="application/xml"
   Link: </robots.txt>; rel="robots"; type="text/plain"
   Link: </.well-known/security.txt>; rel="security.txt"; type="text/plain"

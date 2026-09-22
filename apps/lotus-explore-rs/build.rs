@@ -317,10 +317,12 @@ fn build_headers_txt() -> String {
     \x20 Cross-Origin-Opener-Policy: same-origin\n\
     \x20 Cross-Origin-Embedder-Policy: credentialless\n\
     \x20 Cross-Origin-Resource-Policy: same-origin\n\
-    \x20 Link: </llms.txt>; rel=\"http://llmstxt.org/llms.txt\"; type=\"text/plain\"\n\
-    \x20 Link: </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\"\n\
-    \x20 Link: </robots.txt>; rel=\"robots\"; type=\"text/plain\"\n\
-    \x20 Link: </.well-known/security.txt>; rel=\"security.txt\"; type=\"text/plain\"\n\n\
+     \x20 Link: </llms.txt>; rel=\"http://llmstxt.org/llms.txt\"; type=\"text/plain\"\n\
+     \x20 Link: </.well-known/agent-skills.json>; rel=\"https://specification.website/rel/agent-skills\"; type=\"application/json\"\n\
+     \x20 Link: </.well-known/api-catalog.json>; rel=\"https://specification.website/rel/api-catalog\"; type=\"application/json\"\n\
+     \x20 Link: </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\"\n\
+     \x20 Link: </robots.txt>; rel=\"robots\"; type=\"text/plain\"\n\
+     \x20 Link: </.well-known/security.txt>; rel=\"security.txt\"; type=\"text/plain\"\n\n\
     \n\
     # Ketcher editor iframe (served from /assets/ketcher/): allow same-origin framing.\n\
     # The wildcard /* rule above sets X-Frame-Options: DENY + frame-ancestors 'none',\n\
