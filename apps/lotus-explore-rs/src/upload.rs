@@ -17,9 +17,7 @@ use wasm_bindgen::JsValue;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen_futures::JsFuture;
 #[cfg(target_arch = "wasm32")]
-use web_sys::{
-    Blob, BlobPropertyBag, File, HtmlAnchorElement, HtmlFormElement, HtmlInputElement, Url,
-};
+use web_sys::{HtmlAnchorElement, Url};
 
 /// The browser `Blob` type — re-exported from web_sys for WASM.
 #[cfg(target_arch = "wasm32")]
@@ -456,7 +454,7 @@ pub fn download_text_as_blob(
 #[cfg(target_arch = "wasm32")]
 pub fn download_url(url: &str, filename: &str) -> bool {
     let safe_name = sanitize_filename(filename);
-    click_download_anchor(&url, &safe_name, true).unwrap_or_else(|_| {
+    click_download_anchor(url, &safe_name, true).unwrap_or_else(|_| {
         web_sys::window()
             .and_then(|w| w.open_with_url(url).ok())
             .is_some()
@@ -532,7 +530,7 @@ pub async fn submit_download_form(endpoint: &str, fields: &[(&str, &str)]) -> Re
     let _ = body.remove_child(&form);
 
     // Yield so the form submission takes effect before the caller continues.
-    #[allow(clippy::let_underscore_drop)]
+    #[allow(let_underscore_drop)]
     let _ = TimeoutFuture::new(0).await;
     Ok(())
 }

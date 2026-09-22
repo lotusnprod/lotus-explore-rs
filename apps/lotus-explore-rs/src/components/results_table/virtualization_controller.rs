@@ -163,11 +163,14 @@ impl ResultsTableVirtualizationController {
 
     #[cfg(target_arch = "wasm32")]
     fn schedule_scroll_frame(&self, total_rows: usize, row_height_px: usize) {
+        let frame = scroll_runtime::ScrollFrameState {
+            scroll_host: self.scroll_host,
+            raf_scheduled: self.scroll_raf_scheduled,
+            raf_cb: self.scroll_raf_cb,
+            raf_id: self.scroll_raf_id,
+        };
         scroll_runtime::schedule_virtual_scroll_frame(
-            self.scroll_host,
-            self.scroll_raf_scheduled,
-            self.scroll_raf_cb,
-            self.scroll_raf_id,
+            frame,
             self.config.scroll_id,
             row_height_px,
             total_rows,

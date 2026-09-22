@@ -82,21 +82,33 @@ type RafSignal = Signal<Option<RafClosure>>;
 type RafIdSignal = Signal<Option<i32>>;
 #[cfg(target_arch = "wasm32")]
 type ScrollHostSignal = Signal<Option<web_sys::HtmlElement>>;
+
+/// Bundled scroll-RAF state, reducing `schedule_virtual_scroll_frame`'s arity.
 #[cfg(target_arch = "wasm32")]
-type BoolSignal = Signal<bool>;
+#[derive(Clone, Copy)]
+pub(super) struct ScrollFrameState {
+    pub scroll_host: ScrollHostSignal,
+    pub raf_scheduled: Signal<bool>,
+    pub raf_cb: RafSignal,
+    pub raf_id: RafIdSignal,
+}
 
 #[cfg(target_arch = "wasm32")]
+#[allow(clippy::too_many_arguments)]
 pub(super) fn schedule_virtual_scroll_frame(
-    mut scroll_host: ScrollHostSignal,
-    mut scroll_raf_scheduled: BoolSignal,
-    mut scroll_raf_cb: RafSignal,
-    mut scroll_raf_id: RafIdSignal,
+    frame: ScrollFrameState,
     scroll_id: &'static str,
     row_height_px: usize,
     total_rows: usize,
     first_visible_row: Signal<usize>,
     viewport_height_px: Signal<usize>,
 ) {
+    let ScrollFrameState {
+        mut scroll_host,
+        raf_scheduled: mut scroll_raf_scheduled,
+        raf_cb: mut scroll_raf_cb,
+        raf_id: mut scroll_raf_id,
+    } = frame;
     let div = if let Some(existing) = scroll_host.peek().as_ref() {
         existing.clone()
     } else {
