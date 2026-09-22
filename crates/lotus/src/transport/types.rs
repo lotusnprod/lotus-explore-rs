@@ -54,7 +54,7 @@ impl ResponseFormat {
 }
 
 /// Error type for SPARQL-over-HTTP fetch operations.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FetchError {
     /// Network-level failure (DNS, timeout, connection refused).
     Network(String),

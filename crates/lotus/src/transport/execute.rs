@@ -6,13 +6,33 @@
 //! Every public function follows the same retry pattern: up to
 //! [`MAX_HTTP_ATTEMPTS`] attempts, retrying on transient network failures and
 //! 5xx server errors, failing fast on 4xx client errors.
+//!
+//! The HTTP calls are routed through the [`HttpClient`] trait (see
+//! [`super::client`]) so the retry / rate-limit / gateway classification logic
+//! can be unit-tested with a [`MockClient`] rather than the live network. The
+//! public API is unchanged — each entry point builds a [`DefaultHttp`] and
+//! delegates to a generic inner driver.
 
 #[cfg(not(target_arch = "wasm32"))]
 use std::io::{Seek, Write};
 
-use super::client::http_client;
+use super::client::{DefaultHttp, HttpClient, HttpResponse};
 use super::error::{compact_http_error_text, looks_like_gateway_error};
 use super::types::{FetchError, MAX_HTTP_ATTEMPTS, ResponseBody, ResponseFormat};
+
+// ── Rate-limit backoff ────────────────────────────────────────────────────────
+
+/// Sleep for the rate-limit backoff duration.
+///
+/// Production uses a blocking `std::thread::sleep` (matching the original
+/// transport behaviour — a deliberate, in-scope-preserving choice). Under
+/// `cfg(test)` the sleep is elided so retry tests are instant and
+/// deterministic; on WASM the 429 branch returns before reaching this call.
+#[allow(clippy::missing_const_for_fn, unused_variables)]
+fn backoff_sleep(ms: u64) {
+    #[cfg(not(any(target_arch = "wasm32", test)))]
+    std::thread::sleep(std::time::Duration::from_millis(ms));
+}
 
 // ── Convenience wrappers ──────────────────────────────────────────────────────
 
@@ -94,18 +114,22 @@ pub async fn execute_sparql_with_format_bytes(
     Ok(body.to_vec())
 }
 
-/// Execute a SPARQL query and return the raw response body for a representation.
+// ── Generic inner drivers ─────────────────────────────────────────────────────
+
+/// POST a SPARQL query and return the raw response body.
 ///
-/// # Errors
-/// Returns [`FetchError`] for transport/HTTP failures or empty responses.
-pub async fn execute_sparql_with_format_body(
+/// Up to [`MAX_HTTP_ATTEMPTS`] attempts. Retries on transient network errors,
+/// `5xx` responses, HTML gateway pages masquerading as `2xx`, and `429` rate
+/// limits (with [`backoff_sleep`]). Fails fast on other `4xx` codes. On WASM,
+/// `429` fails immediately (no backoff is possible).
+pub(super) async fn execute_sparql_with_format_body_c<C: HttpClient>(
     sparql: &str,
     endpoint: &str,
     format: ResponseFormat,
+    client: &C,
 ) -> Result<ResponseBody, FetchError> {
     log::debug!("SPARQL POST endpoint: {endpoint}");
 
-    let client = http_client()?;
     let mut last_err: Option<FetchError> = None;
 
     for attempt in 0..MAX_HTTP_ATTEMPTS {
@@ -114,18 +138,17 @@ pub async fn execute_sparql_with_format_body(
         // Do not add `User-Agent` or other custom headers — browsers refuse to
         // let WASM set them, which causes `QLever` to reject the preflight.
         let result = client
-            .post(endpoint)
-            .header("Accept", format.accept())
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .body(build_sparql_form_body(sparql, format))
-            .send()
+            .post(
+                endpoint,
+                format.accept(),
+                build_sparql_form_body(sparql, format),
+            )
             .await;
 
         match result {
             Ok(resp) => {
-                let status = resp.status();
-                let code = status.as_u16();
-                if status.is_success() {
+                let code = resp.status();
+                if (200..=299).contains(&code) {
                     return match resp.bytes().await {
                         Ok(bytes) if bytes.is_empty() => Err(FetchError::Empty),
                         Ok(bytes) => {
@@ -158,7 +181,7 @@ pub async fn execute_sparql_with_format_body(
                 let body = resp.text().await.unwrap_or_default();
                 let detail = compact_http_error_text(&body);
                 log::error!("event=sparql_http_error status={code} detail={detail}");
-                // Retry on rate limiting (429) with simple backoff; fail fast on other 4xx.
+                // Retry on rate limiting (429) with backoff; fail fast on other 4xx.
                 if code == 429 {
                     let backoff_ms: u64 = 1000 * u64::from(attempt + 1); // 1s, 2s, 3s...
                     log::warn!(
@@ -168,7 +191,7 @@ pub async fn execute_sparql_with_format_body(
                     );
                     #[cfg(not(target_arch = "wasm32"))]
                     {
-                        std::thread::sleep(std::time::Duration::from_millis(backoff_ms));
+                        backoff_sleep(backoff_ms);
                         last_err = Some(FetchError::Http(code, detail.clone()));
                         continue;
                     }
@@ -183,7 +206,7 @@ pub async fn execute_sparql_with_format_body(
                 last_err = Some(FetchError::Http(code, detail));
             }
             Err(e) => {
-                last_err = Some(FetchError::Network(e.to_string()));
+                last_err = Some(e);
             }
         }
     }
@@ -191,36 +214,46 @@ pub async fn execute_sparql_with_format_body(
     Err(last_err.unwrap_or_else(|| FetchError::Network("unknown error".into())))
 }
 
-/// Execute a SPARQL query and stream the selected representation into a tempfile.
+/// Execute a SPARQL query and return the raw response body for a representation.
 ///
 /// # Errors
-/// Returns [`FetchError`] when request/streaming/tempfile I/O fails, or when
-/// the upstream response is empty / an HTTP error.
-#[cfg(not(target_arch = "wasm32"))]
-pub async fn execute_sparql_with_format_tempfile(
+/// Returns [`FetchError`] for transport/HTTP failures or empty responses.
+pub async fn execute_sparql_with_format_body(
     sparql: &str,
     endpoint: &str,
     format: ResponseFormat,
+) -> Result<ResponseBody, FetchError> {
+    execute_sparql_with_format_body_c(sparql, endpoint, format, &DefaultHttp).await
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+/// POST a SPARQL query and stream the selected representation into a tempfile.
+///
+/// Retries on transient network errors, `5xx` responses, HTML gateway pages,
+/// and `429` rate limits (with [`backoff_sleep`]); fails fast on `4xx`.
+pub(super) async fn execute_sparql_with_format_tempfile_c<C: HttpClient>(
+    sparql: &str,
+    endpoint: &str,
+    format: ResponseFormat,
+    client: &C,
 ) -> Result<tempfile::NamedTempFile, FetchError> {
     log::debug!("SPARQL POST endpoint: {endpoint}");
 
-    let client = http_client()?;
     let mut last_err: Option<FetchError> = None;
 
     'attempts: for attempt in 0..MAX_HTTP_ATTEMPTS {
         let result = client
-            .post(endpoint)
-            .header("Accept", format.accept())
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .body(build_sparql_form_body(sparql, format))
-            .send()
+            .post(
+                endpoint,
+                format.accept(),
+                build_sparql_form_body(sparql, format),
+            )
             .await;
 
         match result {
             Ok(mut resp) => {
-                let status = resp.status();
-                let code = status.as_u16();
-                if status.is_success() {
+                let code = resp.status();
+                if (200..=299).contains(&code) {
                     let mut file = tempfile::NamedTempFile::new()
                         .map_err(|e| FetchError::Parse(format!("tempfile create failed: {e}")))?;
                     let mut preview = Vec::with_capacity(2048);
@@ -274,7 +307,7 @@ pub async fn execute_sparql_with_format_tempfile(
                 let body = resp.text().await.unwrap_or_default();
                 let detail = compact_http_error_text(&body);
                 log::error!("event=sparql_http_error status={code} detail={detail}");
-                // Retry on rate limiting (429) with simple backoff; fail fast on other 4xx.
+                // Retry on rate limiting (429) with backoff; fail fast on other 4xx.
                 if code == 429 {
                     let backoff_ms: u64 = 1000 * u64::from(attempt + 1); // 1s, 2s, 3s...
                     log::warn!(
@@ -282,8 +315,8 @@ pub async fn execute_sparql_with_format_tempfile(
                         attempt + 1,
                         backoff_ms
                     );
-                    last_err = Some(FetchError::Http(code, detail));
-                    std::thread::sleep(std::time::Duration::from_millis(backoff_ms));
+                    backoff_sleep(backoff_ms);
+                    last_err = Some(FetchError::Http(code, detail.clone()));
                     continue;
                 }
                 if (400..500).contains(&code) {
@@ -292,12 +325,26 @@ pub async fn execute_sparql_with_format_tempfile(
                 last_err = Some(FetchError::Http(code, detail));
             }
             Err(e) => {
-                last_err = Some(FetchError::Network(e.to_string()));
+                last_err = Some(e);
             }
         }
     }
 
     Err(last_err.unwrap_or_else(|| FetchError::Network("unknown error".into())))
+}
+
+/// Execute a SPARQL query and stream the response into a temporary file.
+///
+/// # Errors
+/// Returns [`FetchError`] when request/streaming/tempfile I/O fails, or when
+/// the upstream response is empty / an HTTP error.
+#[cfg(not(target_arch = "wasm32"))]
+pub async fn execute_sparql_with_format_tempfile(
+    sparql: &str,
+    endpoint: &str,
+    format: ResponseFormat,
+) -> Result<tempfile::NamedTempFile, FetchError> {
+    execute_sparql_with_format_tempfile_c(sparql, endpoint, format, &DefaultHttp).await
 }
 
 // ── URL-based fetch ─────────────────────────────────────────────────────────
@@ -330,18 +377,22 @@ pub async fn fetch_url_bytes(url: &str) -> Result<Vec<u8>, FetchError> {
 }
 
 /// Fetch a URL with a specific `Accept` header and return the response body.
-async fn fetch_url_bytes_with_accept(url: &str, accept: &str) -> Result<Vec<u8>, FetchError> {
-    let client = http_client()?;
+pub(super) async fn fetch_url_bytes_with_accept_c<C: HttpClient>(
+    url: &str,
+    accept: &str,
+    client: &C,
+) -> Result<Vec<u8>, FetchError> {
+    log::debug!("GET endpoint: {url}");
+
     let mut last_err: Option<FetchError> = None;
 
     for attempt in 0..MAX_HTTP_ATTEMPTS {
-        let result = client.get(url).header("Accept", accept).send().await;
+        let result = client.get(url, accept).await;
 
         match result {
             Ok(resp) => {
-                let status = resp.status();
-                let code = status.as_u16();
-                if status.is_success() {
+                let code = resp.status();
+                if (200..=299).contains(&code) {
                     return match resp.bytes().await {
                         Ok(bytes) if bytes.is_empty() => Err(FetchError::Empty),
                         Ok(bytes) => {
@@ -372,18 +423,24 @@ async fn fetch_url_bytes_with_accept(url: &str, accept: &str) -> Result<Vec<u8>,
 
                 let body = resp.text().await.unwrap_or_default();
                 let detail = compact_http_error_text(&body);
+                log::error!("event=http_error status={code} detail={detail}");
+                // 4xx (including 429) fail fast — no backoff on this path.
                 if (400..500).contains(&code) {
                     return Err(FetchError::Http(code, detail));
                 }
                 last_err = Some(FetchError::Http(code, detail));
             }
             Err(e) => {
-                last_err = Some(FetchError::Network(e.to_string()));
+                last_err = Some(e);
             }
         }
     }
 
     Err(last_err.unwrap_or_else(|| FetchError::Network("unknown error".into())))
+}
+
+async fn fetch_url_bytes_with_accept(url: &str, accept: &str) -> Result<Vec<u8>, FetchError> {
+    fetch_url_bytes_with_accept_c(url, accept, &DefaultHttp).await
 }
 
 // ── Form body construction ────────────────────────────────────────────────────
