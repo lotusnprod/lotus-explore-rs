@@ -4,10 +4,9 @@
 use crate::download::DownloadFormat;
 use crate::perf;
 use crate::sparql;
-use lotus::queries::transform_query_for_wdqs;
+use lotus::queries::wdqs_download_query;
 use lotus::transport::ResponseFormat as LotusResponseFormat;
 use lotus::transport::WDQS_SCHOLARLY;
-use lotus::transport::WDQS_WIKIDATA;
 use std::sync::Arc;
 
 /// Single toggle to force WDQS fallback for testing.
@@ -89,26 +88,14 @@ async fn execute_download_wdqs(
     filename: String,
     dl_timer: perf::TimerHandle,
 ) -> Result<(), String> {
-    // For simple reference queries, use scholarly endpoint directly without transformation
-    if query.contains("SELECT ?ref WHERE {") && query.contains("wdt:P356") {
+    let (endpoint, wdqs_query) = wdqs_download_query(&query);
+    if endpoint == WDQS_SCHOLARLY {
         log::warn!(
             "event=download format={} phase=fetch state=wdqs_scholarly_endpoint",
             format.log_name()
         );
-        let query_without_prefix = query.replace("{CURATION_SPARQL_PREFIXES}\n", "");
-        return execute_download_wdqs_endpoint(
-            format,
-            &query_without_prefix,
-            WDQS_SCHOLARLY,
-            &filename,
-            dl_timer,
-        )
-        .await;
     }
-
-    // For complex queries, apply transformation and use regular WDQS
-    let wdqs_query = transform_query_for_wdqs(&query);
-    execute_download_wdqs_endpoint(format, &wdqs_query, WDQS_WIKIDATA, &filename, dl_timer).await
+    execute_download_wdqs_endpoint(format, &wdqs_query, endpoint, &filename, dl_timer).await
 }
 
 /// Logs fetch timing, triggers the browser download, and logs trigger timing.

@@ -105,6 +105,16 @@ fn mark_wdqs_fallback_used(query: String) {
     });
 }
 
+/// Rewrite `query` for the WDQS endpoint and record that WDQS fallback applied.
+///
+/// This is the single source of truth for the "prepare a query for WDQS
+/// fallback" step, shared by the bytes / body / tempfile execution paths.
+fn prepare_wdqs_fallback_query(query: &str) -> String {
+    let wdqs_query = transform_query_for_wdqs(query);
+    mark_wdqs_fallback_used(wdqs_query.clone());
+    wdqs_query
+}
+
 /// Zero-size, `Copy` production repository.
 ///
 /// Holds no state of its own; all configuration is read from environment and
@@ -138,8 +148,7 @@ impl LotusRepository for HybridRepository {
         // Force WDQS fallback for testing if enabled
         if FORCE_WDQS_FALLBACK {
             log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly (FORCED)");
-            let wdqs_query = transform_query_for_wdqs(query);
-            mark_wdqs_fallback_used(wdqs_query.clone());
+            let wdqs_query = prepare_wdqs_fallback_query(query);
             return transport::execute_sparql_bytes(&wdqs_query, WDQS_WIKIDATA)
                 .await
                 .map_err(map_fetch_error);
@@ -148,8 +157,7 @@ impl LotusRepository for HybridRepository {
         match sparql::execute_sparql_bytes(query).await {
             Err(err) if is_bad_gateway(&err) => {
                 log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly");
-                let wdqs_query = transform_query_for_wdqs(query);
-                mark_wdqs_fallback_used(wdqs_query.clone());
+                let wdqs_query = prepare_wdqs_fallback_query(query);
                 transport::execute_sparql_bytes(&wdqs_query, WDQS_WIKIDATA)
                     .await
                     .map_err(map_fetch_error)
@@ -165,8 +173,7 @@ impl LotusRepository for HybridRepository {
         // Force WDQS fallback for testing if enabled
         if FORCE_WDQS_FALLBACK {
             log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly (FORCED)");
-            let wdqs_query = transform_query_for_wdqs(query);
-            mark_wdqs_fallback_used(wdqs_query.clone());
+            let wdqs_query = prepare_wdqs_fallback_query(query);
             return transport::execute_sparql_body(&wdqs_query, WDQS_WIKIDATA)
                 .await
                 .map_err(map_fetch_error);
@@ -175,8 +182,7 @@ impl LotusRepository for HybridRepository {
         match sparql::execute_sparql_body(query).await {
             Err(err) if is_bad_gateway(&err) => {
                 log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly");
-                let wdqs_query = transform_query_for_wdqs(query);
-                mark_wdqs_fallback_used(wdqs_query.clone());
+                let wdqs_query = prepare_wdqs_fallback_query(query);
                 transport::execute_sparql_body(&wdqs_query, WDQS_WIKIDATA)
                     .await
                     .map_err(map_fetch_error)
@@ -193,8 +199,7 @@ impl LotusRepository for HybridRepository {
         // Force WDQS fallback for testing if enabled
         if FORCE_WDQS_FALLBACK {
             log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly (FORCED)");
-            let wdqs_query = transform_query_for_wdqs(query);
-            mark_wdqs_fallback_used(wdqs_query.clone());
+            let wdqs_query = prepare_wdqs_fallback_query(query);
             return transport::execute_sparql_tempfile(&wdqs_query, WDQS_WIKIDATA)
                 .await
                 .map_err(map_fetch_error);
@@ -203,8 +208,7 @@ impl LotusRepository for HybridRepository {
         match sparql::execute_sparql_tempfile(query).await {
             Err(err) if is_bad_gateway(&err) => {
                 log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly");
-                let wdqs_query = transform_query_for_wdqs(query);
-                mark_wdqs_fallback_used(wdqs_query.clone());
+                let wdqs_query = prepare_wdqs_fallback_query(query);
                 transport::execute_sparql_tempfile(&wdqs_query, WDQS_WIKIDATA)
                     .await
                     .map_err(map_fetch_error)

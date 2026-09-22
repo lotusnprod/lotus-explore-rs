@@ -6,8 +6,8 @@ use crate::download::DownloadFormat;
 use crate::models::SearchCriteria;
 use crate::perf;
 use crate::repositories::is_wdqs_fallback_used;
-use lotus::queries::transform_query_for_wdqs;
-use lotus::transport::{QLEVER_WIKIDATA, WDQS_SCHOLARLY, WDQS_WIKIDATA};
+use lotus::queries::wdqs_download_query;
+use lotus::transport::QLEVER_WIKIDATA;
 use std::sync::Arc;
 
 pub(super) async fn execute_download_wasm(
@@ -78,13 +78,7 @@ async fn execute_download_wasm_wdqs(
     dl_timer: perf::TimerHandle,
 ) -> Result<(), String> {
     // For simple reference queries, use scholarly endpoint directly without transformation
-    let (wdqs_query, endpoint) =
-        if query.contains("SELECT ?ref WHERE {") && query.contains("wdt:P356") {
-            let query_without_prefix = query.replace("{CURATION_SPARQL_PREFIXES}\n", "");
-            (query_without_prefix, WDQS_SCHOLARLY)
-        } else {
-            (transform_query_for_wdqs(&query), WDQS_WIKIDATA)
-        };
+    let (endpoint, wdqs_query) = wdqs_download_query(&query);
 
     // For RDF format, the query must be wrapped in CONSTRUCT
     // (WDQS can't return Turtle for SELECT queries)

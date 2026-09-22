@@ -13,7 +13,7 @@ use crate::i18n::{
     curation_note_existing_updates, curation_note_new_compound, curation_pending_reference,
     curation_pending_taxon,
 };
-use lotus::queries::transform_query_for_wdqs;
+use lotus::queries::{is_scholarly_reference_query, transform_query_for_wdqs};
 use lotus::transport::{QLEVER_WIKIDATA, ResponseFormat, WDQS_SCHOLARLY, WDQS_WIKIDATA};
 use serde::Deserialize;
 use serde_json::Value;
@@ -69,7 +69,7 @@ pub async fn execute_sparql_with_wdqs_fallback(
     if FORCE_WDQS_FALLBACK {
         log::warn!("event=curation_sparql phase=forced_wdqs_fallback");
         // For simple reference lookups, use scholarly endpoint directly
-        if query.contains("SELECT ?ref WHERE {") && query.contains("wdt:P356") {
+        if is_scholarly_reference_query(query) {
             return lotus::transport::execute_sparql_with_format(query, WDQS_SCHOLARLY, format)
                 .await;
         }
@@ -86,7 +86,7 @@ pub async fn execute_sparql_with_wdqs_fallback(
         Err(lotus::transport::FetchError::Http(502, _)) => {
             log::warn!("event=curation_sparql phase=fallback reason=qlever_502");
             // For simple reference lookups, use scholarly endpoint directly
-            if query.contains("SELECT ?ref WHERE {") && query.contains("wdt:P356") {
+            if is_scholarly_reference_query(query) {
                 lotus::transport::execute_sparql_with_format(query, WDQS_SCHOLARLY, format).await
             } else {
                 // For complex queries, apply transformation and use regular WDQS
