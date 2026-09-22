@@ -22,9 +22,9 @@ FROM rust:1.97.0-slim-bookworm AS wasm-builder
 
 WORKDIR /build
 
+# Reuse compiled dependencies from the builder stage (target/ only).
+# Each FROM rust:1.97... stage has its own ~/.cargo and ~/.rustup.
 COPY --from=builder /build/target /build/target
-COPY --from=builder /root/.cargo /root/.cargo
-COPY --from=builder /root/.rustup /root/.rustup
 
 ENV PATH="/root/.cargo/bin:${PATH}"
 ENV CARGO_HOME="/root/.cargo"
