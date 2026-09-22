@@ -27,19 +27,22 @@ fn base_url() -> String {
 
 /// Build a root-relative URL for a static asset under the served `public/` tree.
 ///
-/// Emitted as a leading-`/` path so it always resolves against the server origin,
-/// independent of the current SPA route. That is what stops the Ketcher `<iframe>`
-/// from 404'ing into the dev-server SPA fallback (which would serve the app shell
-/// back into the iframe and nest it recursively). Note this deliberately does NOT
-/// use `base_uri()`: `dx` emits no `<base href>`, so `base_uri()` would fall back to
-/// the *current page URL* (e.g. `/curation`) and reintroduce the recursion.
+/// Uses the `<script src>` tag (set by `dx build --base-path`) to detect the base
+/// path at runtime, so the Ketcher iframe works on both GitHub Pages (`/<repo>/`)
+/// and root domains (`/`).
 #[cfg(target_arch = "wasm32")]
 pub fn asset_url(path: &str) -> String {
-    if path.starts_with('/') {
-        String::from(path)
-    } else {
-        format!("/{path}")
-    }
+    let win = web_sys::window().expect("web_sys::window");
+    let doc = win.document().expect("document");
+    let base = doc
+        .query_selector("script[src]")
+        .ok()
+        .flatten()
+        .and_then(|el| el.get_attribute("src"))
+        .and_then(|src| src.find("assets/").map(|pos| src[..pos].to_string()))
+        .unwrap_or_else(|| String::from("/"));
+    let path = path.trim_start_matches('/');
+    format!("{base}{path}")
 }
 
 #[cfg(not(target_arch = "wasm32"))]

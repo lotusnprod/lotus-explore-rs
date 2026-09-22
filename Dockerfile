@@ -34,9 +34,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install dioxus-cli and the wasm target for building the WASM web bundle
 RUN rustup default 1.97.0 && \
     rustup target add wasm32-unknown-unknown && \
-    curl -fsSL -o /tmp/cargo-binstall.tar.gz \
-      https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tar.gz && \
-    tar -xzf /tmp/cargo-binstall.tar.gz -C /usr/local/bin/ && \
+    curl -fsSL -o /tmp/cargo-binstall.tgz \
+      https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz && \
+    tar -xzf /tmp/cargo-binstall.tgz -C /usr/local/bin/ && \
     chmod +x /usr/local/bin/cargo-binstall && \
     cargo binstall dioxus-cli --version 0.7.10 --locked --no-confirm
 
