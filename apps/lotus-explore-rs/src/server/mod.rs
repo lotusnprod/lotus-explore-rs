@@ -126,10 +126,7 @@ pub fn build_router(max_body_bytes: usize, config: &AppConfig, state: AppState) 
         .layer(SetRequestIdLayer::new(X_REQUEST_ID, MakeRequestUuid))
         .layer(CompressionLayer::new())
         .layer(build_cors_layer(config))
-        .layer(SetRequestIdLayer::new(X_REQUEST_ID, MakeRequestUuid))
         .layer(middleware::from_fn(add_security_headers))
-        .layer(CompressionLayer::new())
-        .layer(build_cors_layer(config))
 }
 
 async fn add_security_headers(req: axum::http::Request<Body>, next: Next) -> Response {
