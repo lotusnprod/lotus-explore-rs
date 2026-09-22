@@ -53,12 +53,16 @@ COPY Cargo.toml Cargo.lock ./
 COPY crates/ crates/
 COPY apps/ apps/
 
+# Base path for the WASM bundle: "/" for Docker/local deployment,
+# "/${REPNAME}" for GitHub Pages. Override with --build-arg.
+ARG DX_BASE_PATH="/"
+
 # Fetch Ketcher (115 MB) then build the WASM web bundle.
 # fetch-ketcher runs from apps/lotus-explore-rs/ so the relative
 # `public/assets/ketcher` lands inside the app crate's public/ dir.
 RUN cd apps/lotus-explore-rs && \
     cargo run --release -p lotus-deploy --bin fetch-ketcher && \
-    dx build --release --platform web --base-path "/" --package lotus-explore-rs
+    dx build --release --platform web --base-path "${DX_BASE_PATH}" --package lotus-explore-rs
 
 # ── Stage 3: export (for CI artifact extraction) ────────────────────────────────
 # Exposes the built web bundle via a scratch image so CI can extract it with

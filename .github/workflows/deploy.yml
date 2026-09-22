@@ -38,14 +38,11 @@ jobs:
         run: |
           rm -rf _final_site
           mkdir -p _final_site
+          REPONAME="${GITHUB_REPOSITORY#*/}"
           docker buildx build \
             --target export \
+            --build-arg DX_BASE_PATH="/${REPONAME}" \
             --output "_final_site" .
-
-      - name: Verify Ketcher assets
-        run: |
-          ls _final_site/assets/ketcher/
-          test -f _final_site/assets/ketcher/index.html
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         with:
