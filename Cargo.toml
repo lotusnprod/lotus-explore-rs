@@ -75,14 +75,14 @@ nursery = { level = "warn", priority = -3 }
 # Note: multiple_crate_versions is allow-listed due to transitive deps from dioxus
 cargo = { level = "warn", priority = -1 }
 
+expect_used = "warn"
+indexing_slicing = "deny"
+panic = "warn"
+todo = "deny"
+unimplemented = "deny"
 # Selectively enable valuable restriction lints
 # These catch real quality issues and are defensible
 unwrap_used = "deny"
-expect_used = "warn"
-todo = "deny"
-unimplemented = "deny"
-panic = "warn"
-indexing_slicing = "deny"
 
 # Allow multiple_crate_versions due to transitive deps from dioxus ecosystem
 multiple_crate_versions = "allow"
@@ -93,9 +93,9 @@ multiple_crate_versions = "allow"
 dead_code = "warn"
 missing_debug_implementations = "warn"
 missing_docs = "warn"
+unreachable_pub = "warn"
 unsafe_code = "forbid"
 unused_must_use = "warn"
-unreachable_pub = "warn"
 
 [profile.release]
 debug = false
