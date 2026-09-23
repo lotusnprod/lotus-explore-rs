@@ -534,8 +534,8 @@ pub async fn submit_download_form(endpoint: &str, fields: &[(&str, &str)]) -> Re
         .map_err(|e| format!("failed to submit form: {e:?}"))?;
     let _ = body.remove_child(&form);
 
-    // Yield so the form submission takes effect before the caller continues.
-    #[allow(let_underscore_drop)]
+    // Yield so the form submission takes effect before the caller continues
+    // (intentionally drop the future — the await advances the microtask queue).
     let _ = TimeoutFuture::new(0).await;
     Ok(())
 }
