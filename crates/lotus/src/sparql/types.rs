@@ -269,7 +269,7 @@ pub(crate) fn normalize_statement_value(value: &str) -> Option<&str> {
 /// Normalise a DOI from a CSV cell: strip the `doi.org/` prefix if present.
 ///
 /// Returns `None` for empty/whitespace input.  This is the borrowed-string
-/// equivalent of [`crate::transport::clean_doi`], used internally by the
+/// equivalent of `clean_doi`, used internally by the
 /// interning layer to avoid allocation before calling [`StrInterner`].
 #[inline]
 pub(crate) fn normalize_doi_value(value: &str) -> Option<&str> {

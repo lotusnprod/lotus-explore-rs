@@ -111,12 +111,7 @@ async fn execute_download_wasm_wdqs(
 
     let trigger_timer = perf::start_timer(&format.trigger_timer_label());
     if let Err(e) = crate::upload::download_text_as_blob(&body, &filename, "", mime) {
-        log::error!(
-            "download failed: filename={} mime={} error={}",
-            filename,
-            mime,
-            e
-        );
+        log::error!("download failed: filename={filename} mime={mime} error={e}");
         return Err(e);
     }
     let trigger_elapsed = perf::end_timer(&format.trigger_timer_label(), trigger_timer);
@@ -202,17 +197,10 @@ pub(super) fn trigger_download(filename: &str, mime: &str, content_or_url: &str)
     }
 
     log::debug!(
-        "download_text_as_blob filename={} mime={} content_len={}",
-        filename,
-        mime,
+        "download_text_as_blob filename={filename} mime={mime} content_len={}",
         content_or_url.len()
     );
     if let Err(e) = crate::upload::download_text_as_blob(content_or_url, filename, "", mime) {
-        log::error!(
-            "download failed: filename={} mime={} error={}",
-            filename,
-            mime,
-            e
-        );
+        log::error!("download failed: filename={filename} mime={mime} error={e}");
     }
 }

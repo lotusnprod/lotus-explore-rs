@@ -12,12 +12,12 @@ use super::TABLE_ROW_LIMIT;
 
 /// Cached current year — computed once at first call, then reused so that
 /// `SystemTime::now()` / `js_sys::Date` is only hit a single time.
-pub static CURRENT_YEAR_CACHE: OnceLock<u16> = OnceLock::new();
+static CURRENT_YEAR_CACHE: OnceLock<u16> = OnceLock::new();
 
 /// Returns the current calendar year as a `u16`.
 ///
 /// On native targets this uses `SystemTime::now()`; on WASM, it falls back to
-/// `js_sys::Date`.  The result is memoized in [`CURRENT_YEAR_CACHE`] so the
+/// `js_sys::Date`.  The result is memoized in `CURRENT_YEAR_CACHE` so the
 /// syscall / JS interop only happens once per process.
 ///
 /// The year is clamped to `[1800, u16::MAX]`.  `1800` matches

@@ -23,7 +23,7 @@ mod stats;
 mod tests;
 
 pub use entry::{CompoundEntry, Rows, TaxonMatch};
-pub use runtime::{CURRENT_YEAR_CACHE, current_year, runtime_table_row_limit};
+pub use runtime::{current_year, runtime_table_row_limit};
 pub use search::SearchCriteria;
 pub use sort::{SortColumn, SortDir, SortState};
 pub use stats::{DatasetStats, ElementState, SmilesSearchType};
@@ -31,7 +31,7 @@ pub use stats::{DatasetStats, ElementState, SmilesSearchType};
 // ── Constants ────────────────────────────────────────────────────────────────
 
 /// Base URI for Wikidata entities (e.g. `Q12345` → `<BASE>Q12345`).
-pub const WIKIDATA_ENTITY_BASE: &str = "http://www.wikidata.org/entity/";
+pub(crate) const WIKIDATA_ENTITY_BASE: &str = "http://www.wikidata.org/entity/";
 
 /// Base URI for Wikidata reification statements.
 pub const WIKIDATA_STATEMENT_BASE: &str = "http://www.wikidata.org/entity/statement/";

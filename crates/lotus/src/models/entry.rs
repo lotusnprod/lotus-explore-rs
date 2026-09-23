@@ -56,7 +56,9 @@ impl CompoundEntry {
 
     /// Returns a full `https://doi.org/{doi}` URL, if a DOI is present.
     #[must_use]
-    pub fn doi_url(&self) -> Option<String> {
+    // Only exercised by in-crate unit tests; keep it out of the public API.
+    #[cfg_attr(not(test), allow(dead_code))]
+    pub(crate) fn doi_url(&self) -> Option<String> {
         self.doi().map(|d| format!("https://doi.org/{d}"))
     }
 
@@ -76,7 +78,7 @@ impl CompoundEntry {
 
     /// Returns the bare statement ID (e.g. `S1`), stripping the Wikidata
     /// statement URI prefix if present.
-    pub fn statement_id_str(&self) -> Option<&str> {
+    fn statement_id_str(&self) -> Option<&str> {
         let raw = self.statement.as_deref().map(str::trim)?;
         if raw.is_empty() {
             return None;

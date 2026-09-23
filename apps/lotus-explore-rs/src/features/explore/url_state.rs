@@ -151,9 +151,9 @@ pub fn read_url_query_params() -> BTreeMap<String, String> {
             }
             let (key, val) = pair.split_once('=').unwrap_or((pair, ""));
             let key_decoded =
-                urlencoding::decode(key).map_or_else(|_| key.into(), |v| v.into_owned());
+                urlencoding::decode(key).map_or_else(|_| key.into(), std::borrow::Cow::into_owned);
             let val_decoded =
-                urlencoding::decode(val).map_or_else(|_| val.into(), |v| v.into_owned());
+                urlencoding::decode(val).map_or_else(|_| val.into(), std::borrow::Cow::into_owned);
             out.insert(key_decoded, val_decoded);
         }
         out

@@ -132,7 +132,9 @@ pub fn parse_counts_csv_bytes(csv_bytes: &[u8]) -> Result<DatasetStats, FetchErr
 ///
 /// # Errors
 /// Returns [`FetchError::Parse`] when CSV decoding fails.
-pub fn parse_compounds_csv_capped_bytes(
+// Test-only helper: exercised by `super::tests`, dead in non-test builds.
+#[cfg_attr(not(test), allow(dead_code))]
+pub(super) fn parse_compounds_csv_capped_bytes(
     csv_bytes: &[u8],
     max_rows: usize,
 ) -> Result<(Vec<CompoundEntry>, DatasetStats, bool), FetchError> {

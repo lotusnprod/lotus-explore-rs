@@ -65,7 +65,7 @@ async fn gloo_timer_sleep_ms(ms: u32) {
             if let Some(win) = web_sys::window() {
                 let _ = win.set_timeout_with_callback_and_timeout_and_arguments_0(
                     cb.as_ref().unchecked_ref(),
-                    ms as i32,
+                    i32::try_from(ms).unwrap_or(i32::MAX),
                 );
             }
         });
@@ -89,7 +89,7 @@ pub fn copy_to_clipboard(text: &str) {
             return;
         };
 
-        let window_js = wasm_bindgen::JsValue::from(window.clone());
+        let window_js = wasm_bindgen::JsValue::from(window);
         let nav = js_sys::Reflect::get(&window_js, &wasm_bindgen::JsValue::from_str("navigator"));
         if let Ok(nav) = nav
             && let Ok(clipboard) =
@@ -115,7 +115,7 @@ pub fn copy_to_clipboard(text: &str) {
             );
             let _ = body.append_child(&ta);
             ta.select();
-            let doc_js = wasm_bindgen::JsValue::from(document.clone());
+            let doc_js = wasm_bindgen::JsValue::from(document);
             if let Ok(exec_cmd) =
                 js_sys::Reflect::get(&doc_js, &wasm_bindgen::JsValue::from_str("execCommand"))
                 && let Some(func) = exec_cmd.dyn_ref::<js_sys::Function>()

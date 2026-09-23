@@ -3,7 +3,7 @@
 
 //! Search panel and its subsection components.
 
-pub use crate::components::form_sections::{
+use crate::components::form_sections::{
     FormulaSection, MassRangeInput, TaxonInput, YearRangeInput,
 };
 use crate::features::explore::{FormAction, use_criteria_selector};

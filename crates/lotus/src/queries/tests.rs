@@ -3,13 +3,14 @@
 
 //! Integration tests that exercise query builders across submodule boundaries.
 
+use super::sachem::query_sachem_batch;
 use crate::models::{ElementState, SearchCriteria, SmilesSearchType};
 use crate::queries::consts::SUBSCRIPT_DIGIT_MAPPINGS;
 use crate::queries::formula::{normalize_digits_expr, normalize_formula_digits};
 use crate::queries::{
     StructureKind, classify_structure, query_all_compounds, query_compounds_by_taxon,
-    query_construct_from_select, query_counts_from_base, query_sachem, query_sachem_batch,
-    query_with_limit, query_with_server_filters,
+    query_construct_from_select, query_counts_from_base, query_sachem, query_with_limit,
+    query_with_server_filters,
 };
 
 #[test]

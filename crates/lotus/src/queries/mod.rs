@@ -35,9 +35,9 @@ pub use compound::{query_all_compounds, query_compounds_by_taxon, query_taxon_se
 pub use consts::{is_scholarly_reference_query, transform_query_for_wdqs, wdqs_download_query};
 pub use filters::query_with_server_filters;
 pub use pagination::{query_counts_from_base, query_with_limit};
-pub use rdf::query_construct_from_select;
-pub use sachem::{query_sachem, query_sachem_batch};
-pub use structure::{StructureKind, classify_structure, escape_structure_literal};
+pub(crate) use rdf::query_construct_from_select;
+pub use sachem::query_sachem;
+pub use structure::{StructureKind, classify_structure};
 
 // ── Test module ─────────────────────────────────────────────────────────────
 

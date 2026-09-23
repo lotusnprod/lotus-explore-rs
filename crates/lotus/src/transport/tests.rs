@@ -11,10 +11,10 @@
 #![allow(clippy::indexing_slicing)]
 #![allow(clippy::panic)]
 
+use super::csv::{clean_doi, coalesce, col_idx, extract_qid, field, non_empty, parse_year};
 use super::error::{
     compact_http_error_text, is_client_error, is_rate_limit, is_success, looks_like_gateway_error,
 };
-use crate::transport::{clean_doi, coalesce, col_idx, extract_qid, field, non_empty, parse_year};
 
 // ── Gateway error detection ─────────────────────────────────────────────────
 

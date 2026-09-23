@@ -8,7 +8,10 @@
 
 /// Index of a named header column (None if absent).
 #[must_use]
-pub fn col_idx(headers: &csv::StringRecord, name: &str) -> Option<usize> {
+// `unreachable_pub` (deny) requires `pub(crate)` here for cross-module use;
+// the nursery `redundant_pub_crate` suggestion (`pub`) would re-trigger it.
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn col_idx(headers: &csv::StringRecord, name: &str) -> Option<usize> {
     headers.iter().position(|h| h == name)
 }
 
@@ -29,7 +32,10 @@ pub fn field(record: &csv::StringRecord, idx: Option<usize>) -> &str {
 ///
 /// [`WIKIDATA_ENTITY_BASE`]: crate::models::WIKIDATA_ENTITY_BASE
 #[must_use]
-pub fn extract_qid(s: &str) -> String {
+// `unreachable_pub` (deny) requires `pub(crate)` here for cross-module use;
+// the nursery `redundant_pub_crate` suggestion (`pub`) would re-trigger it.
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn extract_qid(s: &str) -> String {
     use crate::models::WIKIDATA_ENTITY_BASE;
     const WIKIDATA_ENTITY_BASE_HTTPS: &str = "https://www.wikidata.org/entity/";
 
@@ -63,19 +69,26 @@ pub fn non_empty(s: &str) -> Option<&str> {
 
 /// Prefer `a`, fall back to `b`, return None if both empty.
 #[must_use]
-pub fn coalesce<'a>(a: &'a str, b: &'a str) -> Option<&'a str> {
+// Test-only helper: exercised by `super::tests`, dead in non-test builds.
+#[cfg_attr(not(test), allow(dead_code))]
+pub(super) fn coalesce<'a>(a: &'a str, b: &'a str) -> Option<&'a str> {
     non_empty(a).or_else(|| non_empty(b))
 }
 
 /// Parse `2021-04-23T00:00:00Z` or `2021` → year as i32.
 #[must_use]
-pub fn parse_year(s: &str) -> Option<i32> {
+// `unreachable_pub` (deny) requires `pub(crate)` here for cross-module use;
+// the nursery `redundant_pub_crate` suggestion (`pub`) would re-trigger it.
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn parse_year(s: &str) -> Option<i32> {
     s.trim().split(['-', 'T']).next()?.trim().parse().ok()
 }
 
 /// Normalise a DOI: strip `https://doi.org/` prefix if present.
 #[must_use]
-pub fn clean_doi(s: &str) -> Option<String> {
+// Test-only helper: exercised by `super::tests`, dead in non-test builds.
+#[cfg_attr(not(test), allow(dead_code))]
+pub(super) fn clean_doi(s: &str) -> Option<String> {
     let t = s.trim();
     if t.is_empty() {
         return None;

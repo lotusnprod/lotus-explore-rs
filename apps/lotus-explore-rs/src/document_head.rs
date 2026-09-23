@@ -15,7 +15,9 @@ use dioxus::document::document as dioxus_document;
 /// `location` so that every canonical / hreflang link is an absolute URL.
 #[cfg(target_arch = "wasm32")]
 fn base_url() -> String {
-    let win = web_sys::window().expect("web_sys::window");
+    let Some(win) = web_sys::window() else {
+        return String::new();
+    };
     let loc = win.location();
     let origin = loc.origin().unwrap_or_default();
     let pathname = loc.pathname().unwrap_or_default();
@@ -34,16 +36,14 @@ fn base_url() -> String {
 /// and root domains (`/`).
 #[cfg(target_arch = "wasm32")]
 pub fn asset_url(path: &str) -> String {
-    let win = web_sys::window().expect("web_sys::window");
-    let doc = win.document().expect("document");
-    let base = doc
-        .query_selector("script[src]")
-        .ok()
+    let path = path.trim_start_matches('/');
+    let base = web_sys::window()
+        .and_then(|win| win.document())
+        .and_then(|doc| doc.query_selector("script[src]").ok())
         .flatten()
         .and_then(|el| el.get_attribute("src"))
         .and_then(|src| src.find("assets/").map(|pos| src[..pos].to_string()))
         .unwrap_or_else(|| String::from("/"));
-    let path = path.trim_start_matches('/');
     format!("{base}{path}")
 }
 

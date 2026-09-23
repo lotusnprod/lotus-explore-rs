@@ -2,8 +2,6 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 use super::*;
-#[allow(unused_imports)]
-use crate::export::SparqlEndpoint;
 use crate::features::explore::actions::ExploreAction;
 use crate::features::explore::command::SearchCommand;
 use crate::features::explore::types::{DomainError, QueryPhase, QueryStage, ValidationFault};

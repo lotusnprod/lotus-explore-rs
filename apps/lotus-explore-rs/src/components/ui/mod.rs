@@ -9,7 +9,5 @@
 pub mod button;
 pub mod card;
 
-#[allow(unused_imports)]
 pub use button::Button;
-#[allow(unused_imports)]
-pub use card::{Card, CardProps};
+pub use card::Card;

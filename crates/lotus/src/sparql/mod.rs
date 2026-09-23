@@ -25,11 +25,10 @@ mod types;
 pub use execution::execute_sparql_tempfile;
 pub use execution::{
     execute_query, execute_sparql_body, execute_sparql_bytes, execute_sparql_format,
-    fetch_export_url_format,
 };
 pub use parsing::{
-    parse_compounds_csv_capped_bytes, parse_compounds_csv_capped_reader,
-    parse_compounds_csv_display_bytes, parse_counts_csv_bytes, parse_taxon_csv_bytes,
+    parse_compounds_csv_capped_reader, parse_compounds_csv_display_bytes, parse_counts_csv_bytes,
+    parse_taxon_csv_bytes,
 };
 
 #[cfg(test)]

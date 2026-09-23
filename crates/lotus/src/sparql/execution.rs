@@ -11,7 +11,6 @@ use crate::transport::{
     FetchError, QLEVER_WIKIDATA, ResponseFormat, execute_query as shared_execute,
     execute_sparql_body as shared_execute_body, execute_sparql_bytes as shared_execute_bytes,
     execute_sparql_with_format as shared_execute_with_format,
-    fetch_export_url_bytes as shared_fetch_export_url_bytes,
 };
 
 /// Execute a LOTUS query on the default Wikidata `QLever` endpoint.
@@ -61,17 +60,4 @@ pub async fn execute_sparql_format(
     format: ResponseFormat,
 ) -> Result<String, FetchError> {
     shared_execute_with_format(sparql, QLEVER_WIKIDATA, format).await
-}
-
-/// Fetch an export URL and decode the response as UTF-8 text.
-///
-/// # Errors
-/// Returns [`FetchError`] for transport/HTTP failures, empty responses, or
-/// invalid UTF-8 payloads.
-pub async fn fetch_export_url_format(
-    url: &str,
-    format: ResponseFormat,
-) -> Result<String, FetchError> {
-    let bytes = shared_fetch_export_url_bytes(url, format).await?;
-    String::from_utf8(bytes).map_err(|e| FetchError::Parse(e.to_string()))
 }

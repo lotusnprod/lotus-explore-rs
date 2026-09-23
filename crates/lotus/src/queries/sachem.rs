@@ -140,7 +140,9 @@ WHERE {{
 /// Each result binding includes `?input_smiles` so callers can track which
 /// query SMILES produced each match.
 #[must_use]
-pub fn query_sachem_batch(
+// Test-only helper: exercised by `super::tests`, dead in non-test builds.
+#[cfg_attr(not(test), allow(dead_code))]
+pub(super) fn query_sachem_batch(
     smiles_batch: &[&str],
     search_type: SmilesSearchType,
     threshold: f64,

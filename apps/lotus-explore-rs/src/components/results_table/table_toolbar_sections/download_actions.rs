@@ -22,10 +22,16 @@ use std::sync::Arc;
 
 // ── private helpers ─────────────────────────────────────────────────────────
 
+// `criteria_snapshot` is used on WASM only (threaded into the download
+// there); unused on native, where the parameter exists for signature parity.
+#[cfg_attr(
+    not(target_arch = "wasm32"),
+    allow(unused_variables, clippy::needless_pass_by_value)
+)]
 fn spawn_query_download(
     format: DownloadFormat,
     status_message: String,
-    _criteria_snapshot: Option<Arc<SearchCriteria>>,
+    criteria_snapshot: Option<Arc<SearchCriteria>>,
     filename: String,
     query: Arc<str>,
     mut download_busy: Signal<bool>,
@@ -47,7 +53,17 @@ fn spawn_query_download(
         if let Err(err) = execute_download(
             format,
             #[cfg(target_arch = "wasm32")]
-            _criteria_snapshot.expect("wasm download requires criteria snapshot"),
+            {
+                let Some(criteria_snapshot) = criteria_snapshot else {
+                    log::warn!(
+                        "event=download phase=table_query state=error reason=missing_criteria_snapshot"
+                    );
+                    *download_busy.write() = false;
+                    *download_status.write() = None;
+                    return;
+                };
+                criteria_snapshot
+            },
             query,
             filename,
         )
@@ -314,11 +330,12 @@ pub fn DownloadActionsGroup() -> Element {
                                 onclick: move |_| {
                                     #[cfg(target_arch = "wasm32")]
                                     {
-                                        if let Some(win) = web_sys::window() {
-                                            let _ = win.open_with_url_and_target(
-                                                ui_url_for_click.as_ref().unwrap(),
-                                                "_blank",
-                                            );
+                                        if let Some(win) = web_sys::window()
+                                            && let Some(url) =
+                                                ui_url_for_click.as_ref()
+                                        {
+                                            let _ = win
+                                                .open_with_url_and_target(url, "_blank");
                                         }
                                     }
                                 },

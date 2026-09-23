@@ -107,7 +107,7 @@ pub async fn execute_sparql_with_format(
 ///
 /// # Errors
 /// Returns [`FetchError`] for transport/HTTP failures or empty responses.
-pub async fn execute_sparql_with_format_bytes(
+async fn execute_sparql_with_format_bytes(
     sparql: &str,
     endpoint: &str,
     format: ResponseFormat,
@@ -220,7 +220,7 @@ pub(super) async fn execute_sparql_with_format_body_c<C: HttpClient>(
 ///
 /// # Errors
 /// Returns [`FetchError`] for transport/HTTP failures or empty responses.
-pub async fn execute_sparql_with_format_body(
+async fn execute_sparql_with_format_body(
     sparql: &str,
     endpoint: &str,
     format: ResponseFormat,
@@ -342,7 +342,7 @@ pub(super) async fn execute_sparql_with_format_tempfile_c<C: HttpClient>(
 /// Returns [`FetchError`] when request/streaming/tempfile I/O fails, or when
 /// the upstream response is empty / an HTTP error.
 #[cfg(not(target_arch = "wasm32"))]
-pub async fn execute_sparql_with_format_tempfile(
+async fn execute_sparql_with_format_tempfile(
     sparql: &str,
     endpoint: &str,
     format: ResponseFormat,
@@ -352,25 +352,9 @@ pub async fn execute_sparql_with_format_tempfile(
 
 // ── URL-based fetch ─────────────────────────────────────────────────────────
 
-/// Fetch a fully-formed export URL (for example with `action=csv_export`) and
-/// return raw response bytes.
-///
-/// This is useful for clients that want direct `QLever` export representations
-/// while still using HTTP content negotiation (`Accept` / `Accept-Encoding`).
-///
-/// # Errors
-/// Returns [`FetchError`] for transport/HTTP failures or empty responses.
-pub async fn fetch_export_url_bytes(
-    url: &str,
-    format: ResponseFormat,
-) -> Result<Vec<u8>, FetchError> {
-    fetch_url_bytes_with_accept(url, format.accept()).await
-}
-
 /// Fetch an arbitrary URL and return raw response bytes.
 ///
-/// Unlike [`fetch_export_url_bytes`], this does not constrain the `Accept`
-/// header to a specific SPARQL representation. It is used for API-managed
+/// This does not constrain the `Accept` header to a specific SPARQL representation. It is used for API-managed
 /// download artifacts such as `application/gzip` attachments.
 ///
 /// # Errors

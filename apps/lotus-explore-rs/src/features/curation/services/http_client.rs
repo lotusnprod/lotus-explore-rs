@@ -93,8 +93,8 @@ pub(super) async fn rdkit_bridge_call(
 }
 
 #[cfg(target_arch = "wasm32")]
-pub(super) fn js_value_to_json(value: JsValue) -> Result<Value, CurationError> {
-    let text = JSON::stringify(&value)
+pub(super) fn js_value_to_json(value: &JsValue) -> Result<Value, CurationError> {
+    let text = JSON::stringify(value)
         .ok()
         .and_then(|s| s.as_string())
         .ok_or_else(|| CurationError::Parse("rdkit.js returned a non-serializable value".into()))?;

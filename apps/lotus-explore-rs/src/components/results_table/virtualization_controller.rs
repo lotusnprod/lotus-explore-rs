@@ -124,7 +124,7 @@ impl ResultsTableVirtualizationController {
         }
 
         let current_row_height = *self.row_height_px.read();
-        let mut row_height_for_frame = current_row_height;
+        let row_height_for_frame = current_row_height;
 
         // Defer row height measurement to rAF to avoid forced reflow.
         // Reading offsetHeight after DOM mutations triggers synchronous layout.
@@ -144,7 +144,6 @@ impl ResultsTableVirtualizationController {
                 let _ = win.request_animation_frame(cb.as_ref().unchecked_ref());
                 cb.forget();
             }
-            row_height_for_frame = fallback;
         }
 
         // Schedule a frame only during initial attachment/measurement and viewport bootstrap,
@@ -161,9 +160,11 @@ impl ResultsTableVirtualizationController {
     pub(super) const fn sync_after_render(&mut self, _total_rows: usize) {}
 
     #[allow(clippy::unused_self)]
-    pub(super) fn handle_scroll(&self, _total_rows: usize) {
+    // `total_rows` is consumed on WASM only; kept on native for signature parity.
+    #[cfg_attr(not(target_arch = "wasm32"), allow(unused_variables))]
+    pub(super) fn handle_scroll(&self, total_rows: usize) {
         #[cfg(target_arch = "wasm32")]
-        self.schedule_scroll_frame(_total_rows, *self.row_height_px.read());
+        self.schedule_scroll_frame(total_rows, *self.row_height_px.read());
     }
 
     #[cfg(target_arch = "wasm32")]

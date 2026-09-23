@@ -2,8 +2,6 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 #![allow(clippy::doc_markdown)]
-#![allow(clippy::redundant_pub_crate)]
-#![allow(unused_imports)]
 
 #[cfg(not(target_arch = "wasm32"))]
 pub(super) use crate::features::curation::domain::NATPROD_API_BASE;
@@ -19,13 +17,22 @@ use crate::i18n::{
 };
 use lotus::queries::{is_scholarly_reference_query, transform_query_for_wdqs};
 use lotus::transport::{QLEVER_WIKIDATA, ResponseFormat, WDQS_SCHOLARLY, WDQS_WIKIDATA};
+// Shared import hub: children (`http_client`, `chemical`) pull these in via
+// `use super::*`. Each is referenced on only one target, so the allow is
+// scoped to the target where it would otherwise be unused.
+#[cfg_attr(target_arch = "wasm32", allow(unused_imports))]
 use serde::Deserialize;
+#[cfg_attr(not(target_arch = "wasm32"), allow(unused_imports))]
 use serde_json::Value;
 
 mod chemical;
 mod enrichment;
 mod helpers;
 mod http_client;
+// `unreachable_pub`-style narrowing requires `pub(crate)` here (used by
+// `crate::curation`); the nursery `redundant_pub_crate` suggestion (`pub`)
+// would widen it.
+#[allow(clippy::redundant_pub_crate)]
 pub(crate) mod occurrence_cache;
 mod reference_metadata;
 pub mod wikidata;
@@ -37,8 +44,6 @@ use helpers::{
     qs_canonical_smiles_statement, qs_inchi_statement, qs_inchikey_statement,
     qs_isomeric_smiles_statement, qs_statement_with_refs,
 };
-#[cfg(not(target_arch = "wasm32"))]
-use http_client::{BatchConvertResponse, natprod_client};
 use reference_metadata::fetch_reference_quickstatements;
 use wikidata::normalize_taxon_lookup;
 
@@ -47,6 +52,9 @@ pub mod pipeline;
 pub mod quickstatements;
 
 #[cfg(test)]
+// `unreachable_pub`-style narrowing requires `pub(crate)` for this test-only
+// re-export; the nursery `redundant_pub_crate` suggestion (`pub`) would widen it.
+#[allow(clippy::redundant_pub_crate)]
 pub(crate) use chemical::extract_exact_mass_from_json;
 pub use enrichment::curate_single_row;
 #[cfg(test)]

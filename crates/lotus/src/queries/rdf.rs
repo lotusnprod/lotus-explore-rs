@@ -21,7 +21,10 @@ use crate::queries::compound::compound_formula_expr;
 /// Maps the `SELECT` variables to RDF triples using `Wikidata` vocabulary:
 /// compound properties (P235, P233, etc.), taxon info, references, and metadata.
 #[must_use]
-pub fn query_construct_from_select(select_query: &str) -> String {
+// `unreachable_pub` (deny) requires `pub(crate)` here for cross-module use;
+// the nursery `redundant_pub_crate` suggestion (`pub`) would re-trigger it.
+#[allow(clippy::redundant_pub_crate)]
+pub(crate) fn query_construct_from_select(select_query: &str) -> String {
     let Some(select_pos) = select_query.find("SELECT") else {
         return select_query.to_string();
     };

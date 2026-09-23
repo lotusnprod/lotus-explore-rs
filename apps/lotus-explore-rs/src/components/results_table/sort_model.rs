@@ -69,13 +69,19 @@ pub(super) fn build_sort_index_cache(rows: Arc<[CompoundEntry]>) -> SortIndexCac
 }
 
 impl SortIndexCache {
+    // `idx` comes from the exhaustive `sort_column_index` match, so it is
+    // always `< NUM_SORT_COLS`; indexing a fixed-size array is safe here.
     #[allow(clippy::indexing_slicing)]
-    #[allow(clippy::expect_used)]
     fn ascending_for(&self, col: SortColumn) -> Arc<[u32]> {
         let idx = sort_column_index(col);
         // Fast path: return the cached value while holding the lock briefly.
         {
-            let guard = self.0.asc_by_col.lock().expect("sort cache not poisoned");
+            // Recover from poisoning (a panicking writer leaves valid data).
+            let guard = self
+                .0
+                .asc_by_col
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
             if let Some(cached) = &guard[idx] {
                 return cached.clone();
             }
@@ -86,17 +92,27 @@ impl SortIndexCache {
         // Store and return; a benign race on native means two threads might
         // both compute the same column — both results are identical, so the
         // last writer's value is silently discarded by get_or_insert.
-        let mut guard = self.0.asc_by_col.lock().expect("sort cache not poisoned");
+        let mut guard = self
+            .0
+            .asc_by_col
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         guard[idx].get_or_insert(computed).clone()
     }
 
+    // `idx` comes from the exhaustive `sort_column_index` match, so it is
+    // always `< NUM_SORT_COLS`; indexing a fixed-size array is safe here.
     #[allow(clippy::indexing_slicing)]
-    #[allow(clippy::expect_used)]
     fn descending_for(&self, col: SortColumn) -> Arc<[u32]> {
         let idx = sort_column_index(col);
         // Fast path: return the cached value while holding the lock briefly.
         {
-            let guard = self.0.desc_by_col.lock().expect("sort cache not poisoned");
+            // Recover from poisoning (a panicking writer leaves valid data).
+            let guard = self
+                .0
+                .desc_by_col
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
             if let Some(cached) = &guard[idx] {
                 return cached.clone();
             }
@@ -105,7 +121,11 @@ impl SortIndexCache {
         let ascending = self.ascending_for(col);
         let computed = reversed_indices(&ascending);
 
-        let mut guard = self.0.desc_by_col.lock().expect("sort cache not poisoned");
+        let mut guard = self
+            .0
+            .desc_by_col
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         guard[idx].get_or_insert(computed).clone()
     }
 }
@@ -136,8 +156,8 @@ pub(super) fn build_sorted_indices(rows: &[CompoundEntry], sort: SortState) -> A
     }
 }
 
-#[allow(clippy::cast_possible_truncation)]
-#[allow(clippy::indexing_slicing)]
+#[allow(clippy::cast_possible_truncation)] // `rows.len()` far below `u32::MAX` for any displayable table
+#[allow(clippy::indexing_slicing)] // `a`/`b` drawn from `0..rows.len()`, always in bounds
 fn build_sorted_indices_for_column(rows: &[CompoundEntry], column: SortColumn) -> Arc<[u32]> {
     let mut idx: Vec<u32> = (0..rows.len() as u32).collect();
     idx.sort_by(|&a, &b| {

@@ -58,12 +58,18 @@ mod cache_impl {
 
     /// Returns a cached result page if present (cache hit).
     #[cfg(target_arch = "wasm32")]
+    // `unreachable_pub`-style narrowing requires `pub(crate)` for cross-module
+    // use; the nursery `redundant_pub_crate` suggestion (`pub`) would widen it.
+    #[allow(clippy::redundant_pub_crate)]
     pub(crate) fn get_cached(key: &str) -> Option<ResponseBody> {
         CACHE.with(|c| c.borrow().get(key).cloned())
     }
 
     /// Stores a result page for the next identical request (cache miss).
     #[cfg(target_arch = "wasm32")]
+    // `unreachable_pub`-style narrowing requires `pub(crate)` for cross-module
+    // use; the nursery `redundant_pub_crate` suggestion (`pub`) would widen it.
+    #[allow(clippy::redundant_pub_crate)]
     pub(crate) fn store_cached(key: String, bytes: ResponseBody) {
         CACHE.with(|c| c.borrow_mut().insert(key, bytes));
     }
@@ -125,4 +131,7 @@ mod cache_impl {
 }
 
 #[cfg(target_arch = "wasm32")]
+// `unreachable_pub`-style narrowing requires `pub(crate)` for cross-module
+// use; the nursery `redundant_pub_crate` suggestion (`pub`) would widen it.
+#[allow(clippy::redundant_pub_crate)]
 pub(crate) use cache_impl::{get_cached, store_cached};

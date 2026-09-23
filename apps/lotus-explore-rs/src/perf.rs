@@ -51,10 +51,10 @@ pub fn log_timing(phase: &str, message: &str, duration: Option<Duration>) {
     }
 }
 
-/// Start a console.time() block on WASM, or return the current timestamp on native.
+/// Start a `console.time()` block on WASM, or return the current timestamp on native.
 #[cfg(target_arch = "wasm32")]
-pub fn start_timer(_label: &str) -> TimerHandle {
-    web_sys::console::time_with_label(_label);
+pub fn start_timer(label: &str) -> TimerHandle {
+    web_sys::console::time_with_label(label);
     wasm_now_ms()
 }
 
@@ -63,10 +63,10 @@ pub fn start_timer(_label: &str) -> TimerHandle {
     Instant::now()
 }
 
-/// End a console.time() block on WASM and compute elapsed duration on native.
+/// End a `console.time()` block on WASM and compute elapsed duration on native.
 #[cfg(target_arch = "wasm32")]
-pub fn end_timer(_label: &str, started: TimerHandle) -> Duration {
-    web_sys::console::time_end_with_label(_label);
+pub fn end_timer(label: &str, started: TimerHandle) -> Duration {
+    web_sys::console::time_end_with_label(label);
     let elapsed_ms = (wasm_now_ms() - started).max(0.0);
     Duration::from_secs_f64(elapsed_ms / 1000.0)
 }

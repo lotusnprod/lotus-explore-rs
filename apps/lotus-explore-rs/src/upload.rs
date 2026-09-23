@@ -178,9 +178,14 @@ where
     /// Creates a new line reader for the given blob.
     #[must_use]
     pub fn new(blob: &UploadBlob, on_progress: F) -> Self {
+        // `Blob::size()` is an f64 count of bytes: always finite,
+        // non-negative, and far below 2^53 for any real upload, so the
+        // float→int conversion is exact. No `try_from` exists for f64.
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        let total_bytes = blob.size() as u64;
         Self {
             blob: blob.clone(),
-            total_bytes: blob.size() as u64,
+            total_bytes,
             offset: 0,
             buffer: Vec::with_capacity(CHUNK_SIZE),
             buf_start: 0,
@@ -211,8 +216,10 @@ where
             // No complete line yet — check for EOF.
             if self.offset >= self.total_bytes {
                 if self.buf_start < self.buffer.len() {
-                    let remaining =
-                        String::from_utf8_lossy(&self.buffer[self.buf_start..]).into_owned();
+                    // `buf_start <= buffer.len()` is an invariant (see
+                    // `take_line_from_buffer`); fall back to empty on violation.
+                    let tail = self.buffer.get(self.buf_start..).unwrap_or_default();
+                    let remaining = String::from_utf8_lossy(tail).into_owned();
                     self.buf_start = self.buffer.len();
                     return Ok(Some(remaining));
                 }
@@ -224,9 +231,11 @@ where
     }
 
     fn take_line_from_buffer(&mut self) -> Option<String> {
-        let available = &self.buffer[self.buf_start..];
+        // `buf_start <= buffer.len()` is maintained by construction; `pos`
+        // comes from `position()` on the same slice, so both are in bounds.
+        let available = self.buffer.get(self.buf_start..).unwrap_or_default();
         if let Some(pos) = available.iter().position(|b| *b == b'\n') {
-            let line_bytes = &available[..pos];
+            let line_bytes = available.get(..pos).unwrap_or_default();
             let mut line = String::from_utf8_lossy(line_bytes).into_owned();
             self.buf_start += pos + 1;
             if line.ends_with('\r') {
@@ -246,9 +255,13 @@ where
     async fn load_next_chunk(&mut self) -> Result<(), UploadError> {
         let start = self.offset;
         let end = (self.offset + CHUNK_SIZE as u64).min(self.total_bytes);
+        // The `slice_with_f64_and_f64` JS binding takes f64; offsets stay far
+        // below 2^53 for any real upload, so the conversion is exact.
+        #[allow(clippy::cast_precision_loss)]
+        let (start_f64, end_f64) = (start as f64, end as f64);
         let slice = self
             .blob
-            .slice_with_f64_and_f64(start as f64, end as f64)
+            .slice_with_f64_and_f64(start_f64, end_f64)
             .map_err(UploadError::from)?;
         let bytes = JsFuture::from(slice.array_buffer()).await?;
         let array = Uint8Array::new(&bytes);
@@ -540,8 +553,10 @@ pub async fn submit_download_form(endpoint: &str, fields: &[(&str, &str)]) -> Re
         .map_err(|e| format!("failed to submit form: {e:?}"))?;
     let _ = body.remove_child(&form);
 
-    // Yield so the form submission takes effect before the caller continues
-    // (intentionally drop the future — the await advances the microtask queue).
+    // Yield so the form submission takes effect before the caller continues.
+    // The unit value is intentionally dropped: awaiting advances the microtask
+    // queue, which is the entire purpose of this statement.
+    #[allow(clippy::ignored_unit_patterns)]
     let _ = TimeoutFuture::new(0).await;
     Ok(())
 }

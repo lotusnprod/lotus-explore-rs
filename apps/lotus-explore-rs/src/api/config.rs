@@ -59,7 +59,9 @@ fn runtime_query_param(name: &str) -> Option<String> {
         let value = parts.next().unwrap_or_default();
         let decoded_key = urlencoding::decode(key).ok()?;
         if decoded_key == name {
-            return urlencoding::decode(value).ok().map(|v| v.into_owned());
+            return urlencoding::decode(value)
+                .ok()
+                .map(std::borrow::Cow::into_owned);
         }
     }
     None

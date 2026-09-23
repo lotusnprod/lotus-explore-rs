@@ -7,8 +7,7 @@
 //! This module is the single source of truth for the CSV/JSON/RDF export
 //! enum and its mapping to `action=` strings ("`csv_export`",
 //! "`qlever_json_export`", "`turtle_export`").  Apps import `ExportFormat`
-//! and call `qlever_export_url` / `qlever_export_url_with_action` instead of
-//! re-implementing the mapping.
+//! and call `qlever_export_url` instead of re-implementing the mapping.
 
 #![allow(clippy::module_name_repetitions)]
 
@@ -127,20 +126,6 @@ pub fn qlever_export_url(query: &str, format: ExportFormat) -> String {
         crate::transport::QLEVER_WIKIDATA,
         urlencoding::encode(&format.prepared_query(query)),
         format.qlever_action()
-    )
-}
-
-/// Builds a `QLever` export URL for the given query and format action string.
-///
-/// This is kept for callers that need a raw action string (e.g. the
-/// `lotus-explore-rs` `/v1/search` endpoint, which lists direct `QLever` URLs
-/// alongside its own gzip-cached export URLs).
-#[must_use]
-pub fn qlever_export_url_with_action(query: &str, action: &str) -> String {
-    format!(
-        "{}?query={}&action={action}",
-        crate::transport::QLEVER_WIKIDATA,
-        urlencoding::encode(query)
     )
 }
 
@@ -310,13 +295,6 @@ mod tests {
         let url = qlever_export_url(select, ExportFormat::Rdf);
         // RDF should wrap in CONSTRUCT before encoding
         assert!(url.contains("action=turtle_export"));
-    }
-
-    #[test]
-    fn qlever_export_url_with_action_uses_custom_action() {
-        let url = qlever_export_url_with_action("SELECT ?s WHERE { ?s ?p ?o }", "custom_action");
-        assert!(url.starts_with(crate::transport::QLEVER_WIKIDATA));
-        assert!(url.contains("action=custom_action"));
     }
 
     #[test]

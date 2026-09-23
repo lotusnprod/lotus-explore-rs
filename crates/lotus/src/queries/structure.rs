@@ -68,7 +68,7 @@ fn looks_like_molfile(text: &str) -> bool {
 /// Molfiles (multi-line) are wrapped in triple-quoted strings; SMILES strings
 /// in double-quoted strings with escaped inner quotes and backslashes.
 #[must_use]
-pub fn escape_structure_literal(smiles: &str) -> String {
+pub(super) fn escape_structure_literal(smiles: &str) -> String {
     let normalized = smiles.replace("\r\n", "\n").replace('\r', "\n");
     let is_molfile = looks_like_molfile(&normalized);
     let candidate = if is_molfile {

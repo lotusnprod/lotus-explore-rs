@@ -30,16 +30,16 @@ pub(super) async fn fetch_results<R: LotusRepository>(
     let results_key =
         lotus::state::build_search_cache_key(plan.execution_query, plan.display_limit, true);
     let results_timer = perf::start_timer("LOTUS:results_page_query");
-    let (results_csv, fetched_remote) = match crate::cache::get_cached(&results_key) {
-        Some(cached) => (cached, false),
-        None => {
-            let fetched = repo
-                .sparql_body(&results_query)
-                .await
-                .map_err(DomainError::transport_at(QueryStage::ResultsQuery))?;
-            crate::cache::store_cached(results_key, fetched.clone());
-            (fetched, true)
-        }
+    let (results_csv, fetched_remote) = if let Some(cached) = crate::cache::get_cached(&results_key)
+    {
+        (cached, false)
+    } else {
+        let fetched = repo
+            .sparql_body(&results_query)
+            .await
+            .map_err(DomainError::transport_at(QueryStage::ResultsQuery))?;
+        crate::cache::store_cached(results_key, fetched.clone());
+        (fetched, true)
     };
     let results_elapsed = perf::end_timer("LOTUS:results_page_query", results_timer);
     if fetched_remote {
@@ -107,9 +107,10 @@ pub(super) fn is_probable_memory_limit(err: &DomainError) -> bool {
     match err {
         DomainError::Transport { source, .. } => match source {
             RepositoryError::NotConfigured => false,
-            RepositoryError::Network(detail) => has_memory_signature(detail.as_str()),
+            RepositoryError::Network(detail) | RepositoryError::Parse(detail) => {
+                has_memory_signature(detail.as_str())
+            }
             RepositoryError::Http { body, .. } => has_memory_signature(body),
-            RepositoryError::Parse(detail) => has_memory_signature(detail.as_str()),
         },
         DomainError::Parse(ParseFault::ResultsCsv { details }) => has_memory_signature(details),
         _ => false,

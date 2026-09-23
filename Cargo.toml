@@ -66,7 +66,7 @@ zip = "8.6"
 all = { level = "deny", priority = -1 }
 
 # Clippy pedantic lints (additional quality checks)
-pedantic = { level = "warn", priority = -2 }
+pedantic = { level = "deny", priority = -2 }
 
 # Clippy nursery lints (experimental, may be noisy)
 nursery = { level = "warn", priority = -3 }
@@ -93,8 +93,9 @@ multiple_crate_versions = "allow"
 dead_code = "warn"
 missing_debug_implementations = "warn"
 missing_docs = "warn"
-unreachable_pub = "warn"
+unreachable_pub = "deny"
 unsafe_code = "forbid"
+unused_crate_dependencies = "warn"
 unused_must_use = "warn"
 
 [profile.release]

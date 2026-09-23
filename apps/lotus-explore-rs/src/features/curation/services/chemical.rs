@@ -56,7 +56,7 @@ pub(super) async fn convert_smiles(smiles: &str) -> Result<ConvertFormatsRespons
 #[cfg(target_arch = "wasm32")]
 async fn convert_with_rdkit(smiles: &str) -> Result<ConvertFormatsResponse, CurationError> {
     let value = rdkit_bridge_call("convert", smiles.trim()).await?;
-    let parsed = js_value_to_json(value)?;
+    let parsed = js_value_to_json(&value)?;
     let converted = serde_json::from_value::<RdkitConvertResponse>(parsed)
         .map_err(|e| CurationError::Parse(format!("rdkit.js convert parse error: {e}")))?;
     Ok(ConvertFormatsResponse {

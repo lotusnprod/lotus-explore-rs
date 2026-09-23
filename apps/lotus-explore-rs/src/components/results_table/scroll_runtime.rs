@@ -53,18 +53,17 @@ pub(super) fn measure_row_height_px(
     };
 
     let rows = scroll_host.get_elements_by_class_name("data-row");
-    let len = rows.length() as usize;
     let mut sampled_total_px = 0usize;
     let mut sampled_count = 0usize;
 
-    for i in 0..len {
-        let Some(row) = rows.item(i as u32) else {
+    for i in 0..rows.length() {
+        let Some(row) = rows.item(i) else {
             continue;
         };
         let Ok(row) = row.dyn_into::<web_sys::HtmlElement>() else {
             continue;
         };
-        let h = row.offset_height().max(0) as usize;
+        let h = usize::try_from(row.offset_height().max(0)).unwrap_or(0);
         if h > 0 {
             sampled_total_px = sampled_total_px.saturating_add(h);
             sampled_count = sampled_count.saturating_add(1);
@@ -138,10 +137,10 @@ pub(super) fn schedule_virtual_scroll_frame(
     let mut scroll_raf_scheduled_sig = scroll_raf_scheduled;
     let mut scroll_raf_cb_sig = scroll_raf_cb;
     let mut scroll_raf_id_sig = scroll_raf_id;
-    let div_for_raf = div.clone();
+    let div_for_raf = div;
     let raf_cb = wasm_bindgen::closure::Closure::wrap(Box::new(move |_ts: f64| {
-        let top = div_for_raf.scroll_top().max(0) as usize;
-        let height = div_for_raf.client_height().max(0) as usize;
+        let top = usize::try_from(div_for_raf.scroll_top().max(0)).unwrap_or(0);
+        let height = usize::try_from(div_for_raf.client_height().max(0)).unwrap_or(0);
         let next_first = next_first_visible_row(top, row_height_px, total_rows);
         if next_first != *first_visible_row_sig.peek() {
             *first_visible_row_sig.write() = next_first;
@@ -161,13 +160,12 @@ pub(super) fn schedule_virtual_scroll_frame(
                 .ok()
         })
     });
-    match scheduled_id {
-        Some(id) => *scroll_raf_id.write() = Some(id),
-        None => {
-            *scroll_raf_id.write() = None;
-            *scroll_raf_scheduled.write() = false;
-            *scroll_raf_cb.write() = None;
-        }
+    if let Some(id) = scheduled_id {
+        *scroll_raf_id.write() = Some(id);
+    } else {
+        *scroll_raf_id.write() = None;
+        *scroll_raf_scheduled.write() = false;
+        *scroll_raf_cb.write() = None;
     }
 }
 

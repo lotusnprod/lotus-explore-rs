@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::match_same_arms)]
-
 //! User-facing formatting for domain errors and warnings.
 
 use crate::features::explore::{
@@ -77,8 +75,7 @@ fn stage_display_label(locale: Locale, stage: QueryStage) -> &'static str {
 fn transport_error_summary(locale: Locale, source: &RepositoryError) -> String {
     let raw = match source {
         RepositoryError::NotConfigured => return err_api_not_configured(locale),
-        RepositoryError::Network(detail) => detail.as_str(),
-        RepositoryError::Parse(detail) => detail.as_str(),
+        RepositoryError::Network(detail) | RepositoryError::Parse(detail) => detail.as_str(),
         RepositoryError::Http { status, body } => {
             let detail = if looks_like_html(body) {
                 if *status == 429 {
