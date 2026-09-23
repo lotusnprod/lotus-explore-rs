@@ -4,17 +4,16 @@
 // This crate compiles Dioxus WASM-client code alongside native-server code in
 // a single compilation unit.  On native targets (no `server` feature) main()
 // just prints a hint and never launches the Dioxus renderer, so all UI/i18n
-// modules are technically unreachable — hence `allow(dead_code)`. Without it
-// rustc flags ~980 Dioxus RSX component/hook sites as dead (false positives the
-// reachability analyzer can't trace through macro expansion).
-#![allow(dead_code)]
+// modules are technically unreachable. The workspace `[lints.rust] dead_code = "allow"`
+// allows for this Dioxus cross-cfg situation.
 #![cfg_attr(target_arch = "wasm32", allow(clippy::future_not_send))]
+#![allow(clippy::module_name_repetitions, clippy::missing_const_for_fn)]
 
 //! `lotus-explore-rs` — LOTUS Knowledge Explorer.
 //!
 //! A linked open data (LOAD) explorer for the LOTUS compound-taxon-reference
 //! knowledge graph from Wikidata, queried via SPARQL.  Powered by the `lotus`
-//! shared crate and the QLever SPARQL endpoint.
+//! shared crate and the `QLever` SPARQL endpoint.
 //!
 //! # Quick start
 //!

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AppView {
     Explore,
@@ -11,7 +12,7 @@ pub enum AppView {
 impl AppView {
     pub fn from_query_value(value: Option<&str>) -> Self {
         match value {
-            Some("curation") | Some("curation-explorer") => Self::Curation,
+            Some("curation" | "curation-explorer") => Self::Curation,
             Some("draw") => Self::Draw,
             _ => Self::Explore,
         }

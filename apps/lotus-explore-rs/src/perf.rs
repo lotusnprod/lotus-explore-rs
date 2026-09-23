@@ -33,14 +33,10 @@ pub fn log_timing(phase: &str, message: &str, duration: Option<Duration>) {
     }
 
     let msg = duration.map_or_else(
-        || format!("[LOTUS:{}] {}", phase, message),
+        || format!("[LOTUS:{phase}] {message}"),
         |d| {
-            format!(
-                "[LOTUS:{}] {} ({:.1}ms)",
-                phase,
-                message,
-                d.as_secs_f64() * 1000.0
-            )
+            let ms = d.as_secs_f64() * 1000.0;
+            format!("[LOTUS:{phase}] {message} ({ms:.1}ms)")
         },
     );
 
@@ -51,7 +47,7 @@ pub fn log_timing(phase: &str, message: &str, duration: Option<Duration>) {
 
     #[cfg(not(target_arch = "wasm32"))]
     {
-        log::info!("{}", msg);
+        log::info!("{msg}");
     }
 }
 

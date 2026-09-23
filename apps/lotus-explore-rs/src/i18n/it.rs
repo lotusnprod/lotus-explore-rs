@@ -5,6 +5,7 @@
 
 use crate::i18n::TextKey;
 
+#[allow(clippy::too_many_lines)]
 pub const fn it_t(key: TextKey) -> &'static str {
     match key {
         TextKey::Share => "Condividi",
@@ -72,15 +73,15 @@ pub const fn it_t(key: TextKey) -> &'static str {
         }
         TextKey::ExampleSmilesOnly => "Incolla uno SMILES o un Molfile nel campo struttura",
         TextKey::ExampleQueryExecute => "Esegui",
-        TextKey::ExampleQueryTaxon => "Scarica CSV",
-        TextKey::ExampleQueryStructure => "Scarica JSON",
-        TextKey::ExampleQueryAdvanced => "Scarica RDF",
+        TextKey::ExampleQueryTaxon | TextKey::DownloadCsvLabel => "Scarica CSV",
+        TextKey::ExampleQueryStructure | TextKey::DownloadJsonLabel => "Scarica JSON",
+        TextKey::ExampleQueryAdvanced | TextKey::DownloadRdfLabel => "Scarica RDF",
         TextKey::ExampleApiUrls => "Esempi di URL API",
         TextKey::LabelLanguagePolicy => {
             "Le etichette usano prima 'mul' e poi 'en' per risultati confrontabili."
         }
         TextKey::SearchFilters => "Filtri di ricerca",
-        TextKey::Taxon => "Taxon",
+        TextKey::Taxon | TextKey::TaxonCol => "Taxon",
         TextKey::TaxonPlaceholder => "Gentiana lutea - Q34317 - *",
         TextKey::TaxonHint => "Nome, QID oppure * per tutti i taxa.",
         TextKey::StructureSmilesOrMol => "SMILES o Molfile",
@@ -132,11 +133,8 @@ pub const fn it_t(key: TextKey) -> &'static str {
         TextKey::PreparingJsonDownload => "Preparazione download JSON...",
         TextKey::PreparingRdfDownload => "Preparazione download RDF...",
         TextKey::DownloadCsvTitle => "Scarica i risultati in CSV",
-        TextKey::DownloadCsvLabel => "Scarica CSV",
         TextKey::DownloadJsonTitle => "Scarica i risultati in JSON",
-        TextKey::DownloadJsonLabel => "Scarica JSON",
         TextKey::DownloadRdfTitle => "Scarica i risultati in RDF (Turtle)",
-        TextKey::DownloadRdfLabel => "Scarica RDF",
         TextKey::DownloadMetadataTitle => "Scarica metadati Schema.org (JSON-LD)",
         TextKey::DownloadMetadataLabel => "Scarica metadati",
         TextKey::OpenInQlever => "Apri in QLever",
@@ -155,7 +153,6 @@ pub const fn it_t(key: TextKey) -> &'static str {
         TextKey::Compound => "Composto",
         TextKey::Mass => "Massa",
         TextKey::Formula => "Formula",
-        TextKey::TaxonCol => "Taxon",
         TextKey::Reference => "Riferimento",
         TextKey::Year => "Anno",
         TextKey::FooterData => "Dati",

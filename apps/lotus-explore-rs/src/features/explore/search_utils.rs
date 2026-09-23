@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::uninlined_format_args)]
+
 use crate::models::{CompoundEntry, SearchCriteria};
 use sha2::{Digest, Sha256};
 use std::borrow::Cow;

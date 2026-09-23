@@ -11,6 +11,7 @@ use crate::features::explore::{ExploreState, InitialUrlState};
 use crate::i18n::Locale;
 use crate::models::SearchCriteria;
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Clone, PartialEq)]
 pub struct AppBootstrap {
     pub app_state: AppState,

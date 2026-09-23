@@ -26,7 +26,7 @@ use std::cell::RefCell;
 
 /// Single toggle to force WDQS fallback for testing.
 /// Set this to `true` to force all queries to use WDQS.
-/// Set this to `false` to use QLever (default).
+/// Set this to `false` to use `QLever` (default).
 const FORCE_WDQS_FALLBACK: bool = false;
 
 thread_local! {
@@ -62,11 +62,7 @@ fn strip_limit_clause(query: &str) -> String {
     // Find the last occurrence of "limit" preceded by whitespace or start of string
     let mut best_pos = None;
     for (i, _) in lower.match_indices("limit") {
-        let preceded_ok = i == 0
-            || trimmed[..i]
-                .chars()
-                .last()
-                .is_some_and(|c| c.is_whitespace());
+        let preceded_ok = i == 0 || trimmed[..i].chars().last().is_some_and(char::is_whitespace);
         if !preceded_ok {
             continue;
         }

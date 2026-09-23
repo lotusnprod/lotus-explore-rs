@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::uninlined_format_args)]
+
 use super::filename::now_iso8601;
 use super::filters::criteria_to_filters_value;
 use crate::models::SearchCriteria;
@@ -16,10 +18,10 @@ pub const WDQS_ENDPOINT: &str = "https://query.wikidata.org/sparql";
 /// Represents the SPARQL endpoint used for a query.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub enum SparqlEndpoint {
-    /// QLever endpoint (default/preferred)
+    /// `QLever` endpoint (default/preferred)
     #[default]
     Qlever,
-    /// Wikidata Query Service (fallback on 502 from QLever)
+    /// Wikidata Query Service (fallback on 502 from `QLever`)
     Wdqs,
 }
 
@@ -152,6 +154,8 @@ pub struct MetadataInputs<'a> {
     pub endpoint: SparqlEndpoint,
 }
 
+#[allow(clippy::too_many_lines)]
+#[allow(clippy::needless_pass_by_value)]
 pub fn build_metadata_json(inp: MetadataInputs<'_>) -> String {
     let filters = criteria_to_filters_value(inp.criteria);
 
@@ -235,7 +239,7 @@ pub fn build_metadata_json(inp: MetadataInputs<'_>) -> String {
             "search_type".into(),
             c.get("search_type")
                 .cloned()
-                .unwrap_or(json!("substructure")),
+                .unwrap_or_else(|| json!("substructure")),
         );
         sq.insert(
             "input_format".into(),

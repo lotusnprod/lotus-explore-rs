@@ -33,6 +33,7 @@ use std::sync::Arc;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::JsCast;
 
+#[allow(clippy::missing_const_for_fn)]
 fn resolve_startup_dark_mode(startup: &crate::features::explore::InitialUrlState) -> bool {
     if startup.dark_mode {
         return true;
@@ -87,7 +88,7 @@ pub fn AppRoot() -> Element {
 
     let app_state: Signal<AppState> = use_signal(move || AppState {
         dark_mode: startup_dark_mode,
-        ..initial_app_state.clone()
+        ..initial_app_state
     });
     let criteria: Signal<SearchCriteria> = use_signal(move || initial_criteria);
     let criteria_baseline: Signal<SearchCriteria> = use_signal(move || initial_criteria_baseline);

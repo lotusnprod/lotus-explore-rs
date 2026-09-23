@@ -23,8 +23,7 @@ fn StatusSummaryBadges(locale: Locale, rows: Arc<[CurationResultRow]>) -> Elemen
                     class: match status {
                         CurationStatus::ExistingComplete => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-taxon",
                         CurationStatus::ExistingNeedsUpdates => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-entries",
-                        CurationStatus::NewCompound => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference",
-                        CurationStatus::PendingDependencies => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference",
+                        CurationStatus::NewCompound | CurationStatus::PendingDependencies => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference",
                         CurationStatus::Error => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-compound",
                     },
                     "{status_label(locale, &status)} ({count})"
@@ -41,8 +40,7 @@ fn render_curation_result_cells(locale: Locale, row: &CurationResultRow) -> Elem
                 class: match row.status {
                     CurationStatus::ExistingComplete => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-taxon",
                     CurationStatus::ExistingNeedsUpdates => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-entries",
-                    CurationStatus::NewCompound => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference",
-                    CurationStatus::PendingDependencies => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference",
+                    CurationStatus::NewCompound | CurationStatus::PendingDependencies => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference",
                     CurationStatus::Error => "inline-flex items-center rounded-full border border-panel-border bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-compound",
                 },
                 "{status_label(locale, &row.status)}"

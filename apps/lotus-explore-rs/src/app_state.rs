@@ -4,7 +4,7 @@
 //! Consolidated app-level state — single source of truth for view routing,
 //! download orchestration, and render-telemetry.
 //!
-//! ## Why the previous SearchState / UiState were removed
+//! ## Why the previous `SearchState` / `UiState` were removed
 //!
 //! The earlier revision stored `criteria`, `explore`, `locale`, and
 //! stale mirror copies that were kept in sync via `use_effect` loops.  Those copies were:
@@ -38,7 +38,7 @@ use crate::download::DownloadFormat;
 ///   reducer and is exposed through `ResultsContext`.
 /// * `Locale` — provided via `LocaleProvider` context and accessed with
 ///   `use_locale()`.
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct AppState {
     /// Currently active view / page.
     pub view: AppView,

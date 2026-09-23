@@ -134,6 +134,7 @@ pub(super) fn build_sorted_indices(rows: &[CompoundEntry], sort: SortState) -> A
     }
 }
 
+#[allow(clippy::cast_possible_truncation)]
 fn build_sorted_indices_for_column(rows: &[CompoundEntry], column: SortColumn) -> Arc<[u32]> {
     let mut idx: Vec<u32> = (0..rows.len() as u32).collect();
     idx.sort_by(|&a, &b| {

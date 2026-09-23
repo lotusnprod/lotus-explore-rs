@@ -1,9 +1,16 @@
+#![allow(clippy::unused_async)]
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-use super::*;
+#[cfg(target_arch = "wasm32")]
+use super::http_client::{js_value_to_json, rdkit_bridge_call};
+use super::{CurationError, MassResolution, has_stereo_marks};
+#[cfg(not(target_arch = "wasm32"))]
+use super::{NATPROD_API_BASE, http_client::BatchConvertResponse, http_client::natprod_client};
 #[cfg(not(target_arch = "wasm32"))]
 use futures::try_join;
+use serde::Deserialize;
+use serde_json::Value;
 
 #[derive(Debug, Deserialize)]
 pub(super) struct ConvertFormatsResponse {
@@ -90,6 +97,8 @@ async fn convert_with_batch_direct(
 }
 
 #[cfg(not(target_arch = "wasm32"))]
+#[allow(clippy::needless_pass_by_value)]
+#[allow(clippy::cast_precision_loss)]
 fn extract_batch_convert_output(parsed: BatchConvertResponse) -> Result<String, CurationError> {
     let Some(first) = parsed.results.first() else {
         return Err(CurationError::Parse(
@@ -129,6 +138,7 @@ pub fn extract_exact_mass_from_json(value: &Value) -> Option<f64> {
     None
 }
 
+#[allow(clippy::cast_precision_loss)]
 fn parse_exact_mass_scalar(value: &Value) -> Option<f64> {
     if let Some(v) = value.as_f64() {
         return Some(v);

@@ -5,6 +5,7 @@
 
 use crate::i18n::TextKey;
 
+#[allow(clippy::too_many_lines)]
 pub const fn fr_t(key: TextKey) -> &'static str {
     match key {
         TextKey::Share => "Partager",
@@ -70,15 +71,15 @@ pub const fn fr_t(key: TextKey) -> &'static str {
         }
         TextKey::ExampleSmilesOnly => "Collez un SMILES ou un Molfile dans la zone structure",
         TextKey::ExampleQueryExecute => "Exécuter",
-        TextKey::ExampleQueryTaxon => "Télécharger CSV",
-        TextKey::ExampleQueryStructure => "Télécharger JSON",
-        TextKey::ExampleQueryAdvanced => "Télécharger RDF",
+        TextKey::ExampleQueryTaxon | TextKey::DownloadCsvLabel => "Télécharger CSV",
+        TextKey::ExampleQueryStructure | TextKey::DownloadJsonLabel => "Télécharger JSON",
+        TextKey::ExampleQueryAdvanced | TextKey::DownloadRdfLabel => "Télécharger RDF",
         TextKey::ExampleApiUrls => "Exemples d'URLs API",
         TextKey::LabelLanguagePolicy => {
             "Les libellés utilisent d'abord 'mul', puis 'en', pour des résultats comparables."
         }
         TextKey::SearchFilters => "Filtres de recherche",
-        TextKey::Taxon => "Taxon",
+        TextKey::Taxon | TextKey::TaxonCol => "Taxon",
         TextKey::TaxonPlaceholder => "Gentiana lutea - Q34317 - *",
         TextKey::TaxonHint => "Nom, QID ou * pour tous les taxa.",
         TextKey::StructureSmilesOrMol => "SMILES ou Molfile",
@@ -89,7 +90,7 @@ pub const fn fr_t(key: TextKey) -> &'static str {
         TextKey::EditCopyDaylightSmiles => "Édition -> Copier en tant que SMILES Daylight",
         TextKey::CopyExtendedSmilesMol => "Copier en tant que SMILES étendus / MOL V3000",
         TextKey::FormulaFilter => "Filtre formule",
-        TextKey::ExactFormula => "Formule brute",
+        TextKey::ExactFormula | TextKey::Formula => "Formule brute",
         TextKey::MinCount => "min",
         TextKey::MaxCount => "max",
         TextKey::MinCountAria => "compte minimum",
@@ -128,13 +129,11 @@ pub const fn fr_t(key: TextKey) -> &'static str {
         TextKey::PreparingJsonDownload => "Préparation du téléchargement JSON...",
         TextKey::PreparingRdfDownload => "Préparation du téléchargement RDF...",
         TextKey::DownloadCsvTitle => "Télécharger les résultats en CSV",
-        TextKey::DownloadCsvLabel => "Télécharger CSV",
         TextKey::DownloadJsonTitle => "Télécharger les résultats en JSON",
-        TextKey::DownloadJsonLabel => "Télécharger JSON",
         TextKey::DownloadRdfTitle => "Télécharger les résultats en RDF (Turtle)",
-        TextKey::DownloadRdfLabel => "Télécharger RDF",
-        TextKey::DownloadMetadataTitle => "Télécharger les métadonnées",
-        TextKey::DownloadMetadataLabel => "Télécharger les métadonnées",
+        TextKey::DownloadMetadataTitle | TextKey::DownloadMetadataLabel => {
+            "Télécharger les métadonnées"
+        }
         TextKey::OpenInQlever => "Ouvrir dans QLever",
         TextKey::OpenInQleverTitle => "Ouvrir cette requête dans l'interface web de QLever",
         TextKey::OpenInEndpoint => "Ouvrir dans l'endpoint",
@@ -150,8 +149,6 @@ pub const fn fr_t(key: TextKey) -> &'static str {
         TextKey::Structure => "Structure",
         TextKey::Compound => "Composé",
         TextKey::Mass => "Masse",
-        TextKey::Formula => "Formule brute",
-        TextKey::TaxonCol => "Taxon",
         TextKey::Reference => "Référence",
         TextKey::Year => "Année",
         TextKey::FooterData => "Données",

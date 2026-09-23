@@ -68,3 +68,6 @@ server = [
   "dep:utoipa",
   "dep:utoipa-swagger-ui",
 ]
+
+[lints]
+workspace = true

@@ -1,3 +1,4 @@
+#![allow(clippy::wildcard_imports)]
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 

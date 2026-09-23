@@ -48,7 +48,6 @@ pub fn ViewSwitch() -> Element {
                 ],
                 on_select: move |value: String| {
                     let next = match value.as_str() {
-                        "explore" => AppView::Explore,
                         "curation" => AppView::Curation,
                         "draw" => AppView::Draw,
                         _ => AppView::Explore,

@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::future_not_send)]
+#![allow(clippy::unnecessary_operation)]
+
 //! Taxon resolution service — maps a free-text name to a Wikidata QID.
 //!
 //! This module has **no dependency on the Dioxus runtime** and carries **no
@@ -72,13 +75,13 @@ pub async fn resolve<R: LotusRepository>(
     let taxon_timer = perf::start_timer("LOTUS:taxon_resolution");
     let sanitized = sanitize_taxon_input(taxon);
 
-    let standardized_warning = if sanitized != taxon {
+    let standardized_warning = if sanitized == taxon {
+        None
+    } else {
         Some(TaxonWarning::Standardized {
             original: taxon.into(),
             standardized: sanitized.clone(),
         })
-    } else {
-        None
     };
 
     // Fast path: cache hit.

@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::match_same_arms)]
+#![allow(clippy::manual_let_else)]
+
 //! User-facing formatting for domain errors and warnings.
 
 use crate::features::explore::{

@@ -56,8 +56,8 @@ pub(super) fn build_sortable_header_models(
     SORTABLE_COLUMNS.map(|spec| SortableHeaderModel {
         col: spec.col,
         label: spec.label,
-        aria_sort: aria_sort_for(&current_sort, spec.col),
-        sort_icon: sort_icon_for(&current_sort, spec.col),
+        aria_sort: aria_sort_for(current_sort, spec.col),
+        sort_icon: sort_icon_for(current_sort, spec.col),
         next_descending: next_sort_is_descending(current_sort, spec.col),
     })
 }

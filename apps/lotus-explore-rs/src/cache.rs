@@ -20,9 +20,9 @@ mod cache_impl {
     use std::collections::HashMap;
 
     /// Upper bound on result pages kept per browser session.
-    pub(crate) const MAX_CACHED_RESULT_PAGES: usize = 8;
+    pub const MAX_CACHED_RESULT_PAGES: usize = 8;
 
-    pub(crate) struct ResultCache {
+    pub struct ResultCache {
         entries: HashMap<String, ResponseBody>,
     }
 

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::derive_partial_eq_without_eq)]
+
 //! Programmatic document head management — replaces static `index.html` files.
 //!
 //! Uses [`dioxus::document`] to set `<head>` content from Rust code.
@@ -10,7 +12,7 @@ use dioxus::document::document;
 use dioxus::prelude::*;
 
 /// Properties for [`DocumentHead`].
-#[derive(Clone, Props, PartialEq)]
+#[derive(Clone, Props, PartialEq, Eq)]
 pub struct DocumentHeadProps {
     /// Page title.
     pub title: String,
@@ -187,7 +189,7 @@ pub fn DocumentHead(props: DocumentHeadProps) -> Element {
                 "script",
                 &[
                     ("src", url.clone()),
-                    ("async", "".to_string()),
+                    ("async", String::new()),
                     ("crossorigin", "anonymous".to_string()),
                 ],
                 None,
@@ -235,38 +237,26 @@ pub struct DocumentScriptsProps {
 /// this component is mounted.
 ///
 /// Unlike [`DocumentHead`], which runs once at the app root, this component can
-/// live inside a page/route so that heavy third-party scripts (e.g. RDKit,
+/// live inside a page/route so that heavy third-party scripts (e.g. `RDKit`,
 /// citation-js) are only fetched when the view that needs them is rendered —
 /// reducing the bytes consumed by network activity on every other page.
 #[component]
 pub fn DocumentScripts(props: DocumentScriptsProps) -> Element {
-    let scripts = props.scripts.clone();
-    let inline_script = props.inline_script.clone();
-
     use_hook(move || {
         let doc = document();
-        // `async` (not `defer`): `defer` is a no-op on dynamically injected
-        // scripts — the parser has already finished by the time `use_hook`
-        // runs, so a `defer` script would never execute.  `async` loads and
-        // executes as soon as the file arrives; bridge code that depends on
-        // these globals polls for their availability.
-        //
-        // `crossorigin="anonymous"`: prevents `nosniff` MIME-type errors on CDN
-        // resources that send CORS headers.  Browsers also deduplicate
-        // duplicate `async` script `src` URLs naturally.
-        for url in &scripts {
+        for url in &props.scripts {
             doc.create_head_element(
                 "script",
                 &[
                     ("src", url.clone()),
-                    ("async", "".to_string()),
+                    ("async", String::new()),
                     ("crossorigin", "anonymous".to_string()),
                 ],
                 None,
             );
         }
 
-        if let Some(js) = &inline_script {
+        if let Some(js) = &props.inline_script {
             let wrapped = format!("(function(){{{js}}})();");
             doc.create_head_element("script", &[], Some(wrapped));
         }
@@ -276,14 +266,13 @@ pub fn DocumentScripts(props: DocumentScriptsProps) -> Element {
 }
 
 /// Add `<link>` tags to the document head (favicons, preconnect, manifests, etc.).
-#[derive(Clone, Props, PartialEq)]
+#[derive(Clone, Props, PartialEq, Eq)]
 pub struct DocumentLinksProps {
     #[props(default)]
     pub links: Vec<LinkSpec>,
 }
 
-/// Specification for a `<link>` tag.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct LinkSpec {
     pub rel: &'static str,
     pub href: String,
@@ -296,11 +285,9 @@ pub struct LinkSpec {
 
 #[component]
 pub fn DocumentLinks(props: DocumentLinksProps) -> Element {
-    let links = props.links.clone();
-
     use_hook(move || {
         let doc = document();
-        for spec in &links {
+        for spec in &props.links {
             let mut attrs: Vec<(&str, String)> =
                 vec![("rel", spec.rel.to_string()), ("href", spec.href.clone())];
             if let Some(t) = spec.r#type {

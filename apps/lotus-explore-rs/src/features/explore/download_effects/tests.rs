@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::uninlined_format_args)]
+
 use super::dispatch::{DispatchPhase, classify_dispatch_phase};
 use super::metrics::{
     metrics_for_inactive_phase, metrics_for_waiting_loading_phase, metrics_for_waiting_query_phase,

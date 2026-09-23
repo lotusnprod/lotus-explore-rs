@@ -3,7 +3,7 @@
 
 //! Compound identity cell for results-table rows.
 //!
-//! Renders the compound name link, Wikidata badge, Scholia link, and InChIKey badge.
+//! Renders the compound name link, Wikidata badge, Scholia link, and `InChIKey` badge.
 
 use crate::components::results_table::row_cells::prepared::PreparedRow;
 use crate::components::results_table::row_cells::row_text::RowText;

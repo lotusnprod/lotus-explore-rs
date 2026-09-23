@@ -36,7 +36,6 @@ pub fn LangSwitch() -> Element {
                 ],
                 on_select: move |value: String| {
                     let next = match value.as_str() {
-                        "en" => Locale::En,
                         "fr" => Locale::Fr,
                         "de" => Locale::De,
                         "it" => Locale::It,

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::doc_markdown)]
+#![allow(clippy::redundant_pub_crate)]
+#![allow(unused_imports)]
+
 #[cfg(not(target_arch = "wasm32"))]
 pub(super) use crate::features::curation::domain::NATPROD_API_BASE;
 pub(super) use crate::features::curation::domain::{
@@ -22,7 +26,7 @@ mod chemical;
 mod enrichment;
 mod helpers;
 mod http_client;
-mod occurrence_cache;
+pub(crate) mod occurrence_cache;
 mod reference_metadata;
 pub mod wikidata;
 
@@ -35,8 +39,6 @@ use helpers::{
 };
 #[cfg(not(target_arch = "wasm32"))]
 use http_client::{BatchConvertResponse, natprod_client};
-#[cfg(target_arch = "wasm32")]
-use http_client::{js_value_to_json, rdkit_bridge_call};
 use reference_metadata::fetch_reference_quickstatements;
 use wikidata::normalize_taxon_lookup;
 

@@ -39,7 +39,7 @@ pub fn TextInput(
                 class: "w-full rounded-xl border border-border bg-surface px-3 py-2 text-body text-text placeholder:text-subtle shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                 value: "{value}",
                 placeholder: placeholder.unwrap_or_default(),
-                aria_describedby: if !hint_id.is_empty() { "{hint_id}" } else { "" },
+                aria_describedby: if hint_id.is_empty() { "" } else { "{hint_id}" },
                 oninput: move |e| on_change.call(e.value()),
             }
 

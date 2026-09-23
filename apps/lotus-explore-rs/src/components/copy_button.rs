@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::unused_async)]
+
 //! Reusable "copy to clipboard" button.
 
 use crate::components::ui::Button;
@@ -71,7 +73,7 @@ async fn gloo_timer_sleep_ms(ms: u32) {
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
-        std::thread::sleep(std::time::Duration::from_millis(ms as u64));
+        std::thread::sleep(std::time::Duration::from_millis(u64::from(ms)));
     }
 }
 

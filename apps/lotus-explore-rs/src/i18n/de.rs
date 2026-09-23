@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::too_many_lines)]
+
 //! German translation table.
 
 use crate::i18n::TextKey;
@@ -68,15 +70,15 @@ pub const fn de_t(key: TextKey) -> &'static str {
         TextKey::ExampleGentiana => "Taxonname, Wikidata-QID oder * für alle Taxa eingeben",
         TextKey::ExampleSmilesOnly => "SMILES oder Molfile in das Strukturfeld einfügen",
         TextKey::ExampleQueryExecute => "Ausführen",
-        TextKey::ExampleQueryTaxon => "CSV herunterladen",
-        TextKey::ExampleQueryStructure => "JSON herunterladen",
-        TextKey::ExampleQueryAdvanced => "RDF herunterladen",
+        TextKey::ExampleQueryTaxon | TextKey::DownloadCsvLabel => "CSV herunterladen",
+        TextKey::ExampleQueryStructure | TextKey::DownloadJsonLabel => "JSON herunterladen",
+        TextKey::ExampleQueryAdvanced | TextKey::DownloadRdfLabel => "RDF herunterladen",
         TextKey::ExampleApiUrls => "API-URL-Beispiele",
         TextKey::LabelLanguagePolicy => {
             "Beschriftungen werden zuerst aus 'mul' und dann 'en' aufgelöst, damit Ergebnisse vergleichbar bleiben."
         }
         TextKey::SearchFilters => "Suchfilter",
-        TextKey::Taxon => "Taxon",
+        TextKey::Taxon | TextKey::TaxonCol => "Taxon",
         TextKey::TaxonPlaceholder => "Gentiana lutea - Q34317 - *",
         TextKey::TaxonHint => "Name, QID oder * für alle Taxa.",
         TextKey::StructureSmilesOrMol => "SMILES oder Molfile",
@@ -132,11 +134,8 @@ pub const fn de_t(key: TextKey) -> &'static str {
         TextKey::PreparingJsonDownload => "JSON-Download wird vorbereitet...",
         TextKey::PreparingRdfDownload => "RDF-Download wird vorbereitet...",
         TextKey::DownloadCsvTitle => "Ergebnisse als CSV herunterladen",
-        TextKey::DownloadCsvLabel => "CSV herunterladen",
         TextKey::DownloadJsonTitle => "Ergebnisse als JSON herunterladen",
-        TextKey::DownloadJsonLabel => "JSON herunterladen",
         TextKey::DownloadRdfTitle => "Ergebnisse als RDF (Turtle) herunterladen",
-        TextKey::DownloadRdfLabel => "RDF herunterladen",
         TextKey::DownloadMetadataTitle => "Schema.org-Metadaten herunterladen (JSON-LD)",
         TextKey::DownloadMetadataLabel => "Metadaten herunterladen",
         TextKey::OpenInQlever => "In QLever öffnen",
@@ -153,7 +152,6 @@ pub const fn de_t(key: TextKey) -> &'static str {
         TextKey::Compound => "Verbindung",
         TextKey::Mass => "Masse",
         TextKey::Formula => "Formel",
-        TextKey::TaxonCol => "Taxon",
         TextKey::Reference => "Referenz",
         TextKey::Year => "Jahr",
         TextKey::FooterData => "Daten",

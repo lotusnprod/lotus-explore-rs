@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::future_not_send)]
+
 use super::ResultsPipelineOutcome;
 use crate::export::SparqlEndpoint;
 use crate::features::explore::request::SearchRequest;

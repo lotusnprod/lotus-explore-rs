@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::future_not_send)]
+#![allow(clippy::wildcard_imports)]
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::single_match_else)]
+#![allow(clippy::match_same_arms)]
+
 use super::occurrence_cache::{
     OccurrenceAskCache, compound_has_taxon_cached, compound_has_taxon_with_ref_cached,
 };
@@ -164,8 +170,11 @@ async fn enrich_and_generate(
                             format!("{}|{}|{}", existing.qid, WD_OCCURS_IN_TAXON_PROP, tqid),
                         )
                     }
-                    // Existing compound cannot point to LAST from dependency block safely.
-                    (None, _, _) => (false, String::new()),
+                    // No taxon: add placeholder for new taxon
+                    (None, _, _) => (
+                        true,
+                        format!("LAST|{WD_OCCURS_IN_TAXON_PROP}|[NEW_TAXON_QID]"),
+                    ),
                 };
 
                 if should_add {
@@ -269,15 +278,15 @@ async fn enrich_and_generate(
                     normalized_doi.as_deref(),
                 ) {
                     (Some(tqid), Some(rqid), _) => {
-                        format!("LAST|{}|{}|S248|{}", WD_OCCURS_IN_TAXON_PROP, tqid, rqid)
+                        format!("LAST|{WD_OCCURS_IN_TAXON_PROP}|{tqid}|S248|{rqid}")
                     }
-                    // Reference item does not exist yet: create in dependency block and rerun.
-                    (Some(_), None, Some(_)) => String::new(),
                     (Some(tqid), None, None) => {
-                        format!("LAST|{}|{}", WD_OCCURS_IN_TAXON_PROP, tqid)
+                        format!("LAST|{WD_OCCURS_IN_TAXON_PROP}|{tqid}")
                     }
+                    // Reference item does not exist yet: generate it in dependencies, then rerun.
+                    (Some(_), None, Some(_)) => String::new(),
                     (None, _, _) => {
-                        format!("LAST|{}|[NEW_TAXON_QID]", WD_OCCURS_IN_TAXON_PROP)
+                        format!("LAST|{WD_OCCURS_IN_TAXON_PROP}|[NEW_TAXON_QID]")
                     }
                 };
                 if !p703.is_empty() {
@@ -386,7 +395,7 @@ async fn resolve_row_dependencies(
     Ok(Some(resolution))
 }
 
-/// Fetch pre-generated QuickStatements from citation.js (WASM only).
+/// Fetch pre-generated `QuickStatements` from citation.js (WASM only).
 /// Uses the __lotusCitation JS bridge which fetches CSL JSON from doi.org
 /// and calls `cite.format('quickstatements')` with the plugin-quickstatements
 /// output format registered with citation.js.

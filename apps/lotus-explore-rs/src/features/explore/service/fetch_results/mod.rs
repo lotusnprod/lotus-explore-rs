@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::future_not_send)]
+
 //! Full-results fetch service.
 //!
 //! This module is **Dioxus-free**: the phase-change callback (`on_fetching`)

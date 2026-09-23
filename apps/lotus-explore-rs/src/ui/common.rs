@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::struct_excessive_bools)]
+#![allow(clippy::derive_partial_eq_without_eq)]
+#![allow(clippy::fn_params_excessive_bools)]
+#![allow(clippy::derivable_impls)]
+
 //! Common UI utilities and phase models.
 
 use dioxus::prelude::*;
@@ -16,7 +21,29 @@ pub enum ContentPhase {
     Loaded,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LifecycleBooleans {
+    pub loading: bool,
+    pub has_error: bool,
+    pub searched_once: bool,
+    pub download_only_mode: bool,
+    pub has_entries: bool,
+}
+
+impl Default for LifecycleBooleans {
+    fn default() -> Self {
+        Self {
+            loading: false,
+            has_error: false,
+            searched_once: false,
+            download_only_mode: false,
+            has_entries: false,
+        }
+    }
+}
+
 impl ContentPhase {
+    #[allow(clippy::too_many_arguments)]
     pub fn from_lifecycle(
         loading: bool,
         has_error: bool,
@@ -24,6 +51,25 @@ impl ContentPhase {
         download_only_mode: bool,
         has_entries: bool,
     ) -> Self {
+        Self::from(LifecycleBooleans {
+            loading,
+            has_error,
+            searched_once,
+            download_only_mode,
+            has_entries,
+        })
+    }
+}
+
+impl From<LifecycleBooleans> for ContentPhase {
+    fn from(state: LifecycleBooleans) -> Self {
+        let LifecycleBooleans {
+            loading,
+            has_error,
+            searched_once,
+            download_only_mode,
+            has_entries,
+        } = state;
         if loading {
             Self::Loading
         } else if has_error {

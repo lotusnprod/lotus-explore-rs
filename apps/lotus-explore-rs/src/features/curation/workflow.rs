@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::future_not_send)]
+
 use crate::curation::{
     CurationError, CurationErrorKind, CurationInputRow, CurationResultRow, CurationStatus,
     QuickStatementsBundle, build_quickstatements_bundle, curate_rows, row_uniqueness_key,

@@ -173,6 +173,7 @@ pub struct ExportUrlResponse {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(clippy::struct_field_names)]
 pub struct SearchStats {
     pub n_compounds: usize,
     pub n_taxa: usize,

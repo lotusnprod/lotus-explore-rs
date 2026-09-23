@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-use super::*;
+use super::{CurationInputRow, Locale};
 use crate::features::explore::url_state::{is_true_flag, read_url_query_params};
 use std::collections::BTreeMap;
 

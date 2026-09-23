@@ -3,7 +3,7 @@
 
 //! SPARQL endpoint error classification and recovery heuristics.
 //!
-//! QLever and other SPARQL endpoints may return errors that are transient
+//! `QLever` and other SPARQL endpoints may return errors that are transient
 //! (cache invalidation, server hiccups) or permanent (bad query structure).
 
 /// Classify a plain SPARQL/QLever error message.

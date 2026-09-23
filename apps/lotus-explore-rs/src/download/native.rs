@@ -11,7 +11,7 @@ use std::sync::Arc;
 
 /// Single toggle to force WDQS fallback for testing.
 /// Set this to `true` to force all queries to use WDQS.
-/// Set this to `false` to use QLever (default).
+/// Set this to `false` to use `QLever` (default).
 const FORCE_WDQS_FALLBACK: bool = false;
 
 pub(super) async fn execute_download_with_fallback(
@@ -90,7 +90,7 @@ async fn execute_download_wdqs(
 }
 
 /// Logs fetch timing, triggers the browser download, and logs trigger timing.
-/// Shared between the QLever and WDQS download paths.
+/// Shared between the `QLever` and WDQS download paths.
 fn finalize_download(
     format: DownloadFormat,
     source: &str,

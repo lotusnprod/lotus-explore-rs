@@ -12,7 +12,7 @@
 //!
 //! * **Clean boundaries** — orchestration code does not import transport details
 //! * **Testability** — unit tests can supply a `MockRepository` without network
-//! * **Swappability** — a future ClickHouse or GraphQL backend is a new impl
+//! * **Swappability** — a future `ClickHouse` or GraphQL backend is a new impl
 //!
 //! # Trait object vs generics
 //!

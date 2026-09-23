@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::derive_partial_eq_without_eq)]
+
 use crate::download::DownloadFormat;
 use crate::features::explore::search_state::ExploreState;
 #[cfg(target_arch = "wasm32")]

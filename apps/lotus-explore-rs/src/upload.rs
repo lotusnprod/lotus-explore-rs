@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::doc_markdown)]
+#![allow(clippy::unused_async)]
+#![allow(clippy::unused_self)]
+#![allow(clippy::trivially_copy_pass_by_ref)]
+#![allow(clippy::needless_pass_by_ref_mut)]
+
 //! Inlined upload helpers for lotus-explore-rs.
 //!
 //! Provides WASM-only file blob extraction and streaming read utilities.

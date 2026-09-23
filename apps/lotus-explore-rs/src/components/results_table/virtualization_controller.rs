@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::unused_self)]
+#![allow(clippy::needless_pass_by_ref_mut)]
+
 //! Controller hook for results-table virtualization and scroll scheduling.
 //!
 //! This module centralizes the non-render orchestration that used to live in
@@ -153,9 +156,11 @@ impl ResultsTableVirtualizationController {
         }
     }
 
+    #[allow(clippy::unused_self)]
     #[cfg(not(target_arch = "wasm32"))]
     pub(super) const fn sync_after_render(&mut self, _total_rows: usize) {}
 
+    #[allow(clippy::unused_self)]
     pub(super) fn handle_scroll(&self, _total_rows: usize) {
         #[cfg(target_arch = "wasm32")]
         self.schedule_scroll_frame(_total_rows, *self.row_height_px.read());

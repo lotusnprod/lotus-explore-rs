@@ -38,11 +38,11 @@ pub fn DataCurationPage() -> Element {
         controller.maybe_autorun();
     });
 
-    let on_add_row = move |_: ()| controller.add_row();
-    let on_load_examples = move |_: ()| controller.load_example_rows();
-    let on_parse_tsv = move |_: ()| controller.parse_tsv();
-    let on_process = move |_: ()| controller.process();
-    let on_second_pass = move |_: ()| controller.run_second_pass();
+    let on_add_row = move |()| controller.add_row();
+    let on_load_examples = move |()| controller.load_example_rows();
+    let on_parse_tsv = move |()| controller.parse_tsv();
+    let on_process = move |()| controller.process();
+    let on_second_pass = move |()| controller.run_second_pass();
     let on_import_uploaded_tsv = move |content: String| controller.import_uploaded_tsv(content);
     let on_import_error = move |message: String| controller.status_message.set(Some(message));
 

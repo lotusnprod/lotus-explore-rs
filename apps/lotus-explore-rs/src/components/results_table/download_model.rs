@@ -13,7 +13,7 @@ const WDQS_UI: &str = "https://query.wikidata.org";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub(super) enum SparqlEndpointUI {
-    /// QLever SPARQL endpoint (default)
+    /// `QLever` SPARQL endpoint (default)
     #[default]
     Qlever,
     /// Wikidata Query Service endpoint (fallback)

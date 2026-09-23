@@ -20,6 +20,8 @@ pub fn threshold_label(locale: Locale, value: f64) -> String {
     }
 }
 
+use std::fmt::Write;
+
 fn group_digits(mut value: usize, sep: char) -> String {
     if value < 1000 {
         return value.to_string();
@@ -34,7 +36,7 @@ fn group_digits(mut value: usize, sep: char) -> String {
     let mut out = value.to_string();
     for group in groups.iter().rev() {
         out.push(sep);
-        out.push_str(&format!("{group:03}"));
+        let _ = write!(out, "{group:03}");
     }
     out
 }
@@ -43,8 +45,7 @@ pub fn format_count(locale: Locale, value: usize) -> String {
     let sep = match locale {
         Locale::En => ',',
         Locale::Fr => ' ',
-        Locale::De => '.',
-        Locale::It => '.',
+        Locale::De | Locale::It => '.',
     };
     group_digits(value, sep)
 }
@@ -53,34 +54,28 @@ pub const fn count_label(locale: Locale, noun: CountNoun, count: usize) -> &'sta
     match (locale, noun, count == 1) {
         (Locale::En, CountNoun::Compound, true) => "Compound",
         (Locale::En, CountNoun::Compound, false) => "Compounds",
-        (Locale::En, CountNoun::Taxon, true) => "Taxon",
-        (Locale::En, CountNoun::Taxon, false) => "Taxa",
-        (Locale::En, CountNoun::Reference, true) => "Reference",
-        (Locale::En, CountNoun::Reference, false) => "References",
-        (Locale::En, CountNoun::Entry, true) => "Entry",
-        (Locale::En, CountNoun::Entry, false) => "Entries",
         (Locale::Fr, CountNoun::Compound, true) => "Composé",
         (Locale::Fr, CountNoun::Compound, false) => "Composés",
-        (Locale::Fr, CountNoun::Taxon, true) => "Taxon",
-        (Locale::Fr, CountNoun::Taxon, false) => "Taxa",
-        (Locale::Fr, CountNoun::Reference, true) => "Référence",
-        (Locale::Fr, CountNoun::Reference, false) => "Références",
-        (Locale::Fr, CountNoun::Entry, true) => "Entrée",
-        (Locale::Fr, CountNoun::Entry, false) => "Entrées",
         (Locale::De, CountNoun::Compound, true) => "Verbindung",
         (Locale::De, CountNoun::Compound, false) => "Verbindungen",
-        (Locale::De, CountNoun::Taxon, true) => "Taxon",
-        (Locale::De, CountNoun::Taxon, false) => "Taxa",
-        (Locale::De, CountNoun::Reference, true) => "Referenz",
-        (Locale::De, CountNoun::Reference, false) => "Referenzen",
-        (Locale::De, CountNoun::Entry, true) => "Eintrag",
-        (Locale::De, CountNoun::Entry, false) => "Einträge",
         (Locale::It, CountNoun::Compound, true) => "Composto",
         (Locale::It, CountNoun::Compound, false) => "Composti",
-        (Locale::It, CountNoun::Taxon, true) => "Taxon",
-        (Locale::It, CountNoun::Taxon, false) => "Taxa",
+        (Locale::En | Locale::Fr | Locale::De | Locale::It, CountNoun::Taxon, true) => "Taxon",
+        (Locale::En | Locale::Fr | Locale::De | Locale::It, CountNoun::Taxon, false) => "Taxa",
+        (Locale::En, CountNoun::Reference, true) => "Reference",
+        (Locale::En, CountNoun::Reference, false) => "References",
+        (Locale::Fr, CountNoun::Reference, true) => "Référence",
+        (Locale::Fr, CountNoun::Reference, false) => "Références",
+        (Locale::De, CountNoun::Reference, true) => "Referenz",
+        (Locale::De, CountNoun::Reference, false) => "Referenzen",
         (Locale::It, CountNoun::Reference, true) => "Riferimento",
         (Locale::It, CountNoun::Reference, false) => "Riferimenti",
+        (Locale::En, CountNoun::Entry, true) => "Entry",
+        (Locale::En, CountNoun::Entry, false) => "Entries",
+        (Locale::Fr, CountNoun::Entry, true) => "Entrée",
+        (Locale::Fr, CountNoun::Entry, false) => "Entrées",
+        (Locale::De, CountNoun::Entry, true) => "Eintrag",
+        (Locale::De, CountNoun::Entry, false) => "Einträge",
         (Locale::It, CountNoun::Entry, true) => "Voce",
         (Locale::It, CountNoun::Entry, false) => "Voci",
     }

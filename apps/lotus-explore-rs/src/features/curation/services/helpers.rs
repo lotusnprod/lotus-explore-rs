@@ -1,7 +1,8 @@
+#![allow(clippy::doc_markdown)]
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-use super::*;
+use serde_json::Value;
 
 // -- SPARQL / QS helpers -------------------------------------------------------
 
@@ -35,9 +36,9 @@ pub(super) fn escape_sparql_string(value: &str) -> String {
     out
 }
 
-/// Escape a string literal for use inside a QuickStatements statement value.
+/// Escape a string literal for use inside a `QuickStatements` statement value.
 ///
-/// Unlike SPARQL, QuickStatements string values (inside double quotes)
+/// Unlike SPARQL, `QuickStatements` string values (inside double quotes)
 /// only require double-quote escaping. Backslashes in SMILES/InChI
 /// are stereo chemistry indicators and must NOT be escaped.
 /// See <https://www.wikidata.org/wiki/Q140985706>
@@ -54,18 +55,18 @@ pub(super) fn escape_qs_string(value: &str) -> String {
     out
 }
 
-/// Format a Wikidata QuickStatements mass statement using the dalton unit (Q483261).
+/// Format a Wikidata `QuickStatements` mass statement using the dalton unit (Q483261).
 /// Unit syntax is `U<QID>` - there is NO leading `Q` after the `U`.
 /// Adds S887 reference "inferred from SMILES" (Q113907573).
 pub fn qs_mass_statement(subject: &str, mass: f64) -> String {
     format!("{subject}|P2067|+{mass:.6}U483261|S887|Q113907573")
 }
 
-/// Reference QIDs for S887 (source/reference) in QuickStatements.
+/// Reference QIDs for S887 (source/reference) in `QuickStatements`.
 pub const QS_REF_INFERRED_FROM_SMILES: &str = "Q113907573"; // inferred from SMILES
 pub const QS_REF_INFERRED_FROM_ISOMERIC_SMILES: &str = "Q123282952"; // inferred from isomeric SMILES
 
-/// Build a QuickStatements statement with S887 reference(s).
+/// Build a `QuickStatements` statement with S887 reference(s).
 /// Returns a statement like: `subject|prop|"value"|S887|Q113907573|S887|Q123282952`
 pub fn qs_statement_with_refs(subject: &str, prop: &str, value: &str, refs: &[&str]) -> String {
     let mut stmt = format!("{subject}|{prop}|\"{value}\"");
@@ -102,7 +103,7 @@ pub fn qs_inchi_statement(subject: &str, inchi: &str) -> String {
     qs_statement_with_refs(subject, "P234", inchi, &[QS_REF_INFERRED_FROM_SMILES])
 }
 
-/// Build an InChIKey statement with "inferred from SMILES" reference.
+/// Build an `InChIKey` statement with "inferred from SMILES" reference.
 pub fn qs_inchikey_statement(subject: &str, inchikey: &str) -> String {
     qs_statement_with_refs(subject, "P235", inchikey, &[QS_REF_INFERRED_FROM_SMILES])
 }

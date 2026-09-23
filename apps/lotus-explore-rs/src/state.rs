@@ -49,7 +49,7 @@ impl ResultsContext {
 
 // ── Hook Helpers ──────────────────────────────────────────────────────────────
 
-/// Hook to read the root AppStateContext from any descendant component.
+/// Hook to read the root `AppStateContext` from any descendant component.
 pub fn use_app_state_context() -> AppStateContext {
     use_context::<AppStateContext>()
 }
@@ -83,20 +83,23 @@ mod tests {
     fn apply_form_action_mass_range_round_trips() {
         let base = SearchCriteria::default();
         let updated = apply_form_action(base, FormAction::MassMin(50.0));
-        assert_eq!(updated.mass_min, 50.0);
+        assert!((updated.mass_min - 50.0).abs() < 1e-10);
     }
 
     #[test]
     fn form_action_all_element_bounds_round_trip() {
         use crate::models::ElementState;
+
         let base = SearchCriteria::default();
-        let updated = apply_form_action(base.clone(), FormAction::CMin(6));
+        let updated = apply_form_action(base, FormAction::CMin(6));
         assert_eq!(updated.c_min, 6);
 
-        let updated = apply_form_action(base.clone(), FormAction::HMax(20));
+        let base = SearchCriteria::default();
+        let updated = apply_form_action(base, FormAction::HMax(20));
         assert_eq!(updated.h_max, 20);
 
-        let updated = apply_form_action(base.clone(), FormAction::FState(ElementState::Required));
+        let base = SearchCriteria::default();
+        let updated = apply_form_action(base, FormAction::FState(ElementState::Required));
         assert_eq!(updated.f_state, ElementState::Required);
     }
 
@@ -122,9 +125,10 @@ mod tests {
     #[test]
     fn form_action_year_range_round_trips() {
         let base = SearchCriteria::default();
-        let updated = apply_form_action(base.clone(), FormAction::YearMin(1990));
+        let updated = apply_form_action(base, FormAction::YearMin(1990));
         assert_eq!(updated.year_min, 1990);
-        let updated = apply_form_action(base, FormAction::YearMax(2025));
+        let base2 = SearchCriteria::default();
+        let updated = apply_form_action(base2, FormAction::YearMax(2025));
         assert_eq!(updated.year_max, 2025);
     }
 }

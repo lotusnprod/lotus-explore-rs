@@ -1,9 +1,10 @@
+#![allow(clippy::volatile_composites)]
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 //! Programmatic document `<head>` management for lotus-explore-rs.
 
-use crate::ui::prelude::*;
+use crate::ui::document::DocumentHead;
 use dioxus::prelude::*;
 
 #[cfg(target_arch = "wasm32")]
@@ -103,6 +104,7 @@ pub fn LotusDocumentHead(lang: String) -> Element {
         }
     });
     #[cfg(not(target_arch = "wasm32"))]
+    #[allow(clippy::redundant_clone)]
     let _ = canonical.clone(); // suppress unused warning in tests
 
     rsx! {

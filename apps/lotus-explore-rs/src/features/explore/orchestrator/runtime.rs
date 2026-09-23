@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::unused_async)]
+#![allow(clippy::unused_self)]
+#![allow(clippy::needless_pass_by_value)]
+#![allow(clippy::future_not_send)]
+
 use super::controller::SearchTaskController;
 use crate::features::explore::actions::ExploreAction;
 use crate::features::explore::command::SearchCommand;

@@ -18,13 +18,16 @@ pub fn now_iso8601() -> String {
 
         let secs = SystemTime::now()
             .duration_since(UNIX_EPOCH)
-            .map_or(0, |d| d.as_secs() as i64);
+            .map_or(0, |d| d.as_secs().cast_signed());
         let (y, m, d, hh, mm, ss) = epoch_to_ymdhms(secs);
         format!("{y:04}-{m:02}-{d:02}T{hh:02}:{mm:02}:{ss:02}Z")
     }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
+#[allow(clippy::cast_possible_wrap)]
+#[allow(clippy::cast_possible_truncation)]
+#[allow(clippy::cast_sign_loss)]
 const fn epoch_to_ymdhms(secs: i64) -> (i32, u32, u32, u32, u32, u32) {
     // Dependency-free date conversion (Howard Hinnant, public domain).
     let days = secs.div_euclid(86_400);
@@ -52,7 +55,7 @@ const fn epoch_to_ymdhms(secs: i64) -> (i32, u32, u32, u32, u32, u32) {
 pub fn today_yyyymmdd() -> String {
     now_iso8601()
         .chars()
-        .filter(|c| c.is_ascii_digit())
+        .filter(char::is_ascii_digit)
         .take(8)
         .collect()
 }

@@ -3,7 +3,7 @@
 
 //! Page header: title, language switcher, view switcher, subtitle, archive note.
 //!
-//! Zero props -- all data comes from context (use_locale, AppStateContext).
+//! Zero props -- all data comes from context (`use_locale`, `AppStateContext`).
 
 use crate::components::layout::dark_mode_toggle::DarkModeToggle;
 use crate::components::layout::lang_switch::LangSwitch;

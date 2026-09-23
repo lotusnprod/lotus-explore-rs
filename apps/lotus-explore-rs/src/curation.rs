@@ -5,6 +5,7 @@ use crate::features::curation::domain;
 use crate::features::curation::repositories::{
     CurationKnowledgeRepository, WikidataKnowledgeRepository,
 };
+use crate::features::curation::services::occurrence_cache::OccurrenceAskCache;
 use crate::features::curation::services::{curate_single_row, inputs, pipeline};
 #[cfg(test)]
 use crate::features::curation::services::{
@@ -41,6 +42,7 @@ pub fn parse_tsv_rows(tsv: &str) -> Result<Vec<CurationInputRow>, CurationError>
     inputs::parse_tsv_rows(tsv)
 }
 
+#[allow(clippy::future_not_send)]
 pub async fn curate_rows(
     locale: Locale,
     rows: Vec<CurationInputRow>,
@@ -48,17 +50,17 @@ pub async fn curate_rows(
     let repository: Arc<dyn CurationKnowledgeRepository> = Arc::new(WikidataKnowledgeRepository);
     let taxon_names = rows
         .iter()
-        .filter_map(|row| row.taxon.as_ref().cloned())
+        .filter_map(|row| row.taxon.clone())
         .collect::<Vec<_>>();
     let doi_values = rows
         .iter()
-        .filter_map(|row| row.doi.as_ref().cloned())
+        .filter_map(|row| row.doi.clone())
         .collect::<Vec<_>>();
 
     let prefetched_taxa = Arc::new(repository.resolve_taxon_qids_batch(&taxon_names).await?);
     let prefetched_references =
         Arc::new(repository.resolve_reference_qids_batch(&doi_values).await?);
-    let occurrence_ask_cache = Arc::new(Mutex::new(Default::default()));
+    let occurrence_ask_cache = Arc::new(Mutex::new(OccurrenceAskCache::default()));
 
     pipeline::curate_rows(
         locale,

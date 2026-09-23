@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-//! Form action dispatch for SearchCriteria mutations.
-//!
-//! Centralizes all form update logic to eliminate props drilling and enable
-//! composable form components with single actiondispatcher.
+//! Form action dispatch for `SearchCriteria` mutations.
+
+#![allow(clippy::float_cmp)]
 
 use crate::models::{ElementState, SearchCriteria, SmilesSearchType};
 

@@ -14,7 +14,7 @@ mod structure_model;
 use crate::components::form_inputs::SearchButton;
 use crate::features::explore::{use_explore_interactions, use_lifecycle_selector};
 use crate::i18n::{TextKey, t, threshold_label};
-use crate::models::*;
+use crate::models::SmilesSearchType;
 use crate::queries::classify_structure;
 use crate::state::{use_form_criteria_context, use_results_context};
 use crate::ui::a11y_contract::SEARCH_PANEL_BODY_ID;
@@ -30,8 +30,8 @@ pub fn SearchPanel() -> Element {
 
     let loading = *use_lifecycle_selector(state.explore, |lifecycle| lifecycle.loading).read();
     let is_dirty = form_ctx.is_dirty();
-    let form_search = interactions.clone();
-    let button_search = interactions.clone();
+    let form_search = interactions;
+    let button_search = form_search.clone();
 
     rsx! {
         form {
@@ -66,7 +66,7 @@ pub fn SearchPanel() -> Element {
             SearchButton {
                 loading,
                 is_dirty,
-                on_click: move |_| button_search.search(),
+                on_click: move |()| button_search.search(),
             }
         }
     }
@@ -132,7 +132,7 @@ fn StructureSection() -> Element {
                         class: "accent-accent h-4 w-4 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                         checked: smiles_search_type == SmilesSearchType::Substructure,
                         onchange: move |_| {
-                            ctx.update(FormAction::SmilesSearchType(SmilesSearchType::Substructure))
+                            ctx.update(FormAction::SmilesSearchType(SmilesSearchType::Substructure));
                         },
                     }
                     "{t(locale, TextKey::Substructure)}"
@@ -144,7 +144,7 @@ fn StructureSection() -> Element {
                         class: "accent-accent h-4 w-4 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                         checked: smiles_search_type == SmilesSearchType::Similarity,
                         onchange: move |_| {
-                            ctx.update(FormAction::SmilesSearchType(SmilesSearchType::Similarity))
+                            ctx.update(FormAction::SmilesSearchType(SmilesSearchType::Similarity));
                         },
                     }
                     "{t(locale, TextKey::Similarity)}"

@@ -82,9 +82,9 @@ pub enum TaxonWarning {
     },
     /// Raw warning string received from the REST API response.
     ApiMessage(String),
-    /// QLever returned 502 Bad Gateway; query was retried against WDQS.
+    /// `QLever` returned 502 Bad Gateway; query was retried against WDQS.
     QleverBadGateway,
-    /// QLever returned 502; query executed against Wikidata Query Service.
+    /// `QLever` returned 502; query executed against Wikidata Query Service.
     WdqsFallback,
 }
 
@@ -133,7 +133,7 @@ pub enum ParseFault {
 /// Top-level domain error used throughout the Explore feature.
 ///
 /// Contains **no locale-dependent strings**; UI components format errors at render time.
-#[derive(Clone, Debug, PartialEq, Error)]
+#[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum DomainError {
     #[error("validation: {0}")]
     Validation(ValidationFault),

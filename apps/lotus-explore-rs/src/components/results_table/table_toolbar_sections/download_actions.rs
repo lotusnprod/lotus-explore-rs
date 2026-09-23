@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::redundant_clone)]
+
 //! Download actions toolbar group — buttons to trigger query/metadata downloads
-//! and links to open the query in the QLever UI.
+//! and links to open the query in the `QLever` UI.
 
 use super::super::download_model::{
     DOWNLOAD_METADATA_SPEC, DOWNLOAD_QUERY_CSV_SPEC, DOWNLOAD_QUERY_JSON_SPEC,
@@ -150,8 +152,7 @@ fn DownloadQueryButton(
             aria_label: Some(title.to_string()),
             label: Some(label.to_string()),
             onclick: {
-                let q = sparql_query.clone();
-                let fname = filename.clone();
+                let filename = move || filename.clone();
                 #[cfg(target_arch = "wasm32")]
                 let criteria_snapshot = Some(Arc::new(criteria.read().clone()));
                 #[cfg(not(target_arch = "wasm32"))]
@@ -161,8 +162,8 @@ fn DownloadQueryButton(
                         spec,
                         locale,
                         criteria_snapshot.clone(),
-                        fname.clone(),
-                        q.clone(),
+                        filename(),
+                        sparql_query.clone(),
                         download_busy,
                         download_status,
                     );
@@ -193,10 +194,9 @@ fn DownloadMetadataButton(
             aria_label: Some(title.to_string()),
             label: Some(label.to_string()),
             onclick: {
-                let body = metadata_json.clone();
                 let filename = toolbar_model.read().metadata_filename.clone();
                 move |_| {
-                    dispatch_metadata_download_blob(&filename, body.as_ref());
+                    dispatch_metadata_download_blob(&filename, metadata_json.as_ref());
                 }
             },
         }
@@ -239,9 +239,8 @@ pub fn DownloadActionsGroup() -> Element {
     let metadata_json_value = snapshot.metadata_json.clone();
     let toolbar = toolbar_model.read();
     let export_available = toolbar.export_available;
-    let ui_url = toolbar.ui_url.clone();
+    let ui_url_for_click = toolbar.ui_url.clone();
     let endpoint_name = toolbar.sparql_endpoint_ui.to_string();
-    let ui_url_for_click = ui_url.clone();
     drop(snapshot);
     drop(toolbar);
 

@@ -37,7 +37,12 @@ pub fn normalize_smiles(raw: &str) -> String {
 /// * If `smiles` is non-empty the Sachem SERVICE query is used.
 /// * Otherwise a taxon-filtered or "all compounds" query is generated.
 pub fn build_sparql_query(smiles: &str, crit: &SearchCriteria, taxon_qid: Option<&str>) -> String {
-    if !smiles.is_empty() {
+    if smiles.is_empty() {
+        match taxon_qid {
+            Some(qid) if qid != "*" => queries::query_compounds_by_taxon(qid),
+            _ => queries::query_all_compounds(),
+        }
+    } else {
         let effective_type = if (smiles.contains('\n') || smiles.contains('\r'))
             && crit.smiles_search_type == SmilesSearchType::Similarity
         {
@@ -58,11 +63,6 @@ pub fn build_sparql_query(smiles: &str, crit: &SearchCriteria, taxon_qid: Option
         );
         telemetry::query_build_sachem_query_created(q.contains("SERVICE"));
         q
-    } else {
-        match taxon_qid {
-            Some(qid) if qid != "*" => queries::query_compounds_by_taxon(qid),
-            _ => queries::query_all_compounds(),
-        }
     }
 }
 

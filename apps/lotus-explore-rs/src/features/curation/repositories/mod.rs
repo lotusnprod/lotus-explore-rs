@@ -24,7 +24,7 @@ pub use wikidata::WikidataKnowledgeRepository;
 /// - Easier to reason about lifetime variance in repository implementations
 pub type BoxedFuture<'a, T> = Pin<Box<dyn Future<Output = T> + 'a>>;
 
-/// Resolve or create taxon result: (qid, quickstatements_lines).
+/// Resolve or create taxon result: (`qid`, `quickstatements_lines`).
 pub type ResolveTaxonResult = Result<(Option<String>, Vec<String>), CurationError>;
 
 /// Stable data-access boundary for curation orchestration and enrichment.
@@ -33,7 +33,7 @@ pub type ResolveTaxonResult = Result<(Option<String>, Vec<String>), CurationErro
 /// Uses boxed futures to remain generic over async runtime and avoid trait object
 /// allocation overhead during compilation.
 pub trait CurationKnowledgeRepository: Send + Sync {
-    /// Fetch a chemical compound by InChIKey from Wikidata.
+    /// Fetch a chemical compound by `InChIKey` from Wikidata.
     ///
     /// Returns `None` if no compound with that key exists; errors indicate network/parse issues.
     fn fetch_compound_by_inchikey(

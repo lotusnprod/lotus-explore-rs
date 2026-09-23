@@ -64,7 +64,7 @@ fn build_http_client() -> Result<reqwest::Client, String> {
         reqwest::Client::builder()
             .connect_timeout(Duration::from_secs(5))
             .timeout(Duration::from_secs(30))
-            .pool_idle_timeout(Duration::from_secs(60))
+            .pool_idle_timeout(Duration::from_mins(1))
             .pool_max_idle_per_host(8)
             .tcp_keepalive(Duration::from_secs(30))
             .build()
@@ -102,7 +102,7 @@ fn resolve_api_url(base: &str, url: &str) -> String {
 
 async fn post_json<Req, Res>(base: &str, path: &str, body: &Req) -> Result<Res, ApiClientError>
 where
-    Req: Serialize + ?Sized,
+    Req: Serialize + ?Sized + Sync,
     Res: for<'de> Deserialize<'de>,
 {
     let url = format!("{}{}", base.trim_end_matches('/'), path);

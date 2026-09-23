@@ -4,7 +4,7 @@
 use crate::models::{SortColumn, SortDir, SortState};
 
 /// ARIA `aria-sort` value for a column header.
-pub(super) fn aria_sort_for(state: &SortState, col: SortColumn) -> &'static str {
+pub(super) fn aria_sort_for(state: SortState, col: SortColumn) -> &'static str {
     if state.col != col {
         "none"
     } else if state.dir == SortDir::Asc {
@@ -14,7 +14,7 @@ pub(super) fn aria_sort_for(state: &SortState, col: SortColumn) -> &'static str 
     }
 }
 
-pub(super) fn sort_icon_for(state: &SortState, col: SortColumn) -> &'static str {
+pub(super) fn sort_icon_for(state: SortState, col: SortColumn) -> &'static str {
     if state.col == col {
         if state.dir == SortDir::Asc {
             "▴"

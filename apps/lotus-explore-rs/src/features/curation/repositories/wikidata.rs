@@ -26,7 +26,7 @@ impl CurationKnowledgeRepository for WikidataKnowledgeRepository {
         pre_resolved_qid: Option<&str>,
     ) -> super::BoxedFuture<'_, ResolveTaxonResult> {
         let name = name.to_string();
-        let pre_resolved_qid = pre_resolved_qid.map(|s| s.to_string());
+        let pre_resolved_qid = pre_resolved_qid.map(String::from);
         Box::pin(async move {
             wikidata::resolve_or_create_taxon(&name, pre_resolved_qid.as_deref()).await
         })
@@ -70,7 +70,7 @@ impl CurationKnowledgeRepository for WikidataKnowledgeRepository {
     ) -> super::BoxedFuture<'_, Result<HashMap<String, String>, CurationError>> {
         let names: Vec<String> = names.to_vec();
         Box::pin(async move {
-            wikidata::resolve_taxon_qids_batch(names.iter().map(|s| s.as_str())).await
+            wikidata::resolve_taxon_qids_batch(names.iter().map(String::as_str)).await
         })
     }
 
@@ -80,7 +80,7 @@ impl CurationKnowledgeRepository for WikidataKnowledgeRepository {
     ) -> super::BoxedFuture<'_, Result<HashMap<String, String>, CurationError>> {
         let dois: Vec<String> = dois.to_vec();
         Box::pin(async move {
-            wikidata::resolve_reference_qids_batch(dois.iter().map(|s| s.as_str())).await
+            wikidata::resolve_reference_qids_batch(dois.iter().map(String::as_str)).await
         })
     }
 }

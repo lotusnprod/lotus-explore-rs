@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::cast_possible_truncation)]
+
 //! Lifecycle coordination for explore search execution.
 //!
 //! Keeps dispatch policy (phase updates, stale-token suppression, success/error

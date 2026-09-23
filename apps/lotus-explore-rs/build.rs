@@ -99,7 +99,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     write_if_changed(public_dir.join("_headers"), build_headers_txt())?;
     write_if_changed(
         public_dir.join("site.webmanifest"),
-        serde_json::to_string_pretty(&metadata.manifest)?,
+        format!("{}\n", serde_json::to_string_pretty(&metadata.manifest)?),
     )?;
 
     // Copy public folder to output directory for static asset serving
