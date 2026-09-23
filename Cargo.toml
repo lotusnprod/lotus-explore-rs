@@ -81,7 +81,6 @@ format_push_string = "warn"
 future_not_send = "warn"
 if_not_else = "warn"
 ignored_unit_patterns = "warn"
-implicit_clone = "allow"
 items_after_statements = "warn"
 large_types_passed_by_value = "warn"
 lint_groups_priority = "warn"
@@ -122,15 +121,18 @@ unchecked_time_subtraction = "warn"
 unimplemented = "warn"
 uninlined_format_args = "warn"
 unnecessary_struct_initialization = "warn"
-unnecessary_wraps = "allow"
 unnested_or_patterns = "warn"
 unreadable_literal = "warn"
 unused_async = "warn"
 unused_self = "warn"
-use_self = "allow"
 wildcard_imports = "warn"
 
 [workspace.lints.rust]
+# `dead_code` is allowed repo-wide: this is a Dioxus bin crate where RSX
+# components/hooks and server-only items are frequently invoked via macro
+# expansion or `#[cfg(feature = "server")]` paths that rustc's reachability
+# analysis cannot trace, so it flags ~30 sites as dead (almost all false
+# positives — removing this surfaces them). Kept broad on purpose.
 dead_code = "allow"
 missing_debug_implementations = "warn"
 unsafe_code = "forbid"

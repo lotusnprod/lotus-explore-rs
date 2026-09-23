@@ -4,7 +4,9 @@
 // This crate compiles Dioxus WASM-client code alongside native-server code in
 // a single compilation unit.  On native targets (no `server` feature) main()
 // just prints a hint and never launches the Dioxus renderer, so all UI/i18n
-// modules are technically unreachable — hence `allow(dead_code)`.
+// modules are technically unreachable — hence `allow(dead_code)`. Without it
+// rustc flags ~980 Dioxus RSX component/hook sites as dead (false positives the
+// reachability analyzer can't trace through macro expansion).
 #![allow(dead_code)]
 #![cfg_attr(target_arch = "wasm32", allow(clippy::future_not_send))]
 

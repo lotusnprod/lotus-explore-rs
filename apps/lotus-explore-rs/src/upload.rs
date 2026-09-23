@@ -295,6 +295,11 @@ where
 ///
 /// # Errors
 /// Returns a string message if the file cannot be downcast to a `UploadBlob`.
+#[allow(clippy::unnecessary_wraps)]
+// `Result<Option<..>, _>` is intentional: the wasm path returns `Err` for
+// unsupported file types, so the `Result` is genuinely used there even though
+// the native (non-wasm) cfg branch only ever returns `Ok(None)` — which is what
+// trips the lint. Scoped here instead of allowed workspace-wide.
 pub fn extract_blob_from_file_data(
     files: &[dioxus::html::FileData],
 ) -> Result<Option<ExtractedFile>, String> {

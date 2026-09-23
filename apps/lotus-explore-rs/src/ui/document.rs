@@ -301,10 +301,8 @@ pub fn DocumentLinks(props: DocumentLinksProps) -> Element {
     use_hook(move || {
         let doc = document();
         for spec in &links {
-            let mut attrs: Vec<(&str, String)> = vec![
-                ("rel", spec.rel.to_string()),
-                ("href", spec.href.to_string()),
-            ];
+            let mut attrs: Vec<(&str, String)> =
+                vec![("rel", spec.rel.to_string()), ("href", spec.href.clone())];
             if let Some(t) = spec.r#type {
                 attrs.push(("type", t.to_string()));
             }
