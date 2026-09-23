@@ -69,34 +69,42 @@ all = { level = "deny", priority = -1 }
 pedantic = { level = "deny", priority = -2 }
 
 # Clippy nursery lints (experimental, may be noisy)
-nursery = { level = "warn", priority = -3 }
+nursery = { level = "deny", priority = -3 }
 
 # Clippy cargo lints (Cargo.toml hygiene)
 # Note: multiple_crate_versions is allow-listed due to transitive deps from dioxus
-cargo = { level = "warn", priority = -1 }
+cargo = { level = "deny", priority = -1 }
 
-expect_used = "warn"
+expect_used = "deny"
 indexing_slicing = "deny"
-panic = "warn"
+panic = "deny"
 todo = "deny"
 unimplemented = "deny"
 # Selectively enable valuable restriction lints
 # These catch real quality issues and are defensible
 unwrap_used = "deny"
+# Catch leftover debug macro calls in production code paths
+dbg_macro = "deny"
+# Any unsafe block must come with a justification comment
+undocumented_unsafe_blocks = "deny"
+# Assertions must explain intent; makes test failures self-documenting
+missing_assert_message = "deny"
+# Detect non-canonical Unicode that could break identifier/normalization logic
+unicode_not_nfc = "deny"
 
 # Allow multiple_crate_versions due to transitive deps from dioxus ecosystem
 multiple_crate_versions = "allow"
 
 [workspace.lints.rust]
-# Dead code - warn for visibility issues, but Dioxus cross-cfg requires allowance
-# in the main app where UI/WASM code is unreachable from native builds
-dead_code = "warn"
-missing_debug_implementations = "warn"
-missing_docs = "warn"
+dead_code = "deny"
+missing_debug_implementations = "deny"
+missing_docs = "deny"
 unreachable_pub = "deny"
 unsafe_code = "forbid"
-unused_crate_dependencies = "warn"
-unused_must_use = "warn"
+unused_crate_dependencies = "deny"
+unused_must_use = "deny"
+# Require an explicit unsafe block per unsafe operation inside unsafe fns
+unsafe_op_in_unsafe_fn = "deny"
 
 [profile.release]
 debug = false
