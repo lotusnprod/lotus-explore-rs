@@ -17,7 +17,9 @@
 use std::io::{Seek, Write};
 
 use super::client::{DefaultHttp, HttpClient, HttpResponse};
-use super::error::{compact_http_error_text, looks_like_gateway_error};
+use super::error::{
+    compact_http_error_text, is_client_error, is_rate_limit, is_success, looks_like_gateway_error,
+};
 use super::types::{FetchError, MAX_HTTP_ATTEMPTS, ResponseBody, ResponseFormat};
 
 // ── Rate-limit backoff ────────────────────────────────────────────────────────
@@ -148,7 +150,7 @@ pub(super) async fn execute_sparql_with_format_body_c<C: HttpClient>(
         match result {
             Ok(resp) => {
                 let code = resp.status();
-                if (200..=299).contains(&code) {
+                if is_success(code) {
                     return match resp.bytes().await {
                         Ok(bytes) if bytes.is_empty() => Err(FetchError::Empty),
                         Ok(bytes) => {
@@ -182,7 +184,7 @@ pub(super) async fn execute_sparql_with_format_body_c<C: HttpClient>(
                 let detail = compact_http_error_text(&body);
                 log::error!("event=sparql_http_error status={code} detail={detail}");
                 // Retry on rate limiting (429) with backoff; fail fast on other 4xx.
-                if code == 429 {
+                if is_rate_limit(code) {
                     let backoff_ms: u64 = 1000 * u64::from(attempt + 1); // 1s, 2s, 3s...
                     log::warn!(
                         "event=sparql_rate_limit status={code} attempt={} backoff_ms={}",
@@ -200,7 +202,7 @@ pub(super) async fn execute_sparql_with_format_body_c<C: HttpClient>(
                         return Err(FetchError::Http(code, detail));
                     }
                 }
-                if (400..500).contains(&code) {
+                if is_client_error(code) {
                     return Err(FetchError::Http(code, detail));
                 }
                 last_err = Some(FetchError::Http(code, detail));
@@ -253,7 +255,7 @@ pub(super) async fn execute_sparql_with_format_tempfile_c<C: HttpClient>(
         match result {
             Ok(mut resp) => {
                 let code = resp.status();
-                if (200..=299).contains(&code) {
+                if is_success(code) {
                     let mut file = tempfile::NamedTempFile::new()
                         .map_err(|e| FetchError::Parse(format!("tempfile create failed: {e}")))?;
                     let mut preview = Vec::with_capacity(2048);
@@ -308,7 +310,7 @@ pub(super) async fn execute_sparql_with_format_tempfile_c<C: HttpClient>(
                 let detail = compact_http_error_text(&body);
                 log::error!("event=sparql_http_error status={code} detail={detail}");
                 // Retry on rate limiting (429) with backoff; fail fast on other 4xx.
-                if code == 429 {
+                if is_rate_limit(code) {
                     let backoff_ms: u64 = 1000 * u64::from(attempt + 1); // 1s, 2s, 3s...
                     log::warn!(
                         "event=sparql_rate_limit status={code} attempt={} backoff_ms={}",
@@ -319,7 +321,7 @@ pub(super) async fn execute_sparql_with_format_tempfile_c<C: HttpClient>(
                     last_err = Some(FetchError::Http(code, detail.clone()));
                     continue;
                 }
-                if (400..500).contains(&code) {
+                if is_client_error(code) {
                     return Err(FetchError::Http(code, detail));
                 }
                 last_err = Some(FetchError::Http(code, detail));
@@ -392,7 +394,7 @@ pub(super) async fn fetch_url_bytes_with_accept_c<C: HttpClient>(
         match result {
             Ok(resp) => {
                 let code = resp.status();
-                if (200..=299).contains(&code) {
+                if is_success(code) {
                     return match resp.bytes().await {
                         Ok(bytes) if bytes.is_empty() => Err(FetchError::Empty),
                         Ok(bytes) => {
@@ -425,7 +427,7 @@ pub(super) async fn fetch_url_bytes_with_accept_c<C: HttpClient>(
                 let detail = compact_http_error_text(&body);
                 log::error!("event=http_error status={code} detail={detail}");
                 // 4xx (including 429) fail fast — no backoff on this path.
-                if (400..500).contains(&code) {
+                if is_client_error(code) {
                     return Err(FetchError::Http(code, detail));
                 }
                 last_err = Some(FetchError::Http(code, detail));

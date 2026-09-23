@@ -6,7 +6,9 @@
 //! Only pure (non-async) helpers are tested here — `looks_like_gateway_error`,
 //! `compact_http_error_text`, `extract_qid`, and `clean_doi`.
 
-use super::error::{compact_http_error_text, looks_like_gateway_error};
+use super::error::{
+    compact_http_error_text, is_client_error, is_rate_limit, is_success, looks_like_gateway_error,
+};
 use crate::transport::{clean_doi, coalesce, col_idx, extract_qid, field, non_empty, parse_year};
 
 // ── Gateway error detection ─────────────────────────────────────────────────
@@ -199,6 +201,41 @@ fn parse_json_exception_field_returns_none_when_absent() {
     assert!(compact.starts_with('{'));
     let body = "not json";
     assert_eq!(compact_http_error_text(body), "not json");
+}
+
+// ── HTTP status classification ────────────────────────────────────────────────
+//
+// These predicates drive the retry / fail-fast decision in `execute.rs` and are
+// used by both the native and (cfg-gated) wasm transport paths. Testing them
+// directly pins the boundary semantics independent of any HTTP client.
+
+#[test]
+fn success_range_includes_only_2xx() {
+    assert!(is_success(200));
+    assert!(is_success(204));
+    assert!(is_success(299));
+    assert!(!is_success(199));
+    assert!(!is_success(300));
+    assert!(!is_success(429));
+    assert!(!is_success(502));
+}
+
+#[test]
+fn client_error_range_includes_429() {
+    assert!(is_client_error(400));
+    assert!(is_client_error(404));
+    assert!(is_client_error(429));
+    assert!(is_client_error(499));
+    assert!(!is_client_error(399));
+    assert!(!is_client_error(500));
+    assert!(!is_client_error(503));
+}
+
+#[test]
+fn rate_limit_matches_only_429() {
+    assert!(is_rate_limit(429));
+    assert!(!is_rate_limit(400));
+    assert!(!is_rate_limit(503));
 }
 
 // ── HTTP transport retry / classification (mock-driven) ─────────────────────

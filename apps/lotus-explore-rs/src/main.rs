@@ -6,6 +6,7 @@
 // just prints a hint and never launches the Dioxus renderer, so all UI/i18n
 // modules are technically unreachable — hence `allow(dead_code)`.
 #![allow(dead_code)]
+#![cfg_attr(target_arch = "wasm32", allow(clippy::future_not_send))]
 
 //! `lotus-explore-rs` — LOTUS Knowledge Explorer.
 //!

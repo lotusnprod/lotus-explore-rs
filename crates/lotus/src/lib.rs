@@ -24,6 +24,9 @@
 //! - Application routing, Dioxus state machines, or i18n → these live in each app.
 
 #![warn(missing_docs)]
+// reqwest-wasm futures are inherently `!Send` (single-threaded browser runtime);
+// this is correct, not a defect. Suppress it on the wasm target only.
+#![cfg_attr(target_arch = "wasm32", allow(clippy::future_not_send))]
 
 /// Export-format and download-URL helpers used by `lotus-explore-rs`.
 pub mod export;

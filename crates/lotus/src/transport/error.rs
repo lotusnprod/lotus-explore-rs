@@ -54,6 +54,30 @@ fn contains_ci(h: &str, needle: &str) -> bool {
     false
 }
 
+// ── HTTP status classification ────────────────────────────────────────────────
+//
+// Pure, `const` status-code classifiers used by the retry policy in
+// [`crate::transport::execute`]. Centralising the ranges (rather than inlining
+// magic-number checks at each call site) keeps the retry decision logic in one
+// place and makes the boundary semantics — shared by both the native and the
+// wasm transport paths — explicitly unit-testable.
+
+/// `2xx` success statuses.
+pub(super) const fn is_success(code: u16) -> bool {
+    code >= 200 && code <= 299
+}
+
+/// `4xx` client errors, **including** `429` (which is additionally handled
+/// with backoff on the SPARQL-POST path).
+pub(super) const fn is_client_error(code: u16) -> bool {
+    code >= 400 && code < 500
+}
+
+/// `429 Too Many Requests`.
+pub(super) const fn is_rate_limit(code: u16) -> bool {
+    code == 429
+}
+
 /// Reduce a raw HTTP error body to a concise, single-line description.
 ///
 /// Preference order:
