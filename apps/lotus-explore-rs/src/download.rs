@@ -15,7 +15,6 @@ use crate::perf;
 #[cfg(target_arch = "wasm32")]
 use crate::models::SearchCriteria;
 
-mod coordinator;
 #[cfg(not(target_arch = "wasm32"))]
 mod native;
 #[cfg(target_arch = "wasm32")]
@@ -42,7 +41,7 @@ pub async fn execute_download(
 
     #[cfg(not(target_arch = "wasm32"))]
     {
-        native::execute_download_native(format, query, filename, dl_timer).await
+        native::execute_download_with_fallback(format, query, filename, dl_timer).await
     }
 }
 

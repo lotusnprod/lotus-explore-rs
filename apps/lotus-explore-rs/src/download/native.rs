@@ -14,16 +14,7 @@ use std::sync::Arc;
 /// Set this to `false` to use QLever (default).
 const FORCE_WDQS_FALLBACK: bool = false;
 
-pub(super) async fn execute_download_native(
-    format: DownloadFormat,
-    query: Arc<str>,
-    filename: String,
-    dl_timer: perf::TimerHandle,
-) -> Result<(), String> {
-    execute_download_with_fallback(format, query, filename, dl_timer).await
-}
-
-async fn execute_download_with_fallback(
+pub(super) async fn execute_download_with_fallback(
     format: DownloadFormat,
     query: Arc<str>,
     filename: String,
