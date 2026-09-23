@@ -1,6 +1,7 @@
-#![allow(clippy::volatile_composites)]
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
+#![allow(clippy::volatile_composites)]
 
 //! Programmatic document `<head>` management for lotus-explore-rs.
 
