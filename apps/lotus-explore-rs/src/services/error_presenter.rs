@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 #![allow(clippy::match_same_arms)]
-#![allow(clippy::manual_let_else)]
 
 //! User-facing formatting for domain errors and warnings.
 
@@ -124,9 +123,8 @@ fn compact_error_text(msg: &str) -> String {
 
 fn truncate_for_notice(text: &str) -> String {
     const MAX_CHARS: usize = 220;
-    let end = match text.char_indices().nth(MAX_CHARS) {
-        Some((idx, _)) => idx,
-        None => return text.to_string(),
+    let Some((end, _)) = text.char_indices().nth(MAX_CHARS) else {
+        return text.to_string();
     };
     let mut result = String::with_capacity(end + 3);
     result.push_str(&text[..end]);

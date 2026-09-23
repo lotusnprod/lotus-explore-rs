@@ -40,7 +40,7 @@ impl AppServices {
     }
 
     /// Get the data repository.
-    pub const fn repository(&self) -> HybridRepository {
+    pub const fn repository(self) -> HybridRepository {
         self.repo
     }
 }
