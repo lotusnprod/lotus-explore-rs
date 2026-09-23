@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::doc_markdown)]
 #![allow(clippy::unused_async)]
 #![allow(clippy::unused_self)]
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(clippy::needless_pass_by_ref_mut)]
+#![allow(clippy::doc_markdown)]
 
 //! Inlined upload helpers for lotus-explore-rs.
 //!
@@ -94,7 +94,7 @@ impl From<wasm_bindgen::JsValue> for UploadError {
     }
 }
 
-/// Default chunk size for UploadBlob reads (16 MiB).
+/// Default chunk size for `UploadBlob` reads (16 MiB).
 const CHUNK_SIZE: usize = 16 * 1024 * 1024;
 
 /// Default byte interval for progress reporting (4 MiB).
@@ -266,7 +266,7 @@ where
     }
 }
 
-/// Non-WASM stub for UploadBlobLines.
+/// Non-WASM stub for `UploadBlobLines`.
 #[cfg(not(target_arch = "wasm32"))]
 pub struct UploadBlobLines<F> {
     _phantom: std::marker::PhantomData<F>,

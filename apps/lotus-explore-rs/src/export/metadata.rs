@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::uninlined_format_args)]
-
 use super::filename::now_iso8601;
 use super::filters::criteria_to_filters_value;
 use crate::models::SearchCriteria;
@@ -395,7 +393,7 @@ mod tests {
             result_hash: "def",
             endpoint: SparqlEndpoint::Wdqs,
         });
-        assert!(body.contains(&format!("\"url\": \"{}\"", WDQS_ENDPOINT)));
+        assert!(body.contains(&format!("\"url\": \"{WDQS_ENDPOINT}\"")));
         assert!(body.contains("Wikidata Query Service"));
         assert!(body.contains("fell back from QLever 502"));
     }

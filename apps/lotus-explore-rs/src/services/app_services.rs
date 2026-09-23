@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 #![allow(clippy::large_types_passed_by_value)]
-#![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(clippy::no_effect_underscore_binding)]
 
 //! Application-level services and dependency container.
