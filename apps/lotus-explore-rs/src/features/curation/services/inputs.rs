@@ -1,7 +1,7 @@
-#![allow(clippy::manual_let_else)]
-#![allow(clippy::redundant_closure_for_method_calls)]
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+#![allow(clippy::manual_let_else)]
+#![allow(clippy::redundant_closure_for_method_calls)]
 
 use super::helpers::find_ascii_ci;
 use crate::features::curation::domain::{CurationError, CurationInputRow};

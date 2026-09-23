@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
 //! Retryable search orchestration — integration point for error recovery with the base orchestrator.
 //!
 //! This module demonstrates how to integrate the `error_recovery_coordinator` module into search
@@ -10,9 +13,6 @@
 //! 2. Call `classify_error_recovery(&error, attempt_count)` to determine retry strategy
 //! 3. If `should_retry` is true, schedule a retry after `backoff_ms`
 //! 4. Clear state conditionally based on `should_clear_state_on_error(error.query_stage())`
-
-// SPDX-License-Identifier: AGPL-3.0-only
-// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 #[cfg(test)]
 use crate::features::explore::error_recovery_coordinator::should_clear_state_on_error;

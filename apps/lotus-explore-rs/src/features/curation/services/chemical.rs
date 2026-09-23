@@ -1,6 +1,6 @@
-#![allow(clippy::unused_async)]
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+#![allow(clippy::unused_async)]
 
 #[cfg(target_arch = "wasm32")]
 use super::http_client::{js_value_to_json, rdkit_bridge_call};

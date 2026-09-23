@@ -1,8 +1,7 @@
-#![allow(clippy::struct_excessive_bools)]
-#![allow(clippy::derive_partial_eq_without_eq)]
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-
+#![allow(clippy::struct_excessive_bools)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 use crate::features::explore::types::{DomainError, QueryPhase, TaxonWarning};
 use crate::models::{CompoundEntry, DatasetStats, Rows, SearchCriteria, SortState};
 use std::sync::Arc;
