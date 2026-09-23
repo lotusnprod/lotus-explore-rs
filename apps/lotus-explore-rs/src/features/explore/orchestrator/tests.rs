@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 #![allow(clippy::manual_string_new)]
+#![allow(clippy::panic)]
 
 use super::runtime::test_exports::{
     build_search_succeeded_action_for_tests, validate_search_criteria_for_tests,

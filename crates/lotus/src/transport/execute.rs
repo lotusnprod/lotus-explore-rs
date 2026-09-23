@@ -267,7 +267,8 @@ pub(super) async fn execute_sparql_with_format_tempfile_c<C: HttpClient>(
                                 wrote_any = true;
                                 if preview.len() < 2048 {
                                     let take = (2048 - preview.len()).min(chunk.len());
-                                    preview.extend_from_slice(&chunk[..take]);
+                                    preview
+                                        .extend_from_slice(chunk.get(..take).unwrap_or_default());
                                 }
                                 file.write_all(&chunk).map_err(|e| {
                                     FetchError::Parse(format!("tempfile write failed: {e}"))

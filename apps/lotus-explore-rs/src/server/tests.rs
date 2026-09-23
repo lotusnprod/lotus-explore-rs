@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::expect_used)]
+#![allow(clippy::unwrap_used)]
+#![allow(clippy::indexing_slicing)]
+#![allow(clippy::panic)]
+
 use std::{
     collections::HashMap,
     time::{Duration, Instant},

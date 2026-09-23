@@ -33,14 +33,39 @@ pub fn build_export_cache_key(query: &str) -> String {
 
 /// Lowercase hex encoding of a finalized digest.
 fn sha256_hex(bytes: impl AsRef<[u8]>) -> String {
-    const HEX: &[u8; 16] = b"0123456789abcdef";
+    const HEX: [u8; 16] = *b"0123456789abcdef";
     let bytes = bytes.as_ref();
     let mut out = String::with_capacity(bytes.len() * 2);
     for &b in bytes {
-        out.push(HEX[(b >> 4) as usize] as char);
-        out.push(HEX[(b & 0x0f) as usize] as char);
+        let high = (b >> 4) as usize;
+        let low = (b & 0x0f) as usize;
+        out.push(safe_hex_char(HEX, high));
+        out.push(safe_hex_char(HEX, low));
     }
     out
+}
+
+#[inline]
+fn safe_hex_char(_hex: [u8; 16], index: usize) -> char {
+    match index {
+        0 => '0',
+        1 => '1',
+        2 => '2',
+        3 => '3',
+        4 => '4',
+        5 => '5',
+        6 => '6',
+        7 => '7',
+        8 => '8',
+        9 => '9',
+        10 => 'a',
+        11 => 'b',
+        12 => 'c',
+        13 => 'd',
+        14 => 'e',
+        15 => 'f',
+        _ => unreachable!("hex index out of bounds: {index}"),
+    }
 }
 
 #[cfg(test)]

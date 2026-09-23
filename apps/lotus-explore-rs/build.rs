@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+//! Build script for lotus-explore-rs.
+//!
+//! Generates site metadata files (llms.txt, robots.txt, sitemap.xml, etc.)
+//! from the site-metadata.json configuration and copies public assets.
+
+#![allow(missing_docs)]
+
 use serde::{Deserialize, Serialize};
 use std::{error::Error, fs, path::PathBuf};
 

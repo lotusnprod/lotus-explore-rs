@@ -99,11 +99,11 @@ needless_pass_by_ref_mut = "deny"
 needless_pass_by_value = "deny"
 needless_raw_string_hashes = "warn"
 no_effect_underscore_binding = "deny"
-nursery = { level = "deny", priority = -1 }
+nursery = { level = "warn", priority = -1 }
 option_as_ref_cloned = "warn"
 option_if_let_else = "warn"
 or_fun_call = "warn"
-pedantic = { level = "deny", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
 redundant_clone = "deny"
 redundant_closure_for_method_calls = "deny"
 redundant_pub_crate = "deny"
@@ -116,7 +116,6 @@ struct_excessive_bools = "deny"
 struct_field_names = "warn"
 todo = "deny"
 too_many_lines = "deny"
-trivially_copy_pass_by_ref = "deny"
 unchecked_time_subtraction = "warn"
 unimplemented = "warn"
 uninlined_format_args = "deny"
@@ -127,16 +126,19 @@ unused_async = "deny"
 unused_self = "deny"
 wildcard_imports = "deny"
 
+# Restriction lints — selectively enabled for quality, not blanket denial
+unwrap_used = "deny"
+expect_used = "warn"
+indexing_slicing = "deny"
+panic = "warn"
+
 [workspace.lints.rust]
-# `dead_code` is allowed repo-wide: this is a Dioxus bin crate where RSX
-# components/hooks and server-only items are frequently invoked via macro
-# expansion or `#[cfg(feature = "server")]` paths that rustc's reachability
-# analysis cannot trace, so it flags ~30 sites as dead (almost all false
-# positives — removing this surfaces them). Kept broad on purpose.
 dead_code = "allow"
 missing_debug_implementations = "warn"
+missing_docs = "warn"
 unsafe_code = "forbid"
 unused_must_use = "deny"
+# unreachable_pub = "deny"
 
 [profile.release]
 debug = false

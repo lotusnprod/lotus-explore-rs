@@ -104,6 +104,9 @@ pub fn row_uniqueness_key(row: &CurationInputRow) -> String {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+    #![allow(clippy::indexing_slicing)]
+
     use super::*;
     use std::collections::BTreeMap;
 

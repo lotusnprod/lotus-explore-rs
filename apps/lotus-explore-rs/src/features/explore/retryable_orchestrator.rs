@@ -106,6 +106,8 @@ pub enum RetryEligibility {
 }
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::panic)]
+
     use super::*;
     use crate::features::explore::types::{QueryStage, ValidationFault};
     use crate::repositories::RepositoryError;

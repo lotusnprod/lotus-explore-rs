@@ -209,6 +209,8 @@ impl DomainError {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::panic)]
+
     use super::*;
 
     #[test]

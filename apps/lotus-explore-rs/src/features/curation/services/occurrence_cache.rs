@@ -86,6 +86,8 @@ pub async fn compound_has_taxon_with_ref_cached(
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+
     use super::*;
     use crate::features::curation::domain::WikidataCompound;
     use crate::features::curation::repositories::{BoxedFuture, ResolveTaxonResult};

@@ -63,6 +63,8 @@ pub(super) fn pick_best_match<'a>(
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+
     use super::*;
 
     fn candidate(name: &str, qid: &str) -> TaxonMatch {

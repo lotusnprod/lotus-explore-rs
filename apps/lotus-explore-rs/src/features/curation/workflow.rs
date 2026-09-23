@@ -122,6 +122,8 @@ pub fn apply_second_pass(
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::indexing_slicing)]
+
     use super::*;
 
     fn row(name: &str, smiles: &str, deps: Vec<&str>, qs: Vec<&str>) -> CurationResultRow {

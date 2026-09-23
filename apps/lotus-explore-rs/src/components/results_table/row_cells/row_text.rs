@@ -32,6 +32,8 @@ pub(in crate::components::results_table) fn row_text(locale: Locale) -> RowText 
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::indexing_slicing)]
+
     use super::*;
     use crate::i18n::Locale;
 

@@ -33,6 +33,7 @@ pub struct TaxonResolution {
 }
 
 #[must_use]
+#[allow(clippy::indexing_slicing)]
 pub fn requires_remote_lookup(taxon: &str) -> bool {
     if taxon.is_empty() || taxon == "*" {
         return false;
@@ -143,6 +144,9 @@ fn immediate_resolution(taxon: &str) -> Option<TaxonResolution> {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+    #![allow(clippy::unwrap_used)]
+
     use super::*;
     use crate::api::SearchResponse;
     use crate::models::SearchCriteria;

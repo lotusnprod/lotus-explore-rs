@@ -17,6 +17,7 @@ use super::row_text::RowText;
 pub(in crate::components::results_table) use super::row_text::row_text;
 
 #[component]
+#[allow(clippy::indexing_slicing)]
 pub(in crate::components::results_table) fn ResultsRowsWindow(
     locale: Locale,
     text: RowText,

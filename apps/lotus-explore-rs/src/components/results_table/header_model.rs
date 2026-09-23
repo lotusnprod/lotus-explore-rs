@@ -69,6 +69,8 @@ fn next_sort_is_descending(sort: SortState, col: SortColumn) -> bool {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+
     use super::*;
 
     #[test]

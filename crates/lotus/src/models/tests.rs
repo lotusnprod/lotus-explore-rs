@@ -174,7 +174,12 @@ fn compound_entry_depict_url_rejects_multiline_smiles() {
         smiles: Some(Arc::from("c1ccccc1")),
         ..CompoundEntry::default()
     };
-    assert!(entry.depict_url().unwrap().contains("smi=c1ccccc1"));
+    assert!(
+        entry
+            .depict_url()
+            .as_ref()
+            .is_some_and(|url| url.contains("smi=c1ccccc1"))
+    );
 }
 
 #[test]

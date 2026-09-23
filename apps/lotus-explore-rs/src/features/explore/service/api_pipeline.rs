@@ -55,6 +55,10 @@ pub async fn try_execute<R: LotusRepository>(
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+    #![allow(clippy::unwrap_used)]
+    #![allow(clippy::panic)]
+
     use super::*;
     use crate::api::SearchResponse;
     use crate::features::explore::command::SearchCommand;

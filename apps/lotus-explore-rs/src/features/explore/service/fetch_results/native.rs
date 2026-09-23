@@ -116,6 +116,8 @@ fn results_csv_parse_error(err: impl std::fmt::Display) -> DomainError {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+
     use super::*;
 
     #[test]

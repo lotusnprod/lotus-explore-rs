@@ -43,10 +43,9 @@ fn contains_ci(h: &str, needle: &str) -> bool {
     let nb = needle.as_bytes();
     let hb = h.as_bytes();
     for i in 0..=hb.len() - nb.len() {
-        if hb[i..i + nb.len()]
-            .iter()
-            .zip(nb)
-            .all(|(a, b)| a.eq_ignore_ascii_case(b))
+        if hb
+            .get(i..i + nb.len())
+            .is_some_and(|slice| slice.iter().zip(nb).all(|(a, b)| a.eq_ignore_ascii_case(b)))
         {
             return true;
         }

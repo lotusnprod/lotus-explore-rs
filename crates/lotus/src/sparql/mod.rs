@@ -34,6 +34,9 @@ pub use parsing::{
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+    #![allow(clippy::indexing_slicing)]
+
     use super::parsing::*;
     use super::types::*;
     use std::sync::Arc;

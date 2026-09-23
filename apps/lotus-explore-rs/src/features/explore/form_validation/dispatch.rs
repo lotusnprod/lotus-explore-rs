@@ -18,12 +18,15 @@ pub fn validate_dispatch_criteria(criteria: &SearchCriteria) -> Result<(), Valid
         return Err(ValidationFault::EmptyInput);
     }
 
+    // Safety: map_err is only called when validate_criteria returns Err,
+    // which means errors is guaranteed non-empty.
+    #[allow(clippy::expect_used)]
     validate_criteria(criteria)
         .map_err(|errors| {
             errors
                 .into_iter()
                 .next()
-                .expect("non-empty validation error list")
+                .expect("validation_errors contains at least one error")
         })
         .map_err(ValidationError::into_fault)
 }

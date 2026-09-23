@@ -69,7 +69,8 @@ pub(super) fn build_sort_index_cache(rows: Arc<[CompoundEntry]>) -> SortIndexCac
 }
 
 impl SortIndexCache {
-    /// Return (or lazily compute) the ascending sort index for `col`.
+    #[allow(clippy::indexing_slicing)]
+    #[allow(clippy::expect_used)]
     fn ascending_for(&self, col: SortColumn) -> Arc<[u32]> {
         let idx = sort_column_index(col);
         // Fast path: return the cached value while holding the lock briefly.
@@ -89,7 +90,8 @@ impl SortIndexCache {
         guard[idx].get_or_insert(computed).clone()
     }
 
-    /// Return (or lazily compute) the descending sort index for `col`.
+    #[allow(clippy::indexing_slicing)]
+    #[allow(clippy::expect_used)]
     fn descending_for(&self, col: SortColumn) -> Arc<[u32]> {
         let idx = sort_column_index(col);
         // Fast path: return the cached value while holding the lock briefly.
@@ -135,6 +137,7 @@ pub(super) fn build_sorted_indices(rows: &[CompoundEntry], sort: SortState) -> A
 }
 
 #[allow(clippy::cast_possible_truncation)]
+#[allow(clippy::indexing_slicing)]
 fn build_sorted_indices_for_column(rows: &[CompoundEntry], column: SortColumn) -> Arc<[u32]> {
     let mut idx: Vec<u32> = (0..rows.len() as u32).collect();
     idx.sort_by(|&a, &b| {

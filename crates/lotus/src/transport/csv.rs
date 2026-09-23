@@ -42,7 +42,11 @@ pub fn extract_qid(s: &str) -> String {
     // All QID characters are ASCII — check bytes instead of chars to avoid
     // the full Unicode iterator overhead.
     let bytes = candidate.as_bytes();
-    if bytes.first() == Some(&b'Q') && bytes[1..].iter().all(u8::is_ascii_digit) && bytes.len() > 1
+    if bytes.first() == Some(&b'Q')
+        && bytes.len() > 1
+        && bytes
+            .get(1..)
+            .is_some_and(|rest| rest.iter().all(u8::is_ascii_digit))
     {
         candidate.to_string()
     } else {

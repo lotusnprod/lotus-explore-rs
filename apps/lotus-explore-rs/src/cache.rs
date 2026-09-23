@@ -70,6 +70,8 @@ mod cache_impl {
 
     #[cfg(test)]
     mod tests {
+        #![allow(clippy::expect_used)]
+
         use super::*;
         use lotus::state::build_search_cache_key;
 

@@ -56,6 +56,8 @@ where
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+
     use super::*;
     use crate::features::curation::domain::{CurationInputRow, CurationStatus};
     use futures::executor::block_on;

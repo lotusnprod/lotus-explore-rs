@@ -56,6 +56,8 @@ impl SearchRequest {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::panic)]
+
     use super::SearchRequest;
     use crate::features::explore::command::SearchCommand;
     use crate::models::SearchCriteria;

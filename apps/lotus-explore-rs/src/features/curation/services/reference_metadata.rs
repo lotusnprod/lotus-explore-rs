@@ -48,6 +48,8 @@ pub(super) async fn fetch_reference_quickstatements(_doi: &str) -> Option<Vec<St
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+
     use super::parse_quickstatements_text;
 
     #[test]

@@ -47,8 +47,7 @@ pub fn compute_hashes(
     let normalized_taxon = criteria.taxon.trim();
     let mut query_source =
         String::with_capacity(normalized_qid.len() + normalized_taxon.len() + 64);
-    write!(query_source, "{}|{}", normalized_qid, normalized_taxon)
-        .expect("String write is infallible");
+    let _ = write!(query_source, "{}|{}", normalized_qid, normalized_taxon);
 
     // Build `|key=value&key=value&…` suffix without an intermediate Vec<String>.
     for (i, (k, v)) in criteria.shareable_query_params().into_iter().enumerate() {
@@ -57,7 +56,7 @@ pub fn compute_hashes(
         } else {
             query_source.push('&');
         }
-        write!(query_source, "{k}={v}").expect("String write is infallible");
+        let _ = write!(query_source, "{k}={v}");
     }
     let query_hash = to_hex_lower(&Sha256::digest(query_source.as_bytes()));
 
@@ -81,6 +80,7 @@ pub fn compute_hashes(
     (query_hash, result_hash)
 }
 
+#[allow(clippy::indexing_slicing)]
 pub fn to_hex_lower(bytes: &[u8]) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";
     let mut out = String::with_capacity(bytes.len() * 2);

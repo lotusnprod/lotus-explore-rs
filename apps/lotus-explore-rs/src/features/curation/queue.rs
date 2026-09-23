@@ -46,6 +46,8 @@ pub fn append_unique_rows(
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::indexing_slicing)]
+
     use super::*;
 
     #[test]

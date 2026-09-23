@@ -6,6 +6,11 @@
 //! Only pure (non-async) helpers are tested here — `looks_like_gateway_error`,
 //! `compact_http_error_text`, `extract_qid`, and `clean_doi`.
 
+#![allow(clippy::expect_used)]
+#![allow(clippy::unwrap_used)]
+#![allow(clippy::indexing_slicing)]
+#![allow(clippy::panic)]
+
 use super::error::{
     compact_http_error_text, is_client_error, is_rate_limit, is_success, looks_like_gateway_error,
 };

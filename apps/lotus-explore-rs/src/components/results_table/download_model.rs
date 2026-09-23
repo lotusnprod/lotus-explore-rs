@@ -152,6 +152,8 @@ fn build_sparql_ui_url(sparql_query: Option<&str>, endpoint: SparqlEndpointUI) -
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+
     use super::{
         DOWNLOAD_QUERY_CSV_SPEC, DOWNLOAD_QUERY_JSON_SPEC, DOWNLOAD_QUERY_RDF_SPEC,
         SparqlEndpointUI, build_download_toolbar_model, build_download_toolbar_model_with_endpoint,

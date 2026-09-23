@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+#![allow(clippy::expect_used)]
+#![allow(clippy::indexing_slicing)]
+
 use crate::download::DownloadFormat;
 use crate::features::curation::state::page_controller::rows_to_tsv;
 use crate::features::explore::search_state::ExploreState;

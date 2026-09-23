@@ -49,6 +49,8 @@ pub fn ShareBar(locale: Locale, share: Arc<str>) -> Element {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::indexing_slicing)]
+
     use crate::curation::CurationInputRow;
 
     #[test]

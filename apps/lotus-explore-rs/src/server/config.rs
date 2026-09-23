@@ -204,6 +204,10 @@ pub fn build_cors_layer(config: &AppConfig) -> CorsLayer {
 
 #[cfg(test)]
 mod tests {
+    #![allow(clippy::expect_used)]
+    #![allow(clippy::unwrap_used)]
+    #![allow(clippy::indexing_slicing)]
+
     use super::*;
 
     // ── Cli flag resolution (tested via clap's try_parse_from) ───────

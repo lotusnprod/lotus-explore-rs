@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 #![allow(clippy::uninlined_format_args)]
+#![allow(clippy::panic)]
 
 use super::dispatch::{DispatchPhase, classify_dispatch_phase};
 use super::metrics::{
