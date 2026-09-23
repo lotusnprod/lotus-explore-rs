@@ -93,6 +93,7 @@ pub(super) trait HttpResponse {
     async fn text(self) -> Result<String, FetchError>;
 
     /// Read the next chunk of the streaming body. Returns `None` at EOF.
+    #[allow(dead_code)] // Used in the tempfile streaming path (cfg(not(target_arch = "wasm32")))
     async fn chunk(&mut self) -> Result<Option<Bytes>, FetchError>;
 }
 

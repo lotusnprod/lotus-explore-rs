@@ -30,7 +30,7 @@ use super::types::{FetchError, MAX_HTTP_ATTEMPTS, ResponseBody, ResponseFormat};
 /// transport behaviour — a deliberate, in-scope-preserving choice). Under
 /// `cfg(test)` the sleep is elided so retry tests are instant and
 /// deterministic; on WASM the 429 branch returns before reaching this call.
-#[allow(clippy::missing_const_for_fn, unused_variables)]
+#[allow(clippy::missing_const_for_fn, unused_variables, dead_code)]
 fn backoff_sleep(ms: u64) {
     #[cfg(not(any(target_arch = "wasm32", test)))]
     std::thread::sleep(std::time::Duration::from_millis(ms));
