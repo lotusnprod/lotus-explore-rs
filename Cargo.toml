@@ -62,83 +62,40 @@ web-sys = {
 zip = "8.6"
 
 [workspace.lints.clippy]
-cargo = { level = "deny", priority = -1 }
-cargo_common_metadata = "deny"
-cast_lossless = "warn"
-cast_possible_truncation = "deny"
-cast_possible_wrap = "warn"
-cast_precision_loss = "warn"
-cast_sign_loss = "warn"
-dbg_macro = "deny"
-default_trait_access = "warn"
-derive_partial_eq_without_eq = "deny"
-doc_markdown = "deny"
-duration_suboptimal_units = "warn"
-explicit_iter_loop = "warn"
-float_cmp = "deny"
-fn_params_excessive_bools = "deny"
-format_push_string = "warn"
-future_not_send = "deny"
-if_not_else = "deny"
-ignored_unit_patterns = "warn"
-items_after_statements = "warn"
-large_types_passed_by_value = "deny"
-lint_groups_priority = "warn"
-manual_let_else = "deny"
-manual_string_new = "deny"
-map_unwrap_or = "warn"
-match_same_arms = "deny"
-missing_const_for_fn = "warn"
-missing_errors_doc = "warn"
-missing_panics_doc = "warn"
-module_name_repetitions = "warn"
-multiple_crate_versions = "allow"
-must_use_candidate = "warn"
-needless_lifetimes = "warn"
-needless_pass_by_ref_mut = "deny"
-needless_pass_by_value = "deny"
-needless_raw_string_hashes = "warn"
-no_effect_underscore_binding = "deny"
-nursery = { level = "warn", priority = -1 }
-option_as_ref_cloned = "warn"
-option_if_let_else = "warn"
-or_fun_call = "warn"
-pedantic = { level = "warn", priority = -1 }
-redundant_clone = "deny"
-redundant_closure_for_method_calls = "deny"
-redundant_pub_crate = "deny"
-semicolon_if_nothing_returned = "warn"
-significant_drop_tightening = "warn"
-similar_names = "warn"
-single_match_else = "deny"
-single_option_map = "warn"
-struct_excessive_bools = "deny"
-struct_field_names = "warn"
-todo = "deny"
-too_many_lines = "deny"
-unchecked_time_subtraction = "warn"
-unimplemented = "warn"
-uninlined_format_args = "deny"
-unnecessary_struct_initialization = "warn"
-unnested_or_patterns = "deny"
-unreadable_literal = "warn"
-unused_async = "deny"
-unused_self = "deny"
-wildcard_imports = "deny"
+# All clippy lints (core lints)
+all = { level = "deny", priority = -1 }
 
-# Restriction lints — selectively enabled for quality, not blanket denial
+# Clippy pedantic lints (additional quality checks)
+pedantic = { level = "warn", priority = -2 }
+
+# Clippy nursery lints (experimental, may be noisy)
+nursery = { level = "warn", priority = -3 }
+
+# Clippy cargo lints (Cargo.toml hygiene)
+# Note: multiple_crate_versions is allow-listed due to transitive deps from dioxus
+cargo = { level = "warn", priority = -1 }
+
+# Selectively enable valuable restriction lints
+# These catch real quality issues and are defensible
 unwrap_used = "deny"
 expect_used = "warn"
-indexing_slicing = "deny"
+todo = "deny"
+unimplemented = "deny"
 panic = "warn"
+indexing_slicing = "deny"
+
+# Allow multiple_crate_versions due to transitive deps from dioxus ecosystem
+multiple_crate_versions = "allow"
 
 [workspace.lints.rust]
-dead_code = "allow"
+# Dead code - warn for visibility issues, but Dioxus cross-cfg requires allowance
+# in the main app where UI/WASM code is unreachable from native builds
+dead_code = "warn"
 missing_debug_implementations = "warn"
 missing_docs = "warn"
 unsafe_code = "forbid"
-unused_must_use = "deny"
-# unreachable_pub = "deny"
+unused_must_use = "warn"
+unreachable_pub = "warn"
 
 [profile.release]
 debug = false

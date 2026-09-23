@@ -9,10 +9,7 @@ use crate::api::SearchResponse;
 use crate::models::SearchCriteria;
 use crate::repositories::{LotusRepository, RepositoryError};
 
-/// Clone-only test stub that always returns "API not configured" and
-/// delegates every SPARQL call to a fixed response.
-///
-/// Use with orchestrator tests without network dependencies.
+/// Test-only mock repository for unit tests without network dependencies.
 #[derive(Clone)]
 pub struct MockRepository {
     /// Fixed CSV bytes returned for every `sparql_bytes` call.

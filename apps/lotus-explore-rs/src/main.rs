@@ -4,10 +4,15 @@
 // This crate compiles Dioxus WASM-client code alongside native-server code in
 // a single compilation unit.  On native targets (no `server` feature) main()
 // just prints a hint and never launches the Dioxus renderer, so all UI/i18n
-// modules are technically unreachable. The workspace `[lints.rust] dead_code = "allow"`
-// allows for this Dioxus cross-cfg situation.
+// modules are technically unreachable. The following lints are allowed for this
+// Dioxus cross-cfg situation: dead_code, unreachable_pub.
 #![cfg_attr(target_arch = "wasm32", allow(clippy::future_not_send))]
-#![allow(clippy::module_name_repetitions, clippy::missing_const_for_fn)]
+#![allow(
+    clippy::module_name_repetitions,
+    clippy::missing_const_for_fn,
+    dead_code,
+    unreachable_pub
+)]
 
 //! `lotus-explore-rs` — LOTUS Knowledge Explorer.
 //!

@@ -8,9 +8,11 @@
 //! These cluster around entry construction: `CompoundInterners::build_entry`
 //! normalizes/dedupes field values while assembling a `CompoundEntry`.
 //!
-//! These are internal to the lotus crate (used by `parsing` module) but marked
-//! `pub` for access from sibling modules within the crate, despite being
-//! unreachable from external crates (`#[allow(unreachable_pub)]`).
+//! These are crate-internal used by the `parsing` module and tested via
+//! `sparql::tests`. Visibility is `pub(crate)` to allow test module access
+//! while preventing external crate usage.
+
+#![allow(clippy::redundant_pub_crate)] // Required: private module needs pub(crate) for test access
 
 use crate::models::CompoundEntry;
 use crate::transport::{extract_qid, parse_year};
@@ -20,27 +22,26 @@ use std::sync::Arc;
 
 const WIKIDATA_STATEMENT_PREFIX: &str = "http://www.wikidata.org/entity/statement/";
 
-#[allow(unreachable_pub)]
-pub struct CompoundColumns {
-    pub compound: Option<usize>,
-    pub label: Option<usize>,
-    pub inchikey: Option<usize>,
-    pub smiles_iso: Option<usize>,
-    pub smiles_con: Option<usize>,
-    pub mass: Option<usize>,
-    pub formula: Option<usize>,
-    pub taxon: Option<usize>,
-    pub taxon_name: Option<usize>,
-    pub ref_qid: Option<usize>,
-    pub ref_title: Option<usize>,
-    pub ref_doi: Option<usize>,
-    pub ref_date: Option<usize>,
-    pub statement: Option<usize>,
+/// Column indices for CSV parsing.
+pub(crate) struct CompoundColumns {
+    pub(crate) compound: Option<usize>,
+    pub(crate) label: Option<usize>,
+    pub(crate) inchikey: Option<usize>,
+    pub(crate) smiles_iso: Option<usize>,
+    pub(crate) smiles_con: Option<usize>,
+    pub(crate) mass: Option<usize>,
+    pub(crate) formula: Option<usize>,
+    pub(crate) taxon: Option<usize>,
+    pub(crate) taxon_name: Option<usize>,
+    pub(crate) ref_qid: Option<usize>,
+    pub(crate) ref_title: Option<usize>,
+    pub(crate) ref_doi: Option<usize>,
+    pub(crate) ref_date: Option<usize>,
+    pub(crate) statement: Option<usize>,
 }
 
 impl CompoundColumns {
-    #[allow(unreachable_pub)]
-    pub fn detect(headers: &csv::ByteRecord) -> Self {
+    pub(crate) fn detect(headers: &csv::ByteRecord) -> Self {
         let find =
             |name: &str| -> Option<usize> { headers.iter().position(|h| h == name.as_bytes()) };
         Self {
@@ -68,8 +69,7 @@ impl CompoundColumns {
 /// (e.g. the same taxon name appearing in many rows).  Each field has its
 /// own interner to maximize hit rates — taxon names are far less unique than
 /// compound QIDs, so they get a smaller initial capacity.
-#[allow(unreachable_pub)]
-pub struct CompoundInterners {
+pub(crate) struct CompoundInterners {
     qid: StrInterner,
     label: StrInterner,
     taxon_name: StrInterner,
@@ -82,8 +82,7 @@ pub struct CompoundInterners {
 }
 
 impl CompoundInterners {
-    #[allow(unreachable_pub)]
-    pub fn new(cap: usize) -> Self {
+    pub(crate) fn new(cap: usize) -> Self {
         Self {
             qid: StrInterner::with_capacity(cap),
             label: StrInterner::with_capacity(cap),
@@ -97,8 +96,7 @@ impl CompoundInterners {
         }
     }
 
-    #[allow(unreachable_pub)]
-    pub fn build_entry(
+    pub(crate) fn build_entry(
         &mut self,
         cols: &CompoundColumns,
         rec: &csv::ByteRecord,
@@ -143,22 +141,19 @@ impl CompoundInterners {
 
 /// A simple FNV-1a string interner — maps `&str` → `Arc<str>`, reusing the
 /// same allocation for identical values.
-#[allow(unreachable_pub)]
 #[derive(Default)]
-pub struct StrInterner {
+pub(crate) struct StrInterner {
     map: HashMap<Box<str>, Arc<str>>,
 }
 
 impl StrInterner {
-    #[allow(unreachable_pub)]
-    pub fn with_capacity(capacity: usize) -> Self {
+    pub(crate) fn with_capacity(capacity: usize) -> Self {
         Self {
             map: HashMap::with_capacity(capacity),
         }
     }
 
-    #[allow(unreachable_pub)]
-    pub fn intern_or_empty(&mut self, value: &str) -> Arc<str> {
+    pub(crate) fn intern_or_empty(&mut self, value: &str) -> Arc<str> {
         let v = value.trim();
         if v.is_empty() {
             return Arc::<str>::from("");
@@ -171,8 +166,7 @@ impl StrInterner {
         arc
     }
 
-    #[allow(unreachable_pub)]
-    pub fn intern_optional(&mut self, value: &str) -> Option<Arc<str>> {
+    pub(crate) fn intern_optional(&mut self, value: &str) -> Option<Arc<str>> {
         let v = value.trim();
         if v.is_empty() {
             None
@@ -193,9 +187,7 @@ fn fnv1a_extend(mut h: Wrapping<u64>, bytes: &[u8]) -> Wrapping<u64> {
     h
 }
 
-#[allow(unreachable_pub)]
-#[inline]
-pub fn fnv1a_one(bytes: &[u8]) -> u64 {
+pub(crate) fn fnv1a_one(bytes: &[u8]) -> u64 {
     fnv1a_extend(Wrapping(14_695_981_039_346_656_037_u64), bytes).0
 }
 
@@ -203,8 +195,11 @@ pub fn fnv1a_one(bytes: &[u8]) -> u64 {
 ///
 /// Used as a deduplication key in [`parse_compounds_csv_display_bytes`] and
 /// [`parse_compounds_csv_capped_reader`].
-#[allow(unreachable_pub)]
-pub fn entry_key_fingerprint(compound_qid: &[u8], taxon_qid: &[u8], reference_qid: &[u8]) -> u64 {
+pub(crate) fn entry_key_fingerprint(
+    compound_qid: &[u8],
+    taxon_qid: &[u8],
+    reference_qid: &[u8],
+) -> u64 {
     let mut h = Wrapping(14_695_981_039_346_656_037_u64);
     h = fnv1a_extend(h, compound_qid);
     h = fnv1a_extend(h, &[0x1f]);
@@ -222,8 +217,7 @@ pub fn entry_key_fingerprint(compound_qid: &[u8], taxon_qid: &[u8], reference_qi
 /// 3. Bare numeric: `456` → `Q456`
 ///
 /// Returns an empty string for non-QID values (e.g. `P123` properties).
-#[allow(unreachable_pub)]
-pub fn parse_entity_id(value: &str) -> String {
+pub(crate) fn parse_entity_id(value: &str) -> String {
     let qid = extract_qid(value);
     if !qid.is_empty() {
         return qid;
@@ -259,9 +253,8 @@ pub fn parse_entity_id(value: &str) -> String {
 ///
 /// Returns `None` for empty/whitespace input, otherwise the value with
 /// `http://www.wikidata.org/entity/statement/` stripped if present.
-#[allow(unreachable_pub)]
 #[inline]
-pub fn normalize_statement_value(value: &str) -> Option<&str> {
+pub(crate) fn normalize_statement_value(value: &str) -> Option<&str> {
     let trimmed = value.trim();
     if trimmed.is_empty() {
         return None;
@@ -278,9 +271,8 @@ pub fn normalize_statement_value(value: &str) -> Option<&str> {
 /// Returns `None` for empty/whitespace input.  This is the borrowed-string
 /// equivalent of [`crate::transport::clean_doi`], used internally by the
 /// interning layer to avoid allocation before calling [`StrInterner`].
-#[allow(unreachable_pub)]
 #[inline]
-pub fn normalize_doi_value(value: &str) -> Option<&str> {
+pub(crate) fn normalize_doi_value(value: &str) -> Option<&str> {
     let trimmed = value.trim();
     if trimmed.is_empty() {
         return None;
@@ -307,8 +299,7 @@ fn byte_field_str(rec: &csv::ByteRecord, idx: Option<usize>) -> &str {
 ///
 /// Clears nothing — callers are expected to clear `out` before calling.
 /// On invalid/empty input, `out` is left unchanged (not emptied).
-#[allow(unreachable_pub)]
-pub fn fill_qid(out: &mut String, bytes: &[u8]) {
+pub(crate) fn fill_qid(out: &mut String, bytes: &[u8]) {
     let s = match std::str::from_utf8(bytes) {
         Ok(s) => s.trim(),
         Err(_) => return,
