@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-
+// The futures built here are intentionally `!Send`: the pipeline drives Dioxus
+// signals and `LotusRepository` futures (reqwest's WASM client), which are `!Send`
+// by design (see `repositories` doc comment). Dioxus's single-threaded executor
+// does not require `Send`, so no boxing would be gained.
 #![allow(clippy::future_not_send)]
-#![allow(clippy::unnecessary_operation)]
 
 //! Taxon resolution service — maps a free-text name to a Wikidata QID.
 //!
@@ -33,6 +35,9 @@ pub struct TaxonResolution {
 }
 
 #[must_use]
+// Bounds are established two lines below: every index reads `bytes[0]` and
+// `bytes[1]` only after the `bytes.len() > 1` guard, and reading the first
+// byte of a non-empty slice can never panic.
 #[allow(clippy::indexing_slicing)]
 pub fn requires_remote_lookup(taxon: &str) -> bool {
     if taxon.is_empty() || taxon == "*" {

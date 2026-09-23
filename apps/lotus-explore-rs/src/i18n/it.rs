@@ -5,6 +5,8 @@
 
 use crate::i18n::TextKey;
 
+// One flat match arm per `TextKey` variant; splitting the table into helper
+// fns would hurt readability more than the line count helps it.
 #[allow(clippy::too_many_lines)]
 pub const fn it_t(key: TextKey) -> &'static str {
     match key {

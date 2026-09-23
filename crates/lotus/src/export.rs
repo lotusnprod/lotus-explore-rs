@@ -9,6 +9,8 @@
 //! "`qlever_json_export`", "`turtle_export`").  Apps import `ExportFormat`
 //! and call `qlever_export_url` instead of re-implementing the mapping.
 
+// `qlever_export_url`/`api_export_file_url` intentionally echo the module
+// name: they are stable library-facing names for the export URLs apps call.
 #![allow(clippy::module_name_repetitions)]
 
 /// The three archive formats supported by the LOTUS/QLever export pipeline.

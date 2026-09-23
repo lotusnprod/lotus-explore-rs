@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::too_many_lines)]
-
 //! German translation table.
 
 use crate::i18n::TextKey;
 
+// One flat match arm per `TextKey` variant; splitting the table into helper
+// fns would hurt readability more than the line count helps it.
+#[allow(clippy::too_many_lines)]
 pub const fn de_t(key: TextKey) -> &'static str {
     match key {
         TextKey::Share => "Teilen",

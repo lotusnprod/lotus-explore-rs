@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::derive_partial_eq_without_eq)]
-
 use crate::download::DownloadFormat;
 use crate::features::explore::search_state::ExploreState;
 #[cfg(target_arch = "wasm32")]
@@ -10,6 +8,10 @@ use crate::models::SearchCriteria;
 use std::sync::Arc;
 
 /// Narrow view of download readiness state to avoid repeating complex queries.
+// Cannot derive `Eq`: on WASM the `Ready` variant holds `Arc<SearchCriteria>`,
+// which contains `f64` bounds and is therefore not `Eq`. The native-only lint
+// sees only the cfg-stripped shape and would otherwise demand it.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, Debug, PartialEq)]
 pub enum DispatchPhase {
     /// No download pending — nothing to do.

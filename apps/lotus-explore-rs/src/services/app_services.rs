@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::large_types_passed_by_value)]
-#![allow(clippy::no_effect_underscore_binding)]
-
 //! Application-level services and dependency container.
 //!
 //! This module defines a single, unified dependency container that holds all
@@ -53,6 +50,10 @@ impl Default for AppServices {
 
 #[cfg(test)]
 mod tests {
+    // The double-bind is the point: it is a compile-time assertion that
+    // `AppServices` is Copy (the second bind would fail to compile otherwise).
+    #![allow(clippy::no_effect_underscore_binding)]
+
     use super::*;
 
     #[test]

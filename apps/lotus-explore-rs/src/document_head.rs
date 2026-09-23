@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::volatile_composites)]
-
 //! Programmatic document `<head>` management for lotus-explore-rs.
+
+// Dioxus's `asset!` macro resolves to `&[u8]`, which clippy's
+// `volatile_composites` flags in every `asset!` call site; the value type is
+// fixed by the framework and cannot be made volatile-compatible at the call
+// site. The lint is suppressed for the whole module because every flagged
+// expression is an `asset!` invocation of exactly this shape.
+#![allow(clippy::volatile_composites)]
 
 use crate::ui::document::DocumentHead;
 use dioxus::prelude::*;

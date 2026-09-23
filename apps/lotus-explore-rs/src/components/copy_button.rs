@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::unused_async)]
-
 //! Reusable "copy to clipboard" button.
 
 use crate::components::ui::Button;
@@ -53,6 +51,10 @@ pub fn CopyButton(
     }
 }
 
+// `async` is required for signature parity at the call site: the WASM branch
+// `.await`s a `JsFuture`, while the native branch sleeps synchronously. Clippy
+// sees only the current target, so on native this "looks" like an unused async.
+#[allow(clippy::unused_async)]
 async fn gloo_timer_sleep_ms(ms: u32) {
     #[cfg(target_arch = "wasm32")]
     {

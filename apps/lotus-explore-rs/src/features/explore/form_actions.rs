@@ -3,8 +3,6 @@
 
 //! Form action dispatch for `SearchCriteria` mutations.
 
-#![allow(clippy::float_cmp)]
-
 use crate::models::{ElementState, SearchCriteria, SmilesSearchType};
 
 /// Unified action type for all form field updates.
@@ -121,6 +119,10 @@ mod tests {
     }
 
     #[test]
+    // The action writes the exact literal `100.5` through; equality must hold
+    // bit-for-bit to prove the write-through, so exact float comparison is the
+    // meaningful assertion here.
+    #[allow(clippy::float_cmp)]
     fn form_action_mutates_mass_range() {
         let crit = SearchCriteria::default();
         let result = apply_form_action(crit, FormAction::MassMin(100.5));

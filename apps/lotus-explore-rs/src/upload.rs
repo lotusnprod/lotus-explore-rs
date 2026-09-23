@@ -1,16 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+//! Inlined upload helpers for lotus-explore-rs.
+//!
+//! Provides WASM-only file blob extraction and streaming read utilities.
+//! Copied from the shared `upload` crate to make lotus-explore-rs standalone.
+//!
+//! The native half of this module (`cfg(not(target_arch = "wasm32"))`) exists
+//! only to preserve WASM/native signature parity: `UploadBlob = ()` and each
+//! stub returns `Err(BrowserOnly)`. Clippy's `unused_async`/`unused_self`/
+//! `trivially_copy_pass_by_ref`/`needless_pass_by_ref_mut` fire on those stubs
+//! because they are deliberately inert on native; `doc_markdown` fires on
+//! backticked identifiers in this file's doc comments.
 #![allow(clippy::unused_async)]
 #![allow(clippy::unused_self)]
 #![allow(clippy::trivially_copy_pass_by_ref)]
 #![allow(clippy::needless_pass_by_ref_mut)]
 #![allow(clippy::doc_markdown)]
-
-//! Inlined upload helpers for lotus-explore-rs.
-//!
-//! Provides WASM-only file blob extraction and streaming read utilities.
-//! Copied from the shared `upload` crate to make lotus-explore-rs standalone.
 
 #[cfg(target_arch = "wasm32")]
 use gloo_timers::future::TimeoutFuture;

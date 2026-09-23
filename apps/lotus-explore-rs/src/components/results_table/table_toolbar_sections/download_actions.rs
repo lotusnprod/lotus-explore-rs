@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::redundant_clone)]
-
 //! Download actions toolbar group — buttons to trigger query/metadata downloads
 //! and links to open the query in the `QLever` UI.
 

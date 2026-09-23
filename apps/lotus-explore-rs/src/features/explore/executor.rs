@@ -1,12 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::future_not_send)]
-
 //! Search execution pipeline for the Explore feature.
 //!
 //! This module runs the API/SPARQL workflow and emits phase callbacks, but does
 //! not mutate Dioxus state directly.
+//!
+//! The futures returned here are intentionally `!Send`: the search pipeline
+//! drives Dioxus signals/`Signal` state and `LotusRepository` futures (reqwest's
+//! WASM client), all of which are `!Send` by design (see `repositories` doc
+//! comment). `spawn` sites use Dioxus's single-threaded executor, which does
+//! not require `Send`; marking these `Send` would need boxing around
+//! `!Send` state with zero benefit.
+#![allow(clippy::future_not_send)]
 
 use crate::features::explore::outcome::SearchOutcome;
 use crate::features::explore::request::SearchRequest;

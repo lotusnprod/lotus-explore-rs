@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::struct_excessive_bools)]
-#![allow(clippy::large_types_passed_by_value)]
-
 use crate::curation::{CurationInputRow, CurationResultRow, QuickStatementsBundle, parse_tsv_rows};
 use crate::features::curation::queue::append_unique_rows;
 use crate::features::curation::workflow;
@@ -167,6 +164,9 @@ pub const fn should_autorun(
 
 /// Snapshot of commonly-queried UI state flags.
 /// Used to reduce signal reads and prevent unnecessary component re-renders.
+/// The booleans are independent flags read by separate components; packing
+/// them into a state-machine enum would couple unrelated rendering concerns.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct CurationUiState {
     pub processing: bool,
@@ -177,6 +177,10 @@ pub struct CurationUiState {
 }
 
 impl CurationUiState {
+    // `CurationPageController` is a bundle of Dioxus `Signal`s (Copy handles);
+    // passing it by value is the framework idiomatic style and avoids a borrow
+    // of a signal `Readable` guard.
+    #[allow(clippy::large_types_passed_by_value)]
     pub fn from_controller(controller: CurationPageController) -> Self {
         Self {
             processing: *controller.processing.read(),

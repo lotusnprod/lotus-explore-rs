@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-
+// The futures built here are intentionally `!Send`: the pipeline drives Dioxus
+// signals and `LotusRepository` futures (reqwest's WASM client), which are `!Send`
+// by design (see `repositories` doc comment). Dioxus's single-threaded executor
+// does not require `Send`, so no boxing would be gained.
 #![allow(clippy::future_not_send)]
 
 //! REST API fast-path execution for Explore searches.

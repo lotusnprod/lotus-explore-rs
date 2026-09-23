@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-
-#![allow(clippy::unused_async)]
-#![allow(clippy::unused_self)]
-#![allow(clippy::needless_pass_by_value)]
+// The futures built here are intentionally `!Send`: the pipeline drives Dioxus
+// signals and `LotusRepository` futures (reqwest's WASM client), which are `!Send`
+// by design (see `repositories` doc comment). Dioxus's single-threaded executor
+// does not require `Send`, so no boxing would be gained.
 #![allow(clippy::future_not_send)]
 
 use super::controller::SearchTaskController;
@@ -25,6 +25,11 @@ use std::time::Duration;
 const MAX_RETRIES: u32 = 3;
 
 /// Validate input, dispatch `SearchRequested`, then spawn `do_search`.
+// `task_controller` is a cheap `Rc<RefCell<…>>` handle consumed as part of
+// the argument bundle (callers hold it by `Clone` and pass it down, matching
+// the responder-store style); `replace_in_flight` needs only `&self` but the
+// callee does not outlive the caller's borrow, so by-value is the fit here.
+#[allow(clippy::needless_pass_by_value)]
 pub fn start_search<R: LotusRepository>(
     criteria: Signal<SearchCriteria>,
     command: SearchCommand,
@@ -156,6 +161,10 @@ fn build_search_succeeded_action(request: &SearchRequest, outcome: SearchOutcome
     }
 }
 
+// Async on both targets for signature parity: WASM awaits a JS timer while
+// the native branch only discards `backoff` (native sleeps happen upstream,
+// in `execute_search_with_retries`).
+#[allow(clippy::unused_async)]
 async fn delay_for(backoff: Duration) {
     if backoff.is_zero() {
         return;

@@ -152,7 +152,12 @@ pub struct MetadataInputs<'a> {
     pub endpoint: SparqlEndpoint,
 }
 
+// The JSON body is assembled from many small, individually-necessary
+// write! calls; splitting it across helpers would fracture one cohesive
+// serialization unit more than the line count helps it.
 #[allow(clippy::too_many_lines)]
+// Called with an inline-constructed `MetadataInputs` at both call sites;
+// taking it by reference would add a strict lifetime without benefit.
 #[allow(clippy::needless_pass_by_value)]
 pub fn build_metadata_json(inp: MetadataInputs<'_>) -> String {
     let filters = criteria_to_filters_value(inp.criteria);

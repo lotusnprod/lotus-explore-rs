@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-#![allow(clippy::unused_async)]
 
 #[cfg(target_arch = "wasm32")]
 use super::http_client::{js_value_to_json, rdkit_bridge_call};
@@ -138,6 +137,8 @@ pub fn extract_exact_mass_from_json(value: &Value) -> Option<f64> {
     None
 }
 
+// Exact masses are far below 2^53, so the i64→f64 conversion is exact for
+// every chemically-plausible value.
 #[allow(clippy::cast_precision_loss)]
 fn parse_exact_mass_scalar(value: &Value) -> Option<f64> {
     if let Some(v) = value.as_f64() {
@@ -169,6 +170,10 @@ async fn descriptor_mass_via_rdkit(smiles: &str) -> Result<f64, CurationError> {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
+// Native mirror of the WASM `descriptor_mass_via_rdkit` above: same async
+// signature, returning `Err` because RDKit JS is browser-only. Documented in
+// the module doc for `descriptor_mass`.
+#[allow(clippy::unused_async)]
 async fn descriptor_mass_via_rdkit(_smiles: &str) -> Result<f64, CurationError> {
     // For non-WASM environments (e.g., server-side), use a reasonable default or error
     // Since the app is browser-based, this shouldn't be called in production

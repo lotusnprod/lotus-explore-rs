@@ -42,6 +42,8 @@ pub fn parse_tsv_rows(tsv: &str) -> Result<Vec<CurationInputRow>, CurationError>
     inputs::parse_tsv_rows(tsv)
 }
 
+// The curation pipeline drives Dioxus signals and reqwest (WASM) futures,
+// which are `!Send`; see the `repositories` design note.
 #[allow(clippy::future_not_send)]
 pub async fn curate_rows(
     locale: Locale,

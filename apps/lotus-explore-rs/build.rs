@@ -6,6 +6,9 @@
 //! Generates site metadata files (llms.txt, robots.txt, sitemap.xml, etc.)
 //! from the site-metadata.json configuration and copies public assets.
 
+// Build script only: private `fn main` + toolchain-internal structs whose
+// fields exist purely to mirror site-metadata.json; cargo does not surface
+// doc warnings here, and there is no consuming API to document.
 #![allow(missing_docs)]
 
 use serde::{Deserialize, Serialize};

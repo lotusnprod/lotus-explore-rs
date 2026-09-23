@@ -17,6 +17,9 @@ use super::row_text::RowText;
 pub(in crate::components::results_table) use super::row_text::row_text;
 
 #[component]
+// `end` is clamped to `order.len()`, and `i` is drawn from `order`, whose
+// entries are row offsets into the same `rows`/`prepared_rows` arrays, so
+// every index here stays in bounds.
 #[allow(clippy::indexing_slicing)]
 pub(in crate::components::results_table) fn ResultsRowsWindow(
     locale: Locale,
