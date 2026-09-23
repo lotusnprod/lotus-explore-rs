@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::derive_partial_eq_without_eq)]
-
 //! Programmatic document head management — replaces static `index.html` files.
 //!
 //! Uses [`dioxus::document`] to set `<head>` content from Rust code.
@@ -222,7 +220,7 @@ pub fn DocumentHead(props: DocumentHeadProps) -> Element {
 }
 
 /// Properties for [`DocumentScripts`].
-#[derive(Clone, Props, PartialEq)]
+#[derive(Clone, Props, PartialEq, Eq)]
 pub struct DocumentScriptsProps {
     /// External JS URLs loaded via `<script async src="..." crossorigin>`.
     #[props(default)]

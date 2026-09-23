@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-#![allow(clippy::manual_let_else)]
-#![allow(clippy::redundant_closure_for_method_calls)]
 
 use super::helpers::find_ascii_ci;
 use crate::features::curation::domain::{CurationError, CurationInputRow};
@@ -32,9 +30,8 @@ pub fn example_rows() -> Vec<CurationInputRow> {
 pub fn parse_tsv_rows(tsv: &str) -> Result<Vec<CurationInputRow>, CurationError> {
     let mut lines = tsv.lines().map(str::trim).filter(|line| !line.is_empty());
 
-    let header = match lines.next() {
-        Some(h) => h,
-        None => return Ok(Vec::new()),
+    let Some(header) = lines.next() else {
+        return Ok(Vec::new());
     };
 
     let columns = header.split('\t').map(normalize_header).collect::<Vec<_>>();
@@ -110,7 +107,7 @@ pub fn row_uniqueness_key(row: &CurationInputRow) -> String {
         .as_deref()
         .map(str::trim)
         .filter(|v| !v.is_empty())
-        .map(|v| v.to_ascii_lowercase())
+        .map(str::to_ascii_lowercase)
         .unwrap_or_default();
     let doi = row
         .doi
@@ -180,6 +177,7 @@ mod tests {
 }
 
 #[test]
+// Test-only: fixed literal input, index assertions target known positions.
 #[allow(clippy::expect_used)]
 #[allow(clippy::indexing_slicing)]
 fn test_user_example_multiline() {

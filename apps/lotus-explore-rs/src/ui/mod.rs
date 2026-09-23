@@ -10,7 +10,7 @@ pub mod document;
 pub mod notice;
 pub mod segmented_control;
 
-pub use common::ContentPhase;
+pub use common::{ContentPhase, LifecycleBooleans};
 
 pub mod prelude {
     pub use super::notice::*;

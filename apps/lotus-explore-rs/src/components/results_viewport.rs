@@ -6,7 +6,7 @@
 use crate::components::loading::{DownloadDispatchState, DownloadOnlyState, LoadingState};
 use crate::components::results_table::ResultsTable;
 use crate::state::use_results_context;
-use crate::ui::ContentPhase;
+use crate::ui::{ContentPhase, LifecycleBooleans};
 use dioxus::prelude::*;
 
 #[component]
@@ -23,13 +23,13 @@ pub fn ResultsViewport() -> Element {
 
     let phase = use_memo(move || {
         let s = *ui_state.read();
-        ContentPhase::from_lifecycle(
-            s.loading,
-            s.has_error,
-            s.searched_once,
-            s.download_only_mode,
-            s.has_entries,
-        )
+        ContentPhase::from_lifecycle(LifecycleBooleans {
+            loading: s.loading,
+            has_error: s.has_error,
+            searched_once: s.searched_once,
+            download_only_mode: s.download_only_mode,
+            has_entries: s.has_entries,
+        })
     });
 
     // Get the SPARQL query to show even on error

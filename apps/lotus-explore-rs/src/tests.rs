@@ -8,7 +8,7 @@ use crate::download::DownloadFormat;
 use crate::features::curation::state::page_controller::rows_to_tsv;
 use crate::features::explore::search_state::ExploreState;
 use crate::features::explore::selectors::toolbar_snapshot_from_result;
-use crate::ui::ContentPhase;
+use crate::ui::{ContentPhase, LifecycleBooleans};
 
 fn is_supported_download_format(fmt: &str) -> bool {
     DownloadFormat::parse(fmt).is_some()
@@ -38,13 +38,13 @@ fn integration_explore_snapshot_drives_loaded_phase_and_toolbar_data() {
     explore.result.total_matches = Some(3);
 
     let snapshot = toolbar_snapshot_from_result(&explore.result);
-    let phase = ContentPhase::from_lifecycle(
-        explore.lifecycle.loading,
-        explore.lifecycle.error.is_some(),
-        explore.lifecycle.searched_once,
-        explore.lifecycle.download_only_mode,
-        true,
-    );
+    let phase = ContentPhase::from_lifecycle(LifecycleBooleans {
+        loading: explore.lifecycle.loading,
+        has_error: explore.lifecycle.error.is_some(),
+        searched_once: explore.lifecycle.searched_once,
+        download_only_mode: explore.lifecycle.download_only_mode,
+        has_entries: true,
+    });
 
     assert_eq!(snapshot.total_matches, Some(3));
     assert!(snapshot.sparql_query.is_some());

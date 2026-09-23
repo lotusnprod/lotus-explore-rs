@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::uninlined_format_args)]
-
 use crate::models::{CompoundEntry, SearchCriteria};
 use sha2::{Digest, Sha256};
 use std::borrow::Cow;
@@ -47,7 +45,7 @@ pub fn compute_hashes(
     let normalized_taxon = criteria.taxon.trim();
     let mut query_source =
         String::with_capacity(normalized_qid.len() + normalized_taxon.len() + 64);
-    let _ = write!(query_source, "{}|{}", normalized_qid, normalized_taxon);
+    let _ = write!(query_source, "{normalized_qid}|{normalized_taxon}");
 
     // Build `|key=value&key=value&…` suffix without an intermediate Vec<String>.
     for (i, (k, v)) in criteria.shareable_query_params().into_iter().enumerate() {
@@ -80,6 +78,8 @@ pub fn compute_hashes(
     (query_hash, result_hash)
 }
 
+// `HEX` has 16 entries and both nibble extracts (`b >> 4`, `b & 0x0f`)
+// are always in `0..=15`, so the indexes are provably in bounds.
 #[allow(clippy::indexing_slicing)]
 pub fn to_hex_lower(bytes: &[u8]) -> String {
     const HEX: &[u8; 16] = b"0123456789abcdef";

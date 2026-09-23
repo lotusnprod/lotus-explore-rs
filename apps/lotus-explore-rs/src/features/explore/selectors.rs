@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::struct_excessive_bools)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-
 //! `use_memo`-based derived selectors for [`ExploreState`].
 //!
 //! Components that only care about a sub-set of state can subscribe via one
@@ -102,6 +99,9 @@ pub fn use_criteria_selector<T: PartialEq + Clone + 'static>(
 /// Snapshot of commonly-queried explore UI state flags.
 /// Used to reduce signal reads and prevent unnecessary component re-renders
 /// across results viewport, table, and toolbar sections.
+// Each bool is an independent UI flag read by separate components; collapsing
+// them into a state machine would couple unrelated rendering concerns.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct ExploreUiState {
     pub loading: bool,
@@ -130,7 +130,7 @@ impl ExploreUiState {
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct ToolbarResultSnapshot {
     pub sparql_query: Option<Arc<str>>,
     pub metadata_json: Option<Arc<str>>,

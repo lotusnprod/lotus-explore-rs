@@ -1,20 +1,30 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-
+// The futures built here are intentionally `!Send`: the pipeline drives Dioxus
+// signals and `LotusRepository` futures (reqwest's WASM client), which are `!Send`
+// by design (see `repositories` doc comment). Dioxus's single-threaded executor
+// does not require `Send`, so no boxing would be gained.
 #![allow(clippy::future_not_send)]
-#![allow(clippy::wildcard_imports)]
-#![allow(clippy::too_many_lines)]
-#![allow(clippy::single_match_else)]
-#![allow(clippy::match_same_arms)]
 
 use super::occurrence_cache::{
     OccurrenceAskCache, compound_has_taxon_cached, compound_has_taxon_with_ref_cached,
 };
-use super::*;
+use super::{
+    CurationError, CurationInputRow, CurationResultRow, CurationStatus, DependencyResolution,
+    MassResolution, QS_REF_INFERRED_FROM_SMILES, WD_CHEMICAL_COMPOUND_QID, WD_OCCURS_IN_TAXON_PROP,
+    WD_STEREOISOMER_GROUP_QID, WD_TYPE_CHEMICAL_ENTITY_QID, convert_smiles,
+    curation_note_dependencies_pending, curation_note_existing_complete,
+    curation_note_existing_updates, curation_note_new_compound, curation_pending_reference,
+    curation_pending_taxon, escape_qs_string, fetch_reference_quickstatements, has_isomeric_smiles,
+    has_undefined_stereo, normalize_doi, normalize_taxon_lookup, qs_canonical_smiles_statement,
+    qs_inchi_statement, qs_inchikey_statement, qs_isomeric_smiles_statement,
+    qs_statement_with_refs, resolve_exact_mass,
+};
 use crate::features::curation::repositories::CurationKnowledgeRepository;
 use crate::features::curation::services::helpers::{
     extract_formula_from_inchi, normalize_formula_for_wikidata, qs_mass_statement,
 };
+use crate::i18n::Locale;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
@@ -51,6 +61,14 @@ pub async fn curate_single_row(
     })
 }
 
+// One corpus row pipelines through many dependent resolution steps
+// (smiles convert, exact mass, taxon/reference lookups, quickstatements
+// assembly); splitting it would force threading a dozen intermediates
+// through private helpers, obscuring the ordering that matters.
+#[allow(clippy::too_many_lines)]
+// A large, genuinely two-armed `match` (`Some`/`None` differ in ~equal
+// mass); `if let ... else` would re-indent 270 lines without aiding clarity.
+#[allow(clippy::single_match_else)]
 async fn enrich_and_generate(
     locale: Locale,
     input: &CurationInputRow,

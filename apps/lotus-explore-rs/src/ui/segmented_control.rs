@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::derive_partial_eq_without_eq)]
-
 //! Shared segmented button group.
 
 use dioxus::prelude::*;
 
 /// Item rendered inside a segmented control.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SegmentedControlItem {
     pub label: String,
     pub value: String,

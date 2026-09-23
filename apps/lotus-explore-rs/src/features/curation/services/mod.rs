@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+// Doc comments mix backticked SPARQL terms, Wikidata QIDs/P-IDs, and
+// acronyms (QLever, WDQS) that are accurate as-is and read better without
+// backticks or re-wording.
 #![allow(clippy::doc_markdown)]
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -11,19 +14,12 @@ pub(super) use crate::features::curation::domain::{
     WD_STEREOISOMER_GROUP_QID, WD_TAXON_QID, WD_TYPE_CHEMICAL_ENTITY_QID, WikidataCompound,
 };
 use crate::i18n::{
-    Locale, curation_note_dependencies_pending, curation_note_existing_complete,
+    curation_note_dependencies_pending, curation_note_existing_complete,
     curation_note_existing_updates, curation_note_new_compound, curation_pending_reference,
     curation_pending_taxon,
 };
 use lotus::queries::{is_scholarly_reference_query, transform_query_for_wdqs};
 use lotus::transport::{QLEVER_WIKIDATA, ResponseFormat, WDQS_SCHOLARLY, WDQS_WIKIDATA};
-// Shared import hub: children (`http_client`, `chemical`) pull these in via
-// `use super::*`. Each is referenced on only one target, so the allow is
-// scoped to the target where it would otherwise be unused.
-#[cfg_attr(target_arch = "wasm32", allow(unused_imports))]
-use serde::Deserialize;
-#[cfg_attr(not(target_arch = "wasm32"), allow(unused_imports))]
-use serde_json::Value;
 
 mod chemical;
 mod enrichment;
@@ -39,9 +35,8 @@ pub mod wikidata;
 
 use chemical::{convert_smiles, has_undefined_stereo, resolve_exact_mass};
 use helpers::{
-    QS_REF_INFERRED_FROM_SMILES, binding_value, escape_qs_string, escape_sparql_string,
-    extract_qid_from_uri, has_isomeric_smiles, has_stereo_marks, normalize_doi,
-    qs_canonical_smiles_statement, qs_inchi_statement, qs_inchikey_statement,
+    QS_REF_INFERRED_FROM_SMILES, escape_qs_string, has_isomeric_smiles, has_stereo_marks,
+    normalize_doi, qs_canonical_smiles_statement, qs_inchi_statement, qs_inchikey_statement,
     qs_isomeric_smiles_statement, qs_statement_with_refs,
 };
 use reference_metadata::fetch_reference_quickstatements;

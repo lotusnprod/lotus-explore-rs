@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-#![allow(clippy::wildcard_imports)]
 
-use super::*;
+use super::CurationError;
+#[cfg(not(target_arch = "wasm32"))]
+use serde::Deserialize;
 #[cfg(not(target_arch = "wasm32"))]
 use std::sync::OnceLock;
 
 #[cfg(target_arch = "wasm32")]
 use js_sys::{Function, JSON, Promise, Reflect};
+#[cfg(target_arch = "wasm32")]
+use serde_json::Value;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::{JsCast, JsValue};
 #[cfg(target_arch = "wasm32")]

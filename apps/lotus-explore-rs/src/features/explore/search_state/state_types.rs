@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-#![allow(clippy::struct_excessive_bools)]
-#![allow(clippy::derive_partial_eq_without_eq)]
 use crate::features::explore::types::{DomainError, QueryPhase, TaxonWarning};
 use crate::models::{CompoundEntry, DatasetStats, Rows, SearchCriteria, SortState};
 use std::sync::Arc;
@@ -9,7 +7,11 @@ use std::sync::Arc;
 /// Lifecycle-related fields: loading flag, current error, phase indicator,
 /// and bookkeeping tokens. Changes here should re-render loading overlays
 /// and error notices.
-#[derive(Clone, PartialEq)]
+// The booleans are independent UI flags consumed by separate selectors/
+// components (loading overlay, download toolbar, error strip); packing them
+// into a state-machine enum would couple unrelated rendering concerns.
+#[allow(clippy::struct_excessive_bools)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct SearchLifecycleState {
     pub loading: bool,
     pub error: Option<DomainError>,

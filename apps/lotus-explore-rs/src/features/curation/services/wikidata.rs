@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-#![allow(clippy::wildcard_imports)]
-#![allow(clippy::uninlined_format_args)]
-use super::*;
+use super::helpers::{
+    binding_value, escape_qs_string, escape_sparql_string, extract_qid_from_uri, normalize_doi,
+};
+use super::{
+    CURATION_SPARQL_PREFIXES, CurationError, WD_OCCURS_IN_TAXON_PROP, WD_TAXON_QID,
+    WikidataCompound,
+};
 use lotus::transport::{FetchError, ResponseFormat};
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
@@ -175,11 +179,10 @@ fn build_single_taxon_lookup_query(name: &str) -> Option<String> {
     Some(format!(
         "{CURATION_SPARQL_PREFIXES}\n\
          SELECT ?taxon WHERE {{\n  \
-           VALUES ?taxonName {{ {} }}\n  \
+           VALUES ?taxonName {{ {values} }}\n  \
            ?taxon wdt:P225 ?taxonName ;\n        \
                   wdt:P31 wd:Q16521 .\n\
-         }} LIMIT 1",
-        values
+         }} LIMIT 1"
     ))
 }
 

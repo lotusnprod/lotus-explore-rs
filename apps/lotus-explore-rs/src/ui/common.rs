@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-#![allow(clippy::struct_excessive_bools)]
-#![allow(clippy::derive_partial_eq_without_eq)]
-#![allow(clippy::fn_params_excessive_bools)]
-
 //! Common UI utilities and phase models.
 
 use dioxus::prelude::*;
@@ -20,6 +16,9 @@ pub enum ContentPhase {
     Loaded,
 }
 
+// The booleans are independent UI flags read by separate components; packing
+// them into a state-machine enum would couple unrelated rendering concerns.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct LifecycleBooleans {
     pub loading: bool,
@@ -30,21 +29,8 @@ pub struct LifecycleBooleans {
 }
 
 impl ContentPhase {
-    #[allow(clippy::too_many_arguments)]
-    pub fn from_lifecycle(
-        loading: bool,
-        has_error: bool,
-        searched_once: bool,
-        download_only_mode: bool,
-        has_entries: bool,
-    ) -> Self {
-        Self::from(LifecycleBooleans {
-            loading,
-            has_error,
-            searched_once,
-            download_only_mode,
-            has_entries,
-        })
+    pub fn from_lifecycle(state: LifecycleBooleans) -> Self {
+        Self::from(state)
     }
 }
 
