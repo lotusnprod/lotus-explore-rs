@@ -4,7 +4,6 @@
 #![allow(clippy::struct_excessive_bools)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 #![allow(clippy::fn_params_excessive_bools)]
-#![allow(clippy::derivable_impls)]
 
 //! Common UI utilities and phase models.
 
@@ -21,25 +20,13 @@ pub enum ContentPhase {
     Loaded,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct LifecycleBooleans {
     pub loading: bool,
     pub has_error: bool,
     pub searched_once: bool,
     pub download_only_mode: bool,
     pub has_entries: bool,
-}
-
-impl Default for LifecycleBooleans {
-    fn default() -> Self {
-        Self {
-            loading: false,
-            has_error: false,
-            searched_once: false,
-            download_only_mode: false,
-            has_entries: false,
-        }
-    }
 }
 
 impl ContentPhase {
