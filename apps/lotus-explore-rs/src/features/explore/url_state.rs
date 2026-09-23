@@ -29,11 +29,8 @@ pub fn initial_url_state() -> InitialUrlState {
 pub fn absolute_share_url(share: &str) -> String {
     #[cfg(target_arch = "wasm32")]
     {
-        if let Some(win) = web_sys::window() {
-            let loc = win.location();
-            if let (Ok(origin), Ok(pathname)) = (loc.origin(), loc.pathname()) {
-                return format!("{origin}{pathname}{share}");
-            }
+        if let Some((origin, pathname)) = origin_and_pathname() {
+            return format!("{origin}{pathname}{share}");
         }
     }
     share.into()
@@ -42,20 +39,41 @@ pub fn absolute_share_url(share: &str) -> String {
 pub fn absolute_current_url_with_query(query: &str) -> String {
     #[cfg(target_arch = "wasm32")]
     {
-        if let Some(win) = web_sys::window() {
-            let loc = win.location();
-            if let (Ok(origin), Ok(pathname)) = (loc.origin(), loc.pathname()) {
-                if query.is_empty() {
-                    return format!("{origin}{pathname}");
-                }
-                return format!("{origin}{pathname}?{query}");
-            }
+        if let Some((origin, pathname)) = origin_and_pathname() {
+            return if query.is_empty() {
+                format!("{origin}{pathname}")
+            } else {
+                format!("{origin}{pathname}?{query}")
+            };
         }
     }
     if query.is_empty() {
         String::new()
     } else {
         format!("?{query}")
+    }
+}
+
+/// The browser's `location.origin` + `location.pathname` (no query), when
+/// available. Centralizes the `web_sys::window()` lookup shared by the
+/// `absolute_*` URL builders so they don't each re-open the window.
+#[cfg(target_arch = "wasm32")]
+fn origin_and_pathname() -> Option<(String, String)> {
+    let win = web_sys::window()?;
+    let loc = win.location();
+    Some((loc.origin().ok()?, loc.pathname().ok()?))
+}
+
+/// Replace the current history entry with `query` (the serialized query string)
+/// reflected in the address bar — shared by every `persist_*` caller so they
+/// don't each repeat the build→absolute-url→`replace_state` sequence.
+#[cfg(target_arch = "wasm32")]
+fn replace_history_state(query: &str) {
+    let url = absolute_current_url_with_query(query);
+    if let Some(win) = web_sys::window()
+        && let Ok(history) = win.history()
+    {
+        let _ = history.replace_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some(&url));
     }
 }
 
@@ -69,27 +87,12 @@ pub fn persist_locale_query_param(locale: Locale) {
     #[cfg(target_arch = "wasm32")]
     {
         let mut params = read_url_query_params();
-        match locale {
-            Locale::En => {
-                params.remove("lang");
-            }
-            Locale::Fr => {
-                params.insert("lang".into(), "fr".into());
-            }
-            Locale::De => {
-                params.insert("lang".into(), "de".into());
-            }
-            Locale::It => {
-                params.insert("lang".into(), "it".into());
-            }
+        if locale == Locale::En {
+            params.remove("lang");
+        } else {
+            params.insert("lang".into(), locale.lang_code().into());
         }
-        let query = build_query_string(&params);
-        let url = absolute_current_url_with_query(&query);
-        if let Some(win) = web_sys::window()
-            && let Ok(history) = win.history()
-        {
-            let _ = history.replace_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some(&url));
-        }
+        replace_history_state(&build_query_string(&params));
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
@@ -106,13 +109,7 @@ pub fn persist_view_query_param(view: AppView) {
         } else {
             params.remove("view");
         }
-        let query = build_query_string(&params);
-        let url = absolute_current_url_with_query(&query);
-        if let Some(win) = web_sys::window()
-            && let Ok(history) = win.history()
-        {
-            let _ = history.replace_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some(&url));
-        }
+        replace_history_state(&build_query_string(&params));
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
@@ -129,13 +126,7 @@ pub fn persist_dark_mode_query_param(dark_mode: bool) {
         } else {
             params.remove("dark_mode");
         }
-        let query = build_query_string(&params);
-        let url = absolute_current_url_with_query(&query);
-        if let Some(win) = web_sys::window()
-            && let Ok(history) = win.history()
-        {
-            let _ = history.replace_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some(&url));
-        }
+        replace_history_state(&build_query_string(&params));
     }
     #[cfg(not(target_arch = "wasm32"))]
     {
