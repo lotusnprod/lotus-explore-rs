@@ -29,6 +29,7 @@ ci:
 	just test
 	just doc
 	just wasm
+	just clippy-wasm
 	just machete
 	just audit
 	just deny
@@ -36,6 +37,13 @@ ci:
 # One `cargo check -p <app>` per app keeps the wasm build green.
 wasm:
 	cargo check -p lotus-explore-rs --target wasm32-unknown-unknown --locked
+
+# Per-package WASM clippy (NOT `--workspace --target wasm32`: `lotus-deploy`
+# is a host-only bin — `reqwest::blocking` cannot exist on wasm — so a
+# workspace-wide wasm lint can never pass; only wasm-relevant crates are
+# linted here). Mirrors the Clippy-WASM step in .github/workflows/ci.yml.
+clippy-wasm:
+	cargo clippy --target wasm32-unknown-unknown -p lotus -p lotus-explore-rs --locked -- -D warnings
 
 # ── Per-app dev servers / production builds ───────────────────────────────────
 # fetch-ketcher must run from the app crate dir so the relative

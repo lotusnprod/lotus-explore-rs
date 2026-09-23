@@ -34,6 +34,7 @@ hooks = [
   # Per-app WASM checks (NOT `--workspace --target wasm32`, which flags
   # wasm-incompatible code paths in non-WASM crates).
   { id = "cargo-check-wasm", name = "cargo-check-wasm", language = "system", entry = "just wasm", pass_filenames = false, always_run = true, stages = ["pre-push"] },
+  { id = "cargo-clippy-wasm", name = "cargo-clippy-wasm", language = "system", entry = "just clippy-wasm", pass_filenames = false, always_run = true, stages = ["pre-push"] },
   { id = "cargo-doc", name = "cargo-doc", language = "system", entry = "just doc", pass_filenames = false, always_run = true, stages = ["pre-push"] },
 
   # ── Supply chain (pre-push only) ───────────────────────────────────────────
