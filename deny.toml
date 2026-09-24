@@ -61,6 +61,7 @@ skip = [
   { name = "r-efi" },
   { name = "rustc-hash" },
   { name = "sha1" },
+  { name = "sha2", version = "0.10.9" },
   { name = "zip" },
   { name = "syn" },
   { name = "thiserror" },
