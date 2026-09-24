@@ -1,23 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-//! Consolidated app-level state — single source of truth for view routing,
-//! download orchestration, and render-telemetry.
-//!
-//! ## Why the previous `SearchState` / `UiState` were removed
-//!
-//! The earlier revision stored `criteria`, `explore`, `locale`, and
-//! stale mirror copies that were kept in sync via `use_effect` loops.  Those copies were:
-//!
-//! * **Never read** — every consumer read from the live signal instead.
-//! * **Write-only** — the sync effects wrote to them but nothing consumed them.
-//! * **Race-prone** — the effect runs one tick after the signal write, so there
-//!   was always a frame where the two were out of sync.
-//!
-//! The live signals (`criteria: Signal<SearchCriteria>`,
-//! `explore: Signal<ExploreState>`, `locale: Signal<Locale>`) are now the only
-//! canonical owners of that data.  `AppState` is trimmed to the three concerns
-//! that truly belong at the app root.
+//! Consolidated app-level state for view routing, download orchestration, and render telemetry.
 
 use crate::app::view::AppView;
 use crate::download::DownloadFormat;
@@ -49,7 +33,7 @@ pub struct AppState {
     /// One-shot logging guards used by the download-dispatch hook.
     pub metrics: MetricsState,
 
-    /// Dark mode enabled (undocumented debug flag).
+    /// Dark mode preference.
     pub dark_mode: bool,
 }
 
@@ -133,19 +117,6 @@ mod tests {
             direct_execute: false,
         };
         assert_ne!(s, DownloadState::default());
-    }
-
-    // Phase 2 Integration regression tests: verify that AppState no longer
-    // contains the removed SearchState / UiState mirror fields that caused the
-    // sync-effect antipattern.
-
-    #[test]
-    fn app_state_has_no_search_or_ui_mirror_fields() {
-        // Compile-time proof: if SearchState or UiState still existed and were
-        // embedded here we would get a type-check error trying to construct
-        // AppState without them.  This test just confirms Default works without
-        // any sync-effect scaffolding.
-        let _state = AppState::default();
     }
 
     #[test]

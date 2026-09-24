@@ -16,7 +16,7 @@
 
 use crate::models::CompoundEntry;
 use crate::transport::{extract_qid, parse_year};
-use std::collections::HashMap;
+use std::collections::HashSet;
 use std::num::Wrapping;
 use std::sync::Arc;
 
@@ -139,39 +139,38 @@ impl CompoundInterners {
     }
 }
 
-/// A simple FNV-1a string interner — maps `&str` → `Arc<str>`, reusing the
-/// same allocation for identical values.
+/// A simple string interner — maps `&str` to a shared `Arc<str>`.
 #[derive(Default)]
 pub(crate) struct StrInterner {
-    map: HashMap<Box<str>, Arc<str>>,
+    values: HashSet<Arc<str>>,
 }
 
 impl StrInterner {
     pub(crate) fn with_capacity(capacity: usize) -> Self {
         Self {
-            map: HashMap::with_capacity(capacity),
+            values: HashSet::with_capacity(capacity),
         }
     }
 
     pub(crate) fn intern_or_empty(&mut self, value: &str) -> Arc<str> {
-        let v = value.trim();
-        if v.is_empty() {
+        let value = value.trim();
+        if value.is_empty() {
             return Arc::<str>::from("");
         }
-        if let Some(existing) = self.map.get(v) {
+        if let Some(existing) = self.values.get(value) {
             return existing.clone();
         }
-        let arc = Arc::<str>::from(v);
-        self.map.insert(v.to_owned().into_boxed_str(), arc.clone());
-        arc
+        let value: Arc<str> = Arc::from(value);
+        self.values.insert(value.clone());
+        value
     }
 
     pub(crate) fn intern_optional(&mut self, value: &str) -> Option<Arc<str>> {
-        let v = value.trim();
-        if v.is_empty() {
+        let value = value.trim();
+        if value.is_empty() {
             None
         } else {
-            Some(self.intern_or_empty(v))
+            Some(self.intern_or_empty(value))
         }
     }
 }
@@ -268,9 +267,8 @@ pub(crate) fn normalize_statement_value(value: &str) -> Option<&str> {
 
 /// Normalise a DOI from a CSV cell: strip the `doi.org/` prefix if present.
 ///
-/// Returns `None` for empty/whitespace input.  This is the borrowed-string
-/// equivalent of `clean_doi`, used internally by the
-/// interning layer to avoid allocation before calling [`StrInterner`].
+/// Returns `None` for empty/whitespace input. The borrowed result avoids
+/// allocating before calling [`StrInterner`].
 #[inline]
 pub(crate) fn normalize_doi_value(value: &str) -> Option<&str> {
     let trimmed = value.trim();

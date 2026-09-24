@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-// The futures built here are intentionally `!Send`: the pipeline drives Dioxus
-// signals and `LotusRepository` futures (reqwest's WASM client), which are `!Send`
-// by design (see `repositories` doc comment). Dioxus's single-threaded executor
-// does not require `Send`, so no boxing would be gained.
 #![allow(clippy::future_not_send)]
 
 use crate::features::curation::domain::{
@@ -11,16 +7,10 @@ use crate::features::curation::domain::{
     build_quickstatements_bundle,
 };
 use crate::i18n::Locale;
-use futures::stream::{self, StreamExt};
 use std::future::Future;
 
 // Curation drives Qlever with several POSTs per row (compound fetch, ASK, ...).
-// QLever's *anonymous* quota rejects bursts (the 15:00 storm was 5 POSTs in
-// ~150ms → two 429s), so rows are curated strictly ONE AT A TIME: each row's
-// Qlever POSTs are serialized, which is the only way to stay under the quota
-// without an API key. Non-Qlever work per row (RDKit SMILES handling) still
-// pipelines naturally within the single in-flight row.
-const CURATION_CONCURRENCY: usize = 1;
+// QLever's anonymous quota rejects bursts, so rows are curated one at a time.
 
 pub async fn curate_rows<F, Fut>(
     locale: Locale,
@@ -29,7 +19,7 @@ pub async fn curate_rows<F, Fut>(
     row_uniqueness_key: fn(&CurationInputRow) -> String,
 ) -> Result<(Vec<CurationResultRow>, QuickStatementsBundle), CurationError>
 where
-    F: Fn(Locale, CurationInputRow) -> Fut + Clone,
+    F: Fn(Locale, CurationInputRow) -> Fut,
     Fut: Future<Output = CurationResultRow>,
 {
     let mut seen_keys = std::collections::HashSet::with_capacity(rows.len());
@@ -40,20 +30,10 @@ where
         }
     }
 
-    let mut indexed_results = stream::iter(unique_rows.into_iter().enumerate())
-        .map(|(idx, row)| {
-            let curate_single_row = curate_single_row.clone();
-            async move { (idx, curate_single_row(locale, row).await) }
-        })
-        .buffer_unordered(CURATION_CONCURRENCY)
-        .collect::<Vec<_>>()
-        .await;
-    indexed_results.sort_by_key(|(idx, _)| *idx);
-
-    let results = indexed_results
-        .into_iter()
-        .map(|(_, row)| row)
-        .collect::<Vec<_>>();
+    let mut results = Vec::with_capacity(unique_rows.len());
+    for row in unique_rows {
+        results.push(curate_single_row(locale, row).await);
+    }
     let bundle = build_quickstatements_bundle(&results);
     Ok((results, bundle))
 }

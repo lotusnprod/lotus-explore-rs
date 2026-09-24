@@ -108,7 +108,7 @@ pub(super) fn is_probable_memory_limit(err: &DomainError) -> bool {
         DomainError::Transport { source, .. } => match source {
             RepositoryError::NotConfigured => false,
             RepositoryError::Network(detail) | RepositoryError::Parse(detail) => {
-                has_memory_signature(detail.as_str())
+                has_memory_signature(detail.as_ref())
             }
             RepositoryError::Http { body, .. } => has_memory_signature(body),
         },

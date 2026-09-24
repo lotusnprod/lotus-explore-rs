@@ -4,7 +4,7 @@
 //! Build script for lotus-explore-rs.
 //!
 //! Generates site metadata files (llms.txt, robots.txt, sitemap.xml, etc.)
-//! from the site-metadata.json configuration and copies public assets.
+//! from the site-metadata.json configuration.
 
 // Build script only: private `fn main` + toolchain-internal structs whose
 // fields exist purely to mirror site-metadata.json; cargo does not surface
@@ -85,6 +85,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let metadata_path = manifest_dir.join("metadata/site-metadata.json");
 
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=public");
+    println!("cargo:rerun-if-changed=src");
+    println!("cargo:rerun-if-changed=../../crates/lotus/src");
     println!("cargo:rerun-if-changed={}", metadata_path.display());
 
     let raw = fs::read_to_string(&metadata_path)?;
@@ -112,27 +115,36 @@ fn main() -> Result<(), Box<dyn Error>> {
         format!("{}\n", serde_json::to_string_pretty(&metadata.manifest)?),
     )?;
 
-    // Copy public folder to output directory for static asset serving
-    // Walk up from OUT_DIR to find the workspace target/ directory.
-    let out_dir = std::env::var("OUT_DIR").ok().and_then(|out| {
-        let path = PathBuf::from(out);
-        path.ancestors()
-            .find(|p| p.file_name().is_some_and(|name| name == "target"))
-            .map(|p| {
-                p.join("dx")
-                    .join("lotus-explore-rs")
-                    .join("wasm32-unknown-unknown")
-                    .join("release")
-            })
-    });
-    if let Some(ref out_dir) = out_dir {
-        let out_public = out_dir.join("public");
-        if out_public.exists() {
-            fs::remove_dir_all(&out_public)?;
-        }
-        copy_dir_all(&public_dir, &out_public)?;
-    }
+    clean_dx_output()?;
 
+    Ok(())
+}
+
+fn clean_dx_output() -> Result<(), Box<dyn Error>> {
+    let Ok(target) = std::env::var("TARGET") else {
+        return Ok(());
+    };
+    if !target.starts_with("wasm32") {
+        return Ok(());
+    }
+    let Some(target_dir) = std::env::var("OUT_DIR").ok().and_then(|out| {
+        PathBuf::from(out)
+            .ancestors()
+            .find(|path| path.file_name().is_some_and(|name| name == "target"))
+            .map(PathBuf::from)
+    }) else {
+        return Ok(());
+    };
+    let profile = std::env::var("PROFILE").unwrap_or_else(|_| "release".into());
+    let output = target_dir
+        .join("dx")
+        .join("lotus-explore-rs")
+        .join(profile)
+        .join("web")
+        .join("public");
+    if output.exists() {
+        fs::remove_dir_all(output)?;
+    }
     Ok(())
 }
 
@@ -368,19 +380,4 @@ fn build_headers_txt() -> String {
     /index.html\n\
     \x20 No-Vary-Search: key-order, params, except=(\"locale\")\n"
         .to_string()
-}
-
-fn copy_dir_all(src: &PathBuf, dst: &PathBuf) -> Result<(), Box<dyn Error>> {
-    fs::create_dir_all(dst)?;
-    for entry in fs::read_dir(src)? {
-        let entry = entry?;
-        let ty = entry.file_type()?;
-        let dst_path = dst.join(entry.file_name());
-        if ty.is_dir() {
-            copy_dir_all(&entry.path(), &dst_path)?;
-        } else {
-            fs::copy(entry.path(), dst_path)?;
-        }
-    }
-    Ok(())
 }

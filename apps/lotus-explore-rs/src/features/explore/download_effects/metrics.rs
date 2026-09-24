@@ -3,12 +3,6 @@
 
 use crate::app_state::MetricsState;
 
-/// Metrics state when no download dispatch is pending.
-#[must_use]
-pub fn metrics_for_inactive_phase(_: &MetricsState) -> MetricsState {
-    MetricsState::default()
-}
-
 /// Metrics state after a waiting-for-loading dispatch tick.
 ///
 /// `logged_waiting_loading` must be `true` only when telemetry was emitted

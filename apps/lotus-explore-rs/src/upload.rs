@@ -103,87 +103,25 @@ impl From<wasm_bindgen::JsValue> for UploadError {
 /// Default chunk size for `UploadBlob` reads (16 MiB).
 const CHUNK_SIZE: usize = 16 * 1024 * 1024;
 
-/// Default byte interval for progress reporting (4 MiB).
-const PROGRESS_BYTE_INTERVAL: u64 = 4 * 1024 * 1024;
-
-/// Default time interval for progress reporting (120 ms).
-const PROGRESS_TIME_INTERVAL_MS: f64 = 120.0;
-
-/// Throttles callbacks based on bytes processed and wall-clock time elapsed.
-#[derive(Debug)]
-struct ProgressThrottler<F, T> {
-    last_reported_bytes: u64,
-    last_reported_time: f64,
-    callback: F,
-    time_fn: T,
-    byte_threshold: u64,
-    time_threshold_ms: f64,
-}
-
-impl<F, T> ProgressThrottler<F, T>
-where
-    F: FnMut(u64, u64),
-    T: Fn() -> f64,
-{
-    #[must_use]
-    fn new(callback: F, time_fn: T, byte_threshold: u64, time_threshold_ms: f64) -> Self {
-        let now = time_fn();
-        Self {
-            last_reported_bytes: 0,
-            last_reported_time: now,
-            callback,
-            time_fn,
-            byte_threshold,
-            time_threshold_ms,
-        }
-    }
-
-    fn maybe_report(&mut self, processed: u64, total: u64) -> bool {
-        let now = (self.time_fn)();
-        let bytes_delta = processed.saturating_sub(self.last_reported_bytes);
-
-        if bytes_delta >= self.byte_threshold
-            || now - self.last_reported_time >= self.time_threshold_ms
-        {
-            (self.callback)(processed, total);
-            self.last_reported_bytes = processed;
-            self.last_reported_time = now;
-            true
-        } else {
-            false
-        }
-    }
-
-    const fn force_next(&mut self) {
-        self.last_reported_bytes = u64::MAX;
-        self.last_reported_time = f64::NEG_INFINITY;
-    }
-}
-
 /// A line-oriented, chunked reader over a browser [`UploadBlob`].
 ///
 /// Yields `String` lines (without trailing `\n` or `\r`) one at a time via
 /// [`next_line`](UploadBlobLines::next_line). Internally buffers one 16 MiB chunk.
 #[cfg(target_arch = "wasm32")]
 #[derive(Debug)]
-pub struct UploadBlobLines<F> {
+pub struct UploadBlobLines {
     blob: UploadBlob,
     total_bytes: u64,
     offset: u64,
     buffer: Vec<u8>,
     buf_start: usize,
-    processed: u64,
-    progress: ProgressThrottler<F, fn() -> f64>,
 }
 
 #[cfg(target_arch = "wasm32")]
-impl<F> UploadBlobLines<F>
-where
-    F: FnMut(u64, u64),
-{
+impl UploadBlobLines {
     /// Creates a new line reader for the given blob.
     #[must_use]
-    pub fn new(blob: &UploadBlob, on_progress: F) -> Self {
+    pub fn new(blob: &UploadBlob) -> Self {
         // `Blob::size()` is an f64 count of bytes: always finite,
         // non-negative, and far below 2^53 for any real upload, so the
         // float→int conversion is exact. No `try_from` exists for f64.
@@ -195,13 +133,6 @@ where
             offset: 0,
             buffer: Vec::with_capacity(CHUNK_SIZE),
             buf_start: 0,
-            processed: 0,
-            progress: ProgressThrottler::new(
-                on_progress,
-                js_sys::Date::now,
-                PROGRESS_BYTE_INTERVAL,
-                PROGRESS_TIME_INTERVAL_MS,
-            ),
         }
     }
 
@@ -276,31 +207,21 @@ where
         array.copy_to(&mut chunk_bytes);
         self.buffer.extend_from_slice(&chunk_bytes);
         self.offset = end;
-        self.processed = self.processed.saturating_add((end - start).max(1));
-        if self.progress.maybe_report(self.processed, self.total_bytes) {
-            // Yield to the event loop so the UI stays responsive.
-            TimeoutFuture::new(0).await;
-        }
+        // Yield to the event loop so the UI stays responsive between chunks.
+        TimeoutFuture::new(0).await;
         Ok(())
     }
 }
 
 /// Non-WASM stub for `UploadBlobLines`.
 #[cfg(not(target_arch = "wasm32"))]
-pub struct UploadBlobLines<F> {
-    _phantom: std::marker::PhantomData<F>,
-}
+pub struct UploadBlobLines;
 
 #[cfg(not(target_arch = "wasm32"))]
-impl<F> UploadBlobLines<F>
-where
-    F: FnMut(u64, u64),
-{
+impl UploadBlobLines {
     #[must_use]
-    pub fn new(_blob: &UploadBlob, _on_progress: F) -> Self {
-        Self {
-            _phantom: std::marker::PhantomData,
-        }
+    pub fn new(_blob: &UploadBlob) -> Self {
+        Self
     }
 
     #[must_use]
@@ -369,7 +290,7 @@ pub fn extract_blob_from_file_data(
 /// Returns an error if the blob cannot be read or contains invalid UTF-8.
 #[cfg(target_arch = "wasm32")]
 pub async fn read_blob_string(blob: &UploadBlob) -> Result<String, UploadError> {
-    let mut reader = UploadBlobLines::new(blob, |_, _| {});
+    let mut reader = UploadBlobLines::new(blob);
     let mut out = String::new();
     while let Some(line) = reader.next_line().await? {
         out.push_str(&line);

@@ -6,13 +6,12 @@
 //!
 //! # Design rationale
 //!
-//! `orchestrator.rs` previously called `api::search` and
-//! `sparql::execute_sparql_bytes` directly, mixing I/O concerns with business
-//! logic.  Introducing a trait here gives us:
+//! `orchestrator.rs` previously called `api::search` and SPARQL transport
+//! directly, mixing I/O concerns with business logic. Introducing a trait here
+//! gives us:
 //!
 //! * **Clean boundaries** — orchestration code does not import transport details
 //! * **Testability** — unit tests can supply a `MockRepository` without network
-//! * **Swappability** — a future `ClickHouse` or GraphQL backend is a new impl
 //!
 //! # Trait object vs generics
 //!
@@ -43,45 +42,27 @@ use std::sync::Arc;
 use thiserror::Error;
 
 #[derive(Clone, Debug, PartialEq, Eq, Error)]
-#[error("{message}")]
-pub struct ErrorDetail {
-    pub message: Arc<str>,
-}
-
-impl ErrorDetail {
-    pub fn new(message: impl Into<Arc<str>>) -> Self {
-        Self {
-            message: message.into(),
-        }
-    }
-
-    pub fn as_str(&self) -> &str {
-        &self.message
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Error)]
 pub enum RepositoryError {
     #[error("LOTUS API not configured")]
     NotConfigured,
 
     #[error("network error: {0}")]
-    Network(ErrorDetail),
+    Network(Arc<str>),
 
     #[error("HTTP {status}: {body}")]
     Http { status: u16, body: String },
 
     #[error("parse error: {0}")]
-    Parse(ErrorDetail),
+    Parse(Arc<str>),
 }
 
 impl RepositoryError {
     pub fn network(message: impl Into<Arc<str>>) -> Self {
-        Self::Network(ErrorDetail::new(message))
+        Self::Network(message.into())
     }
 
     pub fn parse(message: impl Into<Arc<str>>) -> Self {
-        Self::Parse(ErrorDetail::new(message))
+        Self::Parse(message.into())
     }
 }
 
@@ -98,7 +79,6 @@ impl From<crate::api::ApiClientError> for RepositoryError {
 /// Boundary trait for data-access operations used by the search orchestrator.
 ///
 /// Implementations may delegate to the REST API, SPARQL, or a test stub.
-/// The two async methods cover the only two I/O paths in the orchestrator.
 pub trait LotusRepository: Clone + 'static {
     /// Try the REST API fast path.  Returns:
     /// - `None` — API path unavailable without an attempted request (e.g. test stub)
@@ -112,19 +92,11 @@ pub trait LotusRepository: Clone + 'static {
         include_counts: bool,
     ) -> Option<Result<SearchResponse, RepositoryError>>;
 
-    /// Execute a SPARQL query and return raw CSV bytes.
-    async fn sparql_bytes(&self, query: &str) -> Result<Vec<u8>, RepositoryError>;
-
-    /// Execute a SPARQL query and return the raw response body without forcing a
-    /// `Bytes -> Vec<u8>` copy in hot paths.
+    /// Execute a SPARQL query and return the raw response body.
     async fn sparql_body(
         &self,
         query: &str,
-    ) -> Result<lotus::transport::ResponseBody, RepositoryError> {
-        self.sparql_bytes(query)
-            .await
-            .map(lotus::transport::ResponseBody::from)
-    }
+    ) -> Result<lotus::transport::ResponseBody, RepositoryError>;
 
     #[cfg(not(target_arch = "wasm32"))]
     async fn sparql_tempfile(

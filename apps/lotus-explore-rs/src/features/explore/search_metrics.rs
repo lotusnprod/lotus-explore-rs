@@ -4,26 +4,13 @@
 //! Execution-time metrics for a single search pipeline run.
 //!
 //! [`SearchMetrics`] accumulates wall-clock timings for the network and
-//! parsing phases of one search request.  It is created fresh per request,
+//! parsing phases of one search request. It is created fresh per request,
 //! passed by `&mut` through the pipeline, then consumed by
 //! [`emit_search_summary`] to produce a single structured log line.
-//!
-//! ## Why a separate module?
-//!
-//! Previously this lived in `search_state.rs` alongside the Dioxus application
-//! state.  Execution metrics are ephemeral data that exist only during a single
-//! async search task; they have no business being adjacent to the persistent
-//! `ExploreState` reducer.  Separating them makes both modules leaner and
-//! keeps platform-specific `#[cfg]` gating (the parallel-network variant is
-//! WASM-only) from contaminating the main state module.
 
 use crate::services::search_telemetry as telemetry;
 
 /// Wall-clock timings accumulated during a single search execution.
-///
-/// All durations are summed; for WASM parallel fetches
-/// `add_parallel_network` accepts an already-overlapped elapsed value so
-/// the total reflects wall time, not summed sequential time.
 #[derive(Default, Clone, Copy)]
 pub struct SearchMetrics {
     /// Total wall time spent waiting for network responses (ms).
@@ -44,15 +31,6 @@ impl SearchMetrics {
     /// Record a completed parse phase.
     pub fn add_parse(&mut self, elapsed: std::time::Duration) {
         self.parse_ms = elapsed.as_secs_f64().mul_add(1000.0, self.parse_ms);
-    }
-
-    /// Record an already-overlapped (parallel) network batch: add the batch's
-    /// wall-clock duration once, and the number of calls bundled in it.
-    /// WASM-only per the parallel-fetch timing design (see struct docs).
-    #[cfg(target_arch = "wasm32")]
-    pub fn add_parallel_network(&mut self, elapsed: std::time::Duration, n_calls: usize) {
-        self.network_ms = elapsed.as_secs_f64().mul_add(1000.0, self.network_ms);
-        self.sparql_calls += n_calls;
     }
 }
 
@@ -97,14 +75,5 @@ mod tests {
         m.add_parse(Duration::from_millis(75));
         assert!((m.parse_ms - 125.0).abs() < 1.0);
         assert_eq!(m.sparql_calls, 0); // parse doesn't count calls
-    }
-
-    #[cfg(target_arch = "wasm32")]
-    #[test]
-    fn add_parallel_network_counts_by_calls_arg() {
-        let mut m = SearchMetrics::default();
-        m.add_parallel_network(Duration::from_millis(200), 2);
-        assert!((m.network_ms - 200.0).abs() < 1.0);
-        assert_eq!(m.sparql_calls, 2);
     }
 }

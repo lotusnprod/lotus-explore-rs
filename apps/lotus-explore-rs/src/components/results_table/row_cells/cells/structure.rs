@@ -14,7 +14,11 @@ fn truncate_alt(text: &str, max: usize) -> String {
     if text.len() <= max {
         text.to_string()
     } else {
-        format!("{}...", &text[..max.saturating_sub(3)])
+        let mut end = max.saturating_sub(3).min(text.len());
+        while end > 0 && !text.is_char_boundary(end) {
+            end -= 1;
+        }
+        format!("{}...", &text[..end])
     }
 }
 

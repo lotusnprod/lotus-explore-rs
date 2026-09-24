@@ -67,14 +67,6 @@ pub fn non_empty(s: &str) -> Option<&str> {
     if t.is_empty() { None } else { Some(t) }
 }
 
-/// Prefer `a`, fall back to `b`, return None if both empty.
-#[must_use]
-// Test-only helper: exercised by `super::tests`, dead in non-test builds.
-#[cfg_attr(not(test), allow(dead_code))]
-pub(super) fn coalesce<'a>(a: &'a str, b: &'a str) -> Option<&'a str> {
-    non_empty(a).or_else(|| non_empty(b))
-}
-
 /// Parse `2021-04-23T00:00:00Z` or `2021` → year as i32.
 #[must_use]
 // `unreachable_pub` (deny) requires `pub(crate)` here for cross-module use;
@@ -82,22 +74,4 @@ pub(super) fn coalesce<'a>(a: &'a str, b: &'a str) -> Option<&'a str> {
 #[allow(clippy::redundant_pub_crate)]
 pub(crate) fn parse_year(s: &str) -> Option<i32> {
     s.trim().split(['-', 'T']).next()?.trim().parse().ok()
-}
-
-/// Normalise a DOI: strip `https://doi.org/` prefix if present.
-#[must_use]
-// Test-only helper: exercised by `super::tests`, dead in non-test builds.
-#[cfg_attr(not(test), allow(dead_code))]
-pub(super) fn clean_doi(s: &str) -> Option<String> {
-    let t = s.trim();
-    if t.is_empty() {
-        return None;
-    }
-    if let Some(doi) = t.split("doi.org/").last() {
-        let doi = doi.trim();
-        if !doi.is_empty() {
-            return Some(doi.to_string());
-        }
-    }
-    Some(t.to_string())
 }

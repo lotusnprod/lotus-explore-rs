@@ -15,7 +15,7 @@ use crate::queries::structure::escape_structure_literal;
 
 /// SPARQL body for a Sachem search with no taxon filter: the reference/taxon
 /// association is wrapped in `OPTIONAL` so compounds lacking occurrence data are
-/// still returned. Shared verbatim by [`query_sachem`] and [`query_sachem_batch`].
+/// still returned.
 fn sachem_body_no_taxon(sachem_clause: &str) -> String {
     format!(
         r"
@@ -128,92 +128,6 @@ pub fn query_sachem(
     format!(
         r"{PREFIXES_WITH_STRUCTURE}
 {compound_select}
-WHERE {{
-{body}
-}}"
-    )
-}
-
-/// Query multiple SMILES at once via Sachem similarity search.
-///
-/// Batches SMILES into a single SPARQL query using a `VALUES` clause.
-/// Each result binding includes `?input_smiles` so callers can track which
-/// query SMILES produced each match.
-#[must_use]
-// Test-only helper: exercised by `super::tests`, dead in non-test builds.
-#[cfg_attr(not(test), allow(dead_code))]
-pub(super) fn query_sachem_batch(
-    smiles_batch: &[&str],
-    search_type: SmilesSearchType,
-    threshold: f64,
-    taxon_qid: Option<&str>,
-) -> String {
-    // Build VALUES clause with all SMILES in this batch
-    // For single variable, don't wrap in parentheses
-    let values_clause = {
-        let smiles_list = smiles_batch
-            .iter()
-            .map(|s| escape_structure_literal(s))
-            .collect::<Vec<_>>()
-            .join(" ");
-        format!("VALUES ?input_smiles {{ {smiles_list} }}")
-    };
-
-    let sachem_clause = match search_type {
-        SmilesSearchType::Similarity => format!(
-            "SERVICE idsm:wikidata {{\n    {values_clause}\n    ?c sachem:similarCompoundSearch [\n      sachem:query ?input_smiles;\n      sachem:cutoff \"{threshold}\"^^xsd:double\n    ].\n  }}"
-        ),
-        SmilesSearchType::Substructure => format!(
-            "SERVICE idsm:wikidata {{\n    {values_clause}\n    ?c sachem:substructureSearch [\n      sachem:query ?input_smiles\n    ].\n  }}"
-        ),
-    };
-
-    let body = taxon_qid.map_or_else(
-        || sachem_body_no_taxon(&sachem_clause),
-        |qid| {
-            format!(
-                r"
-  {sachem_clause}
-  {COMPOUND_IDENTIFIERS}
-
-  ?c p:P703 ?statement .
-  ?statement ps:P703 ?t ;
-             prov:wasDerivedFrom ?ref .
-  ?ref pr:P248 ?r .
-  ?t wdt:P225 ?taxon_name .
-  ?t wdt:P171* wd:{qid} .
-  {REFERENCE_METADATA_OPTIONAL}
-  {PROPERTIES_OPTIONAL}
-"
-            )
-        },
-    );
-
-    // Custom SELECT clause that includes ?input_smiles for batch tracking
-    let batch_select = r#"
-SELECT DISTINCT
-  ?input_smiles
-  ?c
-  (xsd:integer(STRAFTER(STR(?c), "Q")) AS ?compound)
-  ?compoundLabel
-  ?compound_inchikey
-  ?compound_smiles_conn
-  ?compound_smiles_iso
-  ?compound_mass
-  ?compound_formula_raw
-  (xsd:integer(STRAFTER(STR(?t), "Q")) AS ?taxon)
-  ?taxon_name
-  (xsd:integer(STRAFTER(STR(?r), "Q")) AS ?ref_qid)
-  ?ref
-  ?ref_title
-  ?ref_doi
-  ?ref_date
-  ?statement
-"#;
-
-    format!(
-        r"{PREFIXES_WITH_STRUCTURE}
-{batch_select}
 WHERE {{
 {body}
 }}"

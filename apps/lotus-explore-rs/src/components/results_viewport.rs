@@ -8,6 +8,7 @@ use crate::components::results_table::ResultsTable;
 use crate::state::use_results_context;
 use crate::ui::{ContentPhase, LifecycleBooleans};
 use dioxus::prelude::*;
+use std::sync::Arc;
 
 #[component]
 pub fn ResultsViewport() -> Element {
@@ -16,14 +17,11 @@ pub fn ResultsViewport() -> Element {
 
     let state = use_results_context();
     let explore = state.explore;
-    // Hoisted to component top-level — hooks must be called unconditionally.
-    let _locale = crate::hooks::use_locale();
-
     let ui_state = use_memo(move || ExploreUiState::from_explore(explore));
 
     let phase = use_memo(move || {
         let s = *ui_state.read();
-        ContentPhase::from_lifecycle(LifecycleBooleans {
+        ContentPhase::from(LifecycleBooleans {
             loading: s.loading,
             has_error: s.has_error,
             searched_once: s.searched_once,
@@ -47,7 +45,7 @@ pub fn ResultsViewport() -> Element {
             query.as_ref().map_or_else(
                 || rsx! {},
                 |q| {
-                    rsx! { QueryDisplay { query: (*q).to_string() } }
+                    rsx! { QueryDisplay { query: Arc::clone(q) } }
                 },
             )
         }
@@ -76,7 +74,7 @@ pub fn ResultsViewport() -> Element {
 }
 
 #[component]
-fn QueryDisplay(query: String) -> Element {
+fn QueryDisplay(query: std::sync::Arc<str>) -> Element {
     rsx! {
         section {
             id: "query-display",

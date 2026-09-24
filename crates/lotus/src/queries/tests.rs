@@ -3,7 +3,6 @@
 
 //! Integration tests that exercise query builders across submodule boundaries.
 
-use super::sachem::query_sachem_batch;
 use crate::models::{ElementState, SearchCriteria, SmilesSearchType};
 use crate::queries::consts::SUBSCRIPT_DIGIT_MAPPINGS;
 use crate::queries::formula::{normalize_digits_expr, normalize_formula_digits};
@@ -289,14 +288,9 @@ fn classify_structure_detects_formats() {
 }
 
 #[test]
-fn sachem_single_and_batch_share_no_taxon_body() {
-    // Both entry points must route a taxon-less Sachem search through the same
-    // shared OPTIONAL reference block (regression guard for the extracted body).
-    let single = query_sachem("c1ccccc1", SmilesSearchType::Substructure, 0.8, None);
-    let batch = query_sachem_batch(&["c1ccccc1"], SmilesSearchType::Substructure, 0.8, None);
-    for q in [&single, &batch] {
-        assert!(q.contains("OPTIONAL {"));
-        assert!(q.contains("prov:wasDerivedFrom ?ref ."));
-        assert!(q.contains("?t wdt:P225 ?taxon_name"));
-    }
+fn sachem_query_contains_reference_optional_block() {
+    let query = query_sachem("c1ccccc1", SmilesSearchType::Substructure, 0.8, None);
+    assert!(query.contains("OPTIONAL {"));
+    assert!(query.contains("prov:wasDerivedFrom ?ref ."));
+    assert!(query.contains("?t wdt:P225 ?taxon_name"));
 }

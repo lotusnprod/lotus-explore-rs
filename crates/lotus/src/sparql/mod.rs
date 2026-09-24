@@ -77,25 +77,13 @@ mod tests {
     #[test]
     fn parse_compounds_capped_reports_cap_and_stats() {
         let csv = b"compound,compoundLabel,compound_inchikey,compound_smiles_conn,compound_mass,compound_formula,taxon,taxon_name,ref_qid,ref_title,ref_doi,ref_date,statement\nQ1,cmpd,IK1,C,123.4,C1H2,Q10,TaxonA,Q100,TitleA,10.1/a,2022-01-01,http://www.wikidata.org/entity/statement/S1\nQ2,cmpd2,IK2,CC,111.1,C2H4,Q11,TaxonB,Q101,TitleB,10.1/b,2021-01-01,http://www.wikidata.org/entity/statement/S2\nQ3,cmpd3,IK3,CCC,99.1,C3H6,Q12,TaxonC,Q102,TitleC,10.1/c,2020-01-01,http://www.wikidata.org/entity/statement/S3\n";
-        let (rows, stats, capped) = parse_compounds_csv_capped_bytes(csv, 2).expect("capped parse");
+        let (rows, stats, capped) =
+            parse_compounds_csv_capped_reader(std::io::Cursor::new(csv), 2).expect("capped parse");
         assert_eq!(rows.len(), 2);
         assert!(capped);
         assert_eq!(stats.n_entries, 3);
         assert_eq!(stats.n_entries_unique, 3);
         assert_eq!(stats.n_compounds, 3);
-    }
-
-    #[test]
-    fn parse_compounds_capped_reader_matches_bytes_path() {
-        let csv = b"compound,compoundLabel,taxon,ref_qid\nQ1,cmpd,Q10,Q100\nQ2,cmpd2,Q11,Q101\nQ3,cmpd3,Q12,Q102\n";
-        let (rows_bytes, stats_bytes, capped_bytes) =
-            parse_compounds_csv_capped_bytes(csv, 2).expect("bytes parse");
-        let (rows_reader, stats_reader, capped_reader) =
-            parse_compounds_csv_capped_reader(std::io::Cursor::new(csv), 2).expect("reader parse");
-
-        assert_eq!(rows_reader.len(), rows_bytes.len());
-        assert_eq!(stats_reader, stats_bytes);
-        assert_eq!(capped_reader, capped_bytes);
     }
 
     #[test]

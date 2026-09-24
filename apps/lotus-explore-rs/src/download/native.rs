@@ -9,26 +9,12 @@ use lotus::transport::ResponseFormat as LotusResponseFormat;
 use lotus::transport::WDQS_SCHOLARLY;
 use std::sync::Arc;
 
-/// Single toggle to force WDQS fallback for testing.
-/// Set this to `true` to force all queries to use WDQS.
-/// Set this to `false` to use `QLever` (default).
-const FORCE_WDQS_FALLBACK: bool = false;
-
 pub(super) async fn execute_download_with_fallback(
     format: DownloadFormat,
     query: Arc<str>,
     filename: String,
     dl_timer: perf::TimerHandle,
 ) -> Result<(), String> {
-    // Check if we should force WDQS fallback for testing
-    if FORCE_WDQS_FALLBACK {
-        log::warn!(
-            "event=download format={} phase=fetch state=fallback reason=force_env",
-            format.log_name()
-        );
-        return execute_download_wdqs(format, query, filename, dl_timer).await;
-    }
-
     // First try QLever, fallback to WDQS on 502
     let result = execute_download_direct(format, query.as_ref()).await;
 

@@ -12,7 +12,6 @@
 //! - **Single ownership**: `AppServices` is created once at app bootstrap
 //! - **Context provider**: Made available via Dioxus context
 //! - **Zero-cost abstractions**: Copy-able, stateless wrappers around global services
-//! - **Testability**: Services can be swapped via dependency injection
 
 use crate::repositories::HybridRepository;
 
@@ -28,23 +27,15 @@ pub struct AppServices {
 
 impl AppServices {
     /// Create a new services container with all dependencies initialized.
-    pub fn new() -> Self {
-        Self::from_repository(HybridRepository)
-    }
-
-    pub const fn from_repository(repo: HybridRepository) -> Self {
-        Self { repo }
+    pub const fn new() -> Self {
+        Self {
+            repo: HybridRepository,
+        }
     }
 
     /// Get the data repository.
     pub const fn repository(self) -> HybridRepository {
         self.repo
-    }
-}
-
-impl Default for AppServices {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -69,11 +60,5 @@ mod tests {
         let repo1 = services.repository();
         let repo2 = services.repository();
         assert_eq!(repo1, repo2);
-    }
-
-    #[test]
-    fn app_services_supports_explicit_repository_injection() {
-        let services = AppServices::from_repository(HybridRepository);
-        assert_eq!(services.repository(), HybridRepository);
     }
 }

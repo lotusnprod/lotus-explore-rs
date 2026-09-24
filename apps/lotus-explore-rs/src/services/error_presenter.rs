@@ -75,7 +75,7 @@ fn stage_display_label(locale: Locale, stage: QueryStage) -> &'static str {
 fn transport_error_summary(locale: Locale, source: &RepositoryError) -> String {
     let raw = match source {
         RepositoryError::NotConfigured => return err_api_not_configured(locale),
-        RepositoryError::Network(detail) | RepositoryError::Parse(detail) => detail.as_str(),
+        RepositoryError::Network(detail) | RepositoryError::Parse(detail) => detail.as_ref(),
         RepositoryError::Http { status, body } => {
             let detail = if looks_like_html(body) {
                 if *status == 429 {

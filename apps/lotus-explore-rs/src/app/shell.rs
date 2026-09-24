@@ -229,6 +229,3 @@ fn ExplorePage() -> Element {
 fn SearchPanelInline() -> Element {
     crate::components::search_panel::SearchPanel()
 }
-
-#[cfg(test)]
-mod tests {}

@@ -11,8 +11,6 @@
 
 use std::sync::Arc;
 
-use super::WIKIDATA_STATEMENT_BASE;
-
 /// A single deduplicated compound-taxon-reference result row.
 ///
 /// Every field is an `Arc<str>` (or `Option<Arc<str>>`) so rows can be cloned
@@ -43,52 +41,4 @@ pub type Rows = Arc<[CompoundEntry]>;
 pub struct TaxonMatch {
     pub qid: String,
     pub name: String,
-}
-
-impl CompoundEntry {
-    /// Returns the DOI string (trimmed), if present and non-empty.
-    pub fn doi(&self) -> Option<&str> {
-        self.ref_doi
-            .as_deref()
-            .map(str::trim)
-            .filter(|d| !d.is_empty())
-    }
-
-    /// Returns a full `https://doi.org/{doi}` URL, if a DOI is present.
-    #[must_use]
-    // Only exercised by in-crate unit tests; keep it out of the public API.
-    #[cfg_attr(not(test), allow(dead_code))]
-    pub(crate) fn doi_url(&self) -> Option<String> {
-        self.doi().map(|d| format!("https://doi.org/{d}"))
-    }
-
-    /// Returns a `CDKDEPict` SVG URL for the entry's `SMILES`, if available and
-    /// single-line (multi-line SMILES would break the URL).
-    #[must_use]
-    pub fn depict_url(&self) -> Option<String> {
-        let smiles = self.smiles.as_deref()?.trim();
-        if smiles.is_empty() || smiles.contains('\n') {
-            return None;
-        }
-        Some(format!(
-            "https://www.simolecule.com/cdkdepict/depict/cow/svg?smi={}&annotate=cip",
-            urlencoding::encode(smiles)
-        ))
-    }
-
-    /// Returns the bare statement ID (e.g. `S1`), stripping the Wikidata
-    /// statement URI prefix if present.
-    fn statement_id_str(&self) -> Option<&str> {
-        let raw = self.statement.as_deref().map(str::trim)?;
-        if raw.is_empty() {
-            return None;
-        }
-        Some(raw.strip_prefix(WIKIDATA_STATEMENT_BASE).unwrap_or(raw))
-    }
-
-    /// Returns the bare statement ID as an owned `String`.
-    #[must_use]
-    pub fn statement_id(&self) -> Option<String> {
-        self.statement_id_str().map(str::to_owned)
-    }
 }

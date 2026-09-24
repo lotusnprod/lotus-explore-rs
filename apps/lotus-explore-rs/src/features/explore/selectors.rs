@@ -181,8 +181,6 @@ pub fn use_header_meta_snapshot(explore: Signal<ExploreState>) -> Memo<HeaderMet
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::Instant;
-
     #[test]
     fn explore_ui_state_all_false_by_default() {
         let explore = ExploreState::default();
@@ -229,33 +227,5 @@ mod tests {
         assert_eq!(snapshot.result_hash.as_deref(), Some("rh"));
         assert_eq!(snapshot.total_matches, Some(12));
         assert!(snapshot.display_capped_rows);
-    }
-
-    #[test]
-    #[ignore = "profiling benchmark"]
-    fn profile_toolbar_snapshot_construction_cost() {
-        let result = ResultDataState {
-            sparql_query: Some(Arc::from("SELECT * WHERE { ?s ?p ?o }")),
-            metadata_json: Some(Arc::from("{\"k\":\"v\"}")),
-            query_hash: Some(Arc::from("queryhash0123456789")),
-            result_hash: Some(Arc::from("resulthash0123456789")),
-            total_matches: Some(42),
-            display_capped_rows: true,
-            ..ResultDataState::default()
-        };
-
-        let loops = 100_000;
-        let start = Instant::now();
-        let mut observed = 0usize;
-        for _ in 0..loops {
-            let snap = toolbar_snapshot_from_result(&result);
-            observed += snap.total_matches.unwrap_or(0);
-        }
-        let elapsed = start.elapsed();
-        eprintln!(
-            "toolbar snapshot benchmark: loops={loops} elapsed_ms={:.3} observed={observed}",
-            elapsed.as_secs_f64() * 1000.0
-        );
-        assert_eq!(observed, loops * 42);
     }
 }

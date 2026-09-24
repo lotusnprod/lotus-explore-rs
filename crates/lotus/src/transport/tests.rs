@@ -2,16 +2,13 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 //! Unit tests for transport helpers.
-//!
-//! Only pure (non-async) helpers are tested here — `looks_like_gateway_error`,
-//! `compact_http_error_text`, `extract_qid`, and `clean_doi`.
 
 #![allow(clippy::expect_used)]
 #![allow(clippy::unwrap_used)]
 #![allow(clippy::indexing_slicing)]
 #![allow(clippy::panic)]
 
-use super::csv::{clean_doi, coalesce, col_idx, extract_qid, field, non_empty, parse_year};
+use super::csv::{col_idx, extract_qid, field, non_empty, parse_year};
 use super::error::{
     compact_http_error_text, is_client_error, is_rate_limit, is_success, looks_like_gateway_error,
 };
@@ -66,51 +63,7 @@ fn extract_qid_rejects_non_qid_prefixes() {
     assert_eq!(extract_qid("Q"), "");
 }
 
-// ── clean_doi ──────────────────────────────────────────────────────────────
-
-#[test]
-fn clean_doi_normalizes_prefixed_urls() {
-    assert_eq!(
-        clean_doi("https://doi.org/10.1000/xyz"),
-        Some("10.1000/xyz".to_string())
-    );
-    assert_eq!(clean_doi("  "), None);
-}
-
-#[test]
-fn clean_doi_passes_through_bare_dois() {
-    assert_eq!(clean_doi("10.1000/xyz"), Some("10.1000/xyz".to_string()));
-    assert_eq!(
-        clean_doi("  10.1000/xyz  "),
-        Some("10.1000/xyz".to_string())
-    );
-}
-
-#[test]
-fn clean_doi_returns_none_for_empty_input() {
-    assert_eq!(clean_doi(""), None);
-    assert_eq!(clean_doi("   "), None);
-}
-
-// ── coalesce / non_empty ────────────────────────────────────────────────────
-
-#[test]
-fn coalesce_prefers_first_non_empty() {
-    assert_eq!(coalesce("first", "second"), Some("first"));
-    assert_eq!(coalesce("  first  ", "second"), Some("first"));
-}
-
-#[test]
-fn coalesce_falls_back_to_second() {
-    assert_eq!(coalesce("", "second"), Some("second"));
-    assert_eq!(coalesce("   ", "second"), Some("second"));
-}
-
-#[test]
-fn coalesce_returns_none_when_both_empty() {
-    assert_eq!(coalesce("", ""), None);
-    assert_eq!(coalesce("   ", "   "), None);
-}
+// ── non_empty ──────────────────────────────────────────────────────────────
 
 #[test]
 fn non_empty_strips_and_checks() {

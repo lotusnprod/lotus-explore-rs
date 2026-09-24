@@ -16,14 +16,14 @@ license = "AGPL-3.0-only"
 axum = "0.8"
 clap = { version = "4", features = ["derive"] }
 console_log = "1.1"
-dioxus = { version = "=0.7.10", features = ["web"] }
+dioxus = { version = "=0.7.10", default-features = false, features = ["asset", "devtools", "document", "minimal", "web"] }
 env_logger = "0.11"
 flate2 = { version = "1", default-features = false, features = ["miniz_oxide"] }
-futures = "0.3"
+futures = { version = "0.3", default-features = false, features = ["async-await", "std"] }
 gloo-timers = { version = "0.3", features = ["futures"] }
 js-sys = "0.3"
 log = "0.4"
-reqwest = { version = "0.13", features = ["gzip"] }
+reqwest = { version = "0.13", default-features = false, features = ["gzip"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sha2 = { version = "0.11", default-features = false }
@@ -107,12 +107,10 @@ unused_crate_dependencies = "deny"
 unused_must_use = "deny"
 
 [profile.release]
+opt-level = "z"
 debug = false
+strip = "symbols"
 debug-assertions = false
 overflow-checks = false
 lto = "fat"
 codegen-units = 1
-strip = "symbols"
-
-[profile.release.package."*"]
-opt-level = 3

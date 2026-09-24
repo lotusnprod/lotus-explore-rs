@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-// The futures built here are intentionally `!Send`: the pipeline drives Dioxus
-// signals and `LotusRepository` futures (reqwest's WASM client), which are `!Send`
-// by design (see `repositories` doc comment). Dioxus's single-threaded executor
-// does not require `Send`, so no boxing would be gained.
 #![allow(clippy::future_not_send)]
 
 //! Taxon resolution service — maps a free-text name to a Wikidata QID.
@@ -103,7 +99,7 @@ pub async fn resolve<R: LotusRepository>(
     // Slow path: SPARQL query.
     let query = queries::query_taxon_search(&sanitized);
     let csv = repo
-        .sparql_bytes(&query)
+        .sparql_body(&query)
         .await
         .map_err(DomainError::transport_at(QueryStage::TaxonSearch))?;
 
@@ -111,7 +107,7 @@ pub async fn resolve<R: LotusRepository>(
     metrics.add_network(taxon_elapsed);
     telemetry::taxon_sparql_done(taxon_elapsed);
 
-    let matches = sparql::parse_taxon_csv_bytes(&csv).map_err(|e| {
+    let matches = sparql::parse_taxon_csv_bytes(csv.as_ref()).map_err(|e| {
         DomainError::Parse(ParseFault::TaxonCsv {
             details: e.to_string(),
         })
@@ -160,13 +156,13 @@ mod tests {
     /// Stub that always returns a fixed SPARQL CSV response; API not configured.
     #[derive(Clone)]
     struct StubRepo {
-        response: Result<Vec<u8>, RepositoryError>,
+        response: Result<lotus::transport::ResponseBody, RepositoryError>,
     }
 
     impl StubRepo {
         fn ok(csv: &str) -> Self {
             Self {
-                response: Ok(csv.as_bytes().to_vec()),
+                response: Ok(csv.as_bytes().to_vec().into()),
             }
         }
         fn err_network(msg: &str) -> Self {
@@ -186,7 +182,10 @@ mod tests {
             None
         }
 
-        async fn sparql_bytes(&self, _: &str) -> Result<Vec<u8>, RepositoryError> {
+        async fn sparql_body(
+            &self,
+            _: &str,
+        ) -> Result<lotus::transport::ResponseBody, RepositoryError> {
             self.response.clone()
         }
     }

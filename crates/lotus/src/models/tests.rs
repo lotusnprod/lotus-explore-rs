@@ -146,43 +146,6 @@ fn shareable_query_params_use_single_structure_param_namespace() {
 }
 
 #[test]
-fn compound_entry_doi_methods() {
-    let entry = CompoundEntry {
-        ref_doi: Some(Arc::from("  10.1000/xyz  ")),
-        ..CompoundEntry::default()
-    };
-    assert_eq!(entry.doi(), Some("10.1000/xyz"));
-    assert_eq!(
-        entry.doi_url(),
-        Some("https://doi.org/10.1000/xyz".to_string())
-    );
-
-    let no_doi = CompoundEntry::default();
-    assert_eq!(no_doi.doi(), None);
-    assert_eq!(no_doi.doi_url(), None);
-}
-
-#[test]
-fn compound_entry_depict_url_rejects_multiline_smiles() {
-    let entry = CompoundEntry {
-        smiles: Some(Arc::from("c1ccccc1\nc1ccccc1")),
-        ..CompoundEntry::default()
-    };
-    assert_eq!(entry.depict_url(), None);
-
-    let entry = CompoundEntry {
-        smiles: Some(Arc::from("c1ccccc1")),
-        ..CompoundEntry::default()
-    };
-    assert!(
-        entry
-            .depict_url()
-            .as_ref()
-            .is_some_and(|url| url.contains("smi=c1ccccc1"))
-    );
-}
-
-#[test]
 fn sort_state_defaults_to_name_asc() {
     let sort = SortState::default();
     assert_eq!(sort.col, SortColumn::Name);

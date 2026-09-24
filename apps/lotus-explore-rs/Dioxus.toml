@@ -17,6 +17,11 @@ command = "npx @tailwindcss/cli@4.3.3 -i ./tailwind/styles.css -o ./public/asset
 [web]
 pre_compress = true
 
+[web.wasm_opt]
+level = "z"
+debug = false
+keep_names = false
+
 [web.app]
 title = "LOTUS Linked Open Data Explorer"
 

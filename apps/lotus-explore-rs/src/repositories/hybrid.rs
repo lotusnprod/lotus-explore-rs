@@ -24,11 +24,6 @@ use lotus::queries::transform_query_for_wdqs;
 use lotus::transport::{self, FetchError, WDQS_WIKIDATA};
 use std::cell::RefCell;
 
-/// Single toggle to force WDQS fallback for testing.
-/// Set this to `true` to force all queries to use WDQS.
-/// Set this to `false` to use `QLever` (default).
-const FORCE_WDQS_FALLBACK: bool = false;
-
 thread_local! {
     /// Tracks whether WDQS fallback was used for the current search.
     /// Reset at the start of each search operation.
@@ -104,7 +99,7 @@ fn mark_wdqs_fallback_used(query: String) {
 /// Rewrite `query` for the WDQS endpoint and record that WDQS fallback applied.
 ///
 /// This is the single source of truth for the "prepare a query for WDQS
-/// fallback" step, shared by the bytes / body / tempfile execution paths.
+/// fallback" step, shared by the body / tempfile execution paths.
 fn prepare_wdqs_fallback_query(query: &str) -> String {
     let wdqs_query = transform_query_for_wdqs(query);
     mark_wdqs_fallback_used(wdqs_query.clone());
@@ -114,7 +109,7 @@ fn prepare_wdqs_fallback_query(query: &str) -> String {
 /// Zero-size, `Copy` production repository.
 ///
 /// Holds no state of its own; all configuration is read from environment and
-/// runtime globals (`api_base_url`, `sparql::execute_sparql_bytes`, etc.).
+/// runtime globals (`api_base_url`, `sparql::execute_sparql_body`, etc.).
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub struct HybridRepository;
 
@@ -140,41 +135,10 @@ impl LotusRepository for HybridRepository {
         )
     }
 
-    async fn sparql_bytes(&self, query: &str) -> Result<Vec<u8>, RepositoryError> {
-        // Force WDQS fallback for testing if enabled
-        if FORCE_WDQS_FALLBACK {
-            log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly (FORCED)");
-            let wdqs_query = prepare_wdqs_fallback_query(query);
-            return transport::execute_sparql_bytes(&wdqs_query, WDQS_WIKIDATA)
-                .await
-                .map_err(map_fetch_error);
-        }
-
-        match sparql::execute_sparql_bytes(query).await {
-            Err(err) if is_bad_gateway(&err) => {
-                log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly");
-                let wdqs_query = prepare_wdqs_fallback_query(query);
-                transport::execute_sparql_bytes(&wdqs_query, WDQS_WIKIDATA)
-                    .await
-                    .map_err(map_fetch_error)
-            }
-            result => result.map_err(map_fetch_error),
-        }
-    }
-
     async fn sparql_body(
         &self,
         query: &str,
     ) -> Result<lotus::transport::ResponseBody, RepositoryError> {
-        // Force WDQS fallback for testing if enabled
-        if FORCE_WDQS_FALLBACK {
-            log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly (FORCED)");
-            let wdqs_query = prepare_wdqs_fallback_query(query);
-            return transport::execute_sparql_body(&wdqs_query, WDQS_WIKIDATA)
-                .await
-                .map_err(map_fetch_error);
-        }
-
         match sparql::execute_sparql_body(query).await {
             Err(err) if is_bad_gateway(&err) => {
                 log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly");
@@ -192,15 +156,6 @@ impl LotusRepository for HybridRepository {
         &self,
         query: &str,
     ) -> Result<tempfile::NamedTempFile, RepositoryError> {
-        // Force WDQS fallback for testing if enabled
-        if FORCE_WDQS_FALLBACK {
-            log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly (FORCED)");
-            let wdqs_query = prepare_wdqs_fallback_query(query);
-            return transport::execute_sparql_tempfile(&wdqs_query, WDQS_WIKIDATA)
-                .await
-                .map_err(map_fetch_error);
-        }
-
         match sparql::execute_sparql_tempfile(query).await {
             Err(err) if is_bad_gateway(&err) => {
                 log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly");

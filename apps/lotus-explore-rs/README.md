@@ -60,10 +60,10 @@ overview.
 
 ## Development testing
 
-Run logging format tests during telemetry work:
+Run the workspace test suite:
 
 ```bash
-cargo test --locked -p lotus-explore-rs utils::logging::tests
+cargo test --workspace --all-targets --locked
 ```
 
 ## Setup: external assets

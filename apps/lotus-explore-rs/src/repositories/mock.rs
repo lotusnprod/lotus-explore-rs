@@ -12,15 +12,15 @@ use crate::repositories::{LotusRepository, RepositoryError};
 /// Test-only mock repository for unit tests without network dependencies.
 #[derive(Clone)]
 pub struct MockRepository {
-    /// Fixed CSV bytes returned for every `sparql_bytes` call.
-    pub sparql_response: Result<Vec<u8>, RepositoryError>,
+    /// Fixed CSV response returned for every SPARQL call.
+    pub sparql_response: Result<lotus::transport::ResponseBody, RepositoryError>,
 }
 
 impl MockRepository {
     /// Returns fixed CSV bytes for all SPARQL calls; simulates no API.
     pub fn sparql_only(csv: Vec<u8>) -> Self {
         Self {
-            sparql_response: Ok(csv),
+            sparql_response: Ok(csv.into()),
         }
     }
 
@@ -42,7 +42,10 @@ impl LotusRepository for MockRepository {
         None // Simulate "API not configured" — fall through to SPARQL.
     }
 
-    async fn sparql_bytes(&self, _query: &str) -> Result<Vec<u8>, RepositoryError> {
+    async fn sparql_body(
+        &self,
+        _query: &str,
+    ) -> Result<lotus::transport::ResponseBody, RepositoryError> {
         self.sparql_response.clone()
     }
 }

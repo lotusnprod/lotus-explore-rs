@@ -9,7 +9,7 @@
 //!
 //! See [`download_effects`] for pure business logic separated from Dioxus hooks.
 
-use crate::app_state::AppState;
+use crate::app_state::{AppState, MetricsState};
 use crate::download::execute_download;
 use crate::features::explore::actions::ExploreAction;
 use crate::features::explore::command::SearchCommand;
@@ -114,7 +114,7 @@ pub fn use_download_dispatch_effect(
             DispatchPhase::Inactive => {
                 // No download pending — reset any logging guards.
                 let metrics = app_state.peek().metrics.clone();
-                let next = download_effects::metrics_for_inactive_phase(&metrics);
+                let next = MetricsState::default();
                 if next != metrics {
                     app_state.with_mut(|state| state.metrics = next);
                 }

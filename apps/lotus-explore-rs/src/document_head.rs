@@ -109,10 +109,6 @@ pub fn LotusDocumentHead(lang: String) -> Element {
             doc.create_head_element("link", &attrs, None);
         }
     });
-    #[cfg(not(target_arch = "wasm32"))]
-    #[allow(clippy::redundant_clone)]
-    let _ = canonical.clone(); // suppress unused warning in tests
-
     rsx! {
         DocumentHead {
             title: "LOTUS Explore-rs".to_string(),

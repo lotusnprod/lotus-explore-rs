@@ -8,14 +8,13 @@
 //! and is bounded by the number of distinct taxon names searched during the
 //! session, which is expected to be small.
 
+use std::cell::RefCell;
 use std::collections::HashMap;
-use std::sync::{Mutex, OnceLock};
 
 type TaxonCache = HashMap<String, String>;
 
-fn taxon_cache() -> &'static Mutex<TaxonCache> {
-    static CACHE: OnceLock<Mutex<TaxonCache>> = OnceLock::new();
-    CACHE.get_or_init(|| Mutex::new(HashMap::new()))
+thread_local! {
+    static CACHE: RefCell<TaxonCache> = RefCell::new(HashMap::new());
 }
 
 /// Returns the cached QID for the given taxon `name`, or `None` if not cached.
@@ -24,8 +23,7 @@ pub fn lookup(name: &str) -> Option<String> {
     if key.is_empty() {
         return None;
     }
-    let guard = taxon_cache().lock().ok()?;
-    guard.get(&key).cloned()
+    CACHE.with(|cache| cache.borrow().get(&key).cloned())
 }
 
 /// Stores `qid` in the cache under the normalised form of `name`.
@@ -34,9 +32,9 @@ pub fn store(name: &str, qid: &str) {
     if key.is_empty() || qid.trim().is_empty() {
         return;
     }
-    if let Ok(mut guard) = taxon_cache().lock() {
-        guard.insert(key, qid.into());
-    }
+    CACHE.with(|cache| {
+        cache.borrow_mut().insert(key, qid.into());
+    });
 }
 
 #[cfg(test)]

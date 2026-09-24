@@ -20,8 +20,6 @@ pub use domain::{
     QuickStatementsBundle,
 };
 
-// ── Sub-modules ───────────────────────────────────────────────────────────────
-
 #[path = "curation/share_links.rs"]
 mod share_links;
 #[cfg(test)]
@@ -33,10 +31,6 @@ pub use share_links::{
 pub fn example_rows() -> Vec<CurationInputRow> {
     inputs::example_rows()
 }
-
-// ──────────────────────────────────────────────────────────────────────────────
-// Public API
-// ──────────────────────────────────────────────────────────────────────────────
 
 pub fn parse_tsv_rows(tsv: &str) -> Result<Vec<CurationInputRow>, CurationError> {
     inputs::parse_tsv_rows(tsv)
@@ -95,14 +89,6 @@ pub fn build_quickstatements_bundle(results: &[CurationResultRow]) -> QuickState
 pub fn row_uniqueness_key(row: &CurationInputRow) -> String {
     inputs::row_uniqueness_key(row)
 }
-
-// ──────────────────────────────────────────────────────────────────────────────
-// Core curation logic moved to `features/curation/services/enrichment.rs`
-// ──────────────────────────────────────────────────────────────────────────────
-
-// ──────────────────────────────────────────────────────────────────────────────
-// Tests
-// ──────────────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {

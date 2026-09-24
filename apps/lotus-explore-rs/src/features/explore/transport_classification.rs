@@ -34,7 +34,7 @@ pub fn classify_transport_error(error: &RepositoryError) -> TransportFailureKind
         RepositoryError::NotConfigured => TransportFailureKind::Configuration,
         RepositoryError::Network(_) => TransportFailureKind::Network,
         RepositoryError::Http { status, body } => classify_http_error(*status, body),
-        RepositoryError::Parse(detail) => classify_parse_error(detail.as_str()),
+        RepositoryError::Parse(detail) => classify_parse_error(detail.as_ref()),
     }
 }
 

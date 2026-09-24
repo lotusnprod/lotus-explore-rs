@@ -13,9 +13,7 @@ mod metrics;
 mod startup;
 
 pub use dispatch::{DispatchPhase, classify_dispatch_phase};
-pub use metrics::{
-    metrics_for_inactive_phase, metrics_for_waiting_loading_phase, metrics_for_waiting_query_phase,
-};
+pub use metrics::{metrics_for_waiting_loading_phase, metrics_for_waiting_query_phase};
 pub use startup::{StartupTriggerMode, should_trigger_startup_search};
 
 #[cfg(test)]

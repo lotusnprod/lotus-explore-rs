@@ -3,8 +3,6 @@
 
 //! Common UI utilities and phase models.
 
-use dioxus::prelude::*;
-
 /// High-level lifecycle phase for the results area viewport.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContentPhase {
@@ -28,12 +26,6 @@ pub struct LifecycleBooleans {
     pub has_entries: bool,
 }
 
-impl ContentPhase {
-    pub fn from_lifecycle(state: LifecycleBooleans) -> Self {
-        Self::from(state)
-    }
-}
-
 impl From<LifecycleBooleans> for ContentPhase {
     fn from(state: LifecycleBooleans) -> Self {
         let LifecycleBooleans {
@@ -55,35 +47,6 @@ impl From<LifecycleBooleans> for ContentPhase {
             Self::Empty
         } else {
             Self::Loaded
-        }
-    }
-}
-
-/// Default skip link style for keyboard navigation to main content.
-pub const SKIP_LINK_STYLE: &str = "position:absolute;top:-100%;left:0.5rem;z-index:9999;padding:0.5rem 1rem;background:transparent;color:#0b5cab;font-size:0.875rem;font-weight:600;border-radius:0 0 4px 4px;text-decoration:underline;";
-
-/// Skip navigation link for keyboard accessibility.
-#[component]
-pub fn skip_link() -> Element {
-    rsx! {
-        a {
-            href: "#main-content",
-            class: "skip-link",
-            style: SKIP_LINK_STYLE,
-            "Skip to main content"
-        }
-    }
-}
-
-/// Alternative skip link component for apps using `id="main"`.
-#[component]
-pub fn skip_link_main() -> Element {
-    rsx! {
-        a {
-            href: "#main",
-            class: "skip-link",
-            style: SKIP_LINK_STYLE,
-            "Skip to main content"
         }
     }
 }

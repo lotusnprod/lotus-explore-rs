@@ -10,9 +10,6 @@ categories = ["science", "wasm", "web-programming"]
 build = "build.rs"
 publish = false
 
-[package.metadata.dioxus]
-wasm-opt = 4
-
 [[bin]]
 name = "lotus-explore-rs"
 path = "src/main.rs"
@@ -30,6 +27,7 @@ thiserror = { workspace = true }
 urlencoding = { workspace = true }
 
 [dev-dependencies]
+futures = { workspace = true, features = ["executor"] }
 tower = { workspace = true }
 
 [build-dependencies]
@@ -41,6 +39,7 @@ axum = { workspace = true, optional = true }
 clap = { workspace = true, features = ["env"], optional = true }
 env_logger = { workspace = true, optional = true }
 flate2 = { workspace = true, optional = true }
+reqwest = { workspace = true, features = ["default-tls", "gzip"] }
 tempfile = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal", "sync"], optional = true }
 tower-http = { workspace = true, optional = true }

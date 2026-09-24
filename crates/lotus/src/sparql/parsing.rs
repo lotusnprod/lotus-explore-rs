@@ -128,19 +128,6 @@ pub fn parse_counts_csv_bytes(csv_bytes: &[u8]) -> Result<DatasetStats, FetchErr
     })
 }
 
-/// Parse capped compound rows and aggregate stats from CSV bytes.
-///
-/// # Errors
-/// Returns [`FetchError::Parse`] when CSV decoding fails.
-// Test-only helper: exercised by `super::tests`, dead in non-test builds.
-#[cfg_attr(not(test), allow(dead_code))]
-pub(super) fn parse_compounds_csv_capped_bytes(
-    csv_bytes: &[u8],
-    max_rows: usize,
-) -> Result<(Vec<CompoundEntry>, DatasetStats, bool), FetchError> {
-    parse_compounds_csv_capped_reader(csv_bytes, max_rows)
-}
-
 /// Parse capped compound rows and aggregate stats from any CSV reader.
 ///
 /// # Errors

@@ -30,11 +30,6 @@ impl AppStateContext {
 // ── Results Context ───────────────────────────────────────────────────────────
 
 /// Context for results-area components.
-///
-/// Contains only the live `explore` signal — previously it also held a
-/// `app_state` reference that was used to read a stale mirror copy of
-/// `ExploreState`.  That mirror copy has been removed; components now read the
-/// live signal directly.
 #[derive(Clone, Copy)]
 pub struct ResultsContext {
     /// Live explore signal — results, lifecycle, UI chrome.

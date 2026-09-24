@@ -38,7 +38,7 @@ fn integration_explore_snapshot_drives_loaded_phase_and_toolbar_data() {
     explore.result.total_matches = Some(3);
 
     let snapshot = toolbar_snapshot_from_result(&explore.result);
-    let phase = ContentPhase::from_lifecycle(LifecycleBooleans {
+    let phase = ContentPhase::from(LifecycleBooleans {
         loading: explore.lifecycle.loading,
         has_error: explore.lifecycle.error.is_some(),
         searched_once: explore.lifecycle.searched_once,

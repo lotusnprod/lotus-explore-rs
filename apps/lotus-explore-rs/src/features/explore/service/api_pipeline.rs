@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
-// The futures built here are intentionally `!Send`: the pipeline drives Dioxus
-// signals and `LotusRepository` futures (reqwest's WASM client), which are `!Send`
-// by design (see `repositories` doc comment). Dioxus's single-threaded executor
-// does not require `Send`, so no boxing would be gained.
 #![allow(clippy::future_not_send)]
 
 //! REST API fast-path execution for Explore searches.
@@ -102,7 +98,10 @@ mod tests {
             self.api_result.borrow_mut().take()
         }
 
-        async fn sparql_bytes(&self, _: &str) -> Result<Vec<u8>, RepositoryError> {
+        async fn sparql_body(
+            &self,
+            _: &str,
+        ) -> Result<lotus::transport::ResponseBody, RepositoryError> {
             panic!("api fast-path tests should not hit SPARQL")
         }
     }

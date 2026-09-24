@@ -5,9 +5,7 @@
 #![allow(clippy::panic)]
 
 use super::dispatch::{DispatchPhase, classify_dispatch_phase};
-use super::metrics::{
-    metrics_for_inactive_phase, metrics_for_waiting_loading_phase, metrics_for_waiting_query_phase,
-};
+use super::metrics::{metrics_for_waiting_loading_phase, metrics_for_waiting_query_phase};
 use super::startup::{StartupTriggerMode, should_trigger_startup_search};
 use crate::app_state::MetricsState;
 use crate::download::DownloadFormat;
@@ -105,18 +103,6 @@ fn startup_trigger_mode_discriminates_by_source() {
 
     assert!(matches!(download_mode, StartupTriggerMode::Download { .. }));
     assert!(matches!(execute_mode, StartupTriggerMode::DirectExecute));
-}
-
-#[test]
-fn inactive_phase_resets_metrics_guards() {
-    let metrics = MetricsState {
-        waiting_loading_logged: true,
-        waiting_query_logged: true,
-    };
-    assert_eq!(
-        metrics_for_inactive_phase(&metrics),
-        MetricsState::default()
-    );
 }
 
 #[test]

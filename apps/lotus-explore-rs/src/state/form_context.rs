@@ -37,17 +37,3 @@ impl FormCriteriaContext {
 pub fn use_form_criteria_context() -> FormCriteriaContext {
     use_context::<FormCriteriaContext>()
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[ignore = "requires Dioxus runtime context"]
-    fn dirty_state_round_trip() {
-        let criteria = Signal::new(SearchCriteria::default());
-        let baseline = Signal::new(SearchCriteria::default());
-        let ctx = FormCriteriaContext::new(criteria, baseline);
-        assert!(!ctx.is_dirty());
-    }
-}
