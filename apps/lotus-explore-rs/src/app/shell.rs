@@ -154,6 +154,15 @@ fn AppRuntimeEffects(
         }
     });
 
+    #[cfg(target_arch = "wasm32")]
+    use_effect(|| {
+        if let Some(doc) = web_sys::window().and_then(|window| window.document())
+            && let Ok(Some(shell)) = doc.query_selector("[data-boot-shell]")
+        {
+            shell.remove();
+        }
+    });
+
     use_startup_effect(app_state, explore, criteria, search_task_controller, repo);
     use_download_dispatch_effect(app_state, explore);
 

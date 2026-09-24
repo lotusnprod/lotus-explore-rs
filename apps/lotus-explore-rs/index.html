@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>LOTUS Knowledge Explorer</title>
-
-  <link rel="stylesheet" href="assets/lotus-explore.css">
+  <title></title>
+  <link id="app-css" rel="stylesheet" href="assets/lotus-explore.css" media="print">
 
   <!-- Favicons and Manifest (Loaded pre-WASM) -->
   <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
@@ -17,8 +16,8 @@
   <link rel="manifest" href="site.webmanifest" type="application/manifest+json">
 
   <!-- External Third-Party APIs (DNS Prefetching) -->
-  <link rel="dns-prefetch" href="https://qlever.dev">
-  <link rel="dns-prefetch" href="https://query.wikidata.org">
+  <link rel="preconnect" href="https://qlever.dev" crossorigin>
+  <link rel="preconnect" href="https://query.wikidata.org" crossorigin>
   <link rel="dns-prefetch" href="https://unpkg.com">
   <link rel="dns-prefetch" href="https://tools-static.wmflabs.org">
   <link rel="dns-prefetch" href="https://www.simolecule.com">
@@ -30,6 +29,10 @@
       var p = new URL(window.location.href).searchParams;
       document.documentElement.lang =
             p.get("lang") || p.get("locale") || "en";
+      var css = document.getElementById("app-css");
+      if (css) {
+        css.addEventListener("load", function () { css.media = "all"; });
+      }
       var t = window.trustedTypes;
       if (t) {
         try {
@@ -45,8 +48,23 @@
       }
     })();
   </script>
+  <style>
+    html, body, #main { margin: 0; min-height: 100%; }
+    body { background: #f7fafc; color: #111827; font-family: system-ui, sans-serif; }
+    .boot-shell { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 2rem; box-sizing: border-box; }
+    .boot-shell__inner { max-width: 32rem; text-align: center; }
+    .boot-shell h1 { margin: 0 0 .75rem; font-size: clamp(1.25rem, 4vw, 2rem); }
+    .boot-shell p { margin: 0; }
+  </style>
 </head>
 <body>
-  <div id="main"></div>
+  <div id="main">
+    <div class="boot-shell" data-boot-shell aria-hidden="true">
+      <div class="boot-shell__inner">
+        <h1>LOTUS Explorer</h1>
+        <p>Loading the explorer…</p>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

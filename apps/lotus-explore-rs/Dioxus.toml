@@ -23,7 +23,7 @@ debug = false
 keep_names = false
 
 [web.app]
-title = "LOTUS Linked Open Data Explorer"
+title = "LOTUS Explorer"
 
 [web.watcher]
 reload_html = true

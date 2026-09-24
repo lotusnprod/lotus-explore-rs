@@ -9,9 +9,19 @@
         document.head.appendChild(s);
     };
 
-    if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadAnalytics, { timeout: 2000 });
+    var schedule = function () {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(loadAnalytics);
+        } else {
+            setTimeout(loadAnalytics, 3000);
+        }
+    };
+    var scheduleAfterLoad = function () {
+        setTimeout(schedule, 5000);
+    };
+    if (document.readyState === 'complete') {
+        scheduleAfterLoad();
     } else {
-        setTimeout(loadAnalytics, 1500);
+        window.addEventListener('load', scheduleAfterLoad, { once: true });
     }
 })();

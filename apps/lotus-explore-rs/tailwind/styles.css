@@ -19,24 +19,6 @@
    CSS Variables - Design Tokens
    ========================================================================= */
 
-@font-face {
-    font-family: 'Inter';
-    font-display: swap;
-    src: local('Inter');
-}
-
-@font-face {
-    font-family: 'Fira Code';
-    font-display: swap;
-    src: local('Fira Code');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-display: swap;
-    src: local('JetBrains Mono');
-}
-
 *,
 *::before,
 *::after {

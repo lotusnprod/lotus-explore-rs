@@ -119,7 +119,7 @@ pub fn build_router(max_body_bytes: usize, config: &AppConfig, state: AppState) 
 
     // Optionally serve the Dioxus WASM build output as static files.
     if let Some(public_dir) = &config.public_dir {
-        router = router.fallback_service(ServeDir::new(public_dir));
+        router = router.fallback_service(ServeDir::new(public_dir).precompressed_br());
     }
 
     router
