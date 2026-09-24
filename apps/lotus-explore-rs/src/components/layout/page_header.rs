@@ -38,7 +38,7 @@ pub fn PageHeader() -> Element {
                 h1 { id: PAGE_TITLE_ID,
                     class: "text-display font-bold min-w-0 break-words overflow-hidden",
                     a {
-                        href: "/lotus-explore-rs/",
+                        href: "./",
                         class: "break-words text-inherit no-underline hover:no-underline",
                         "{t(locale, TextKey::PageTitle)}"
                     }
