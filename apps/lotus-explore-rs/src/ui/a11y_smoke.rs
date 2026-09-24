@@ -40,7 +40,7 @@ mod tests {
 
         assert!(list_src.contains("\"vocab\": \"https://schema.org/\""));
         assert!(list_src.contains("\"typeof\": \"ItemList\""));
-        assert!(row_src.contains("\"typeof\": \"ChemicalSubstance\""));
+        assert!(row_src.contains("\"typeof\": \"ChemicalEntity\""));
         assert!(row_src.contains("\"data-lotus-id\": \"compound:{compound_qid}\""));
         assert!(compound_src.contains("\"property\": \"wdt:P235\""));
         assert!(taxon_src.contains("\"property\": \"wdt:P171\""));

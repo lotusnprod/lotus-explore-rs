@@ -53,7 +53,7 @@ fn row_view(
     rsx! {
         tr {
             key: "{row_key}",
-            "typeof": "ChemicalSubstance",
+            "typeof": "ChemicalEntity",
             "about": "https://www.wikidata.org/entity/{compound_qid}",
             "data-lotus-id": "compound:{compound_qid}",
             class: "data-row border-b border-shell-border hover:bg-surface/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2 [contain:layout_paint]",
