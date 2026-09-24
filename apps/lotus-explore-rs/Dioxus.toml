@@ -2,17 +2,15 @@
 name = "lotus-explore-rs"
 default_platform = "web"
 asset_dir = "public"
+tailwind_input = "tailwind/styles.css"
+tailwind_output = "../../target/dx/lotus-explore-rs/debug/web/public/assets/lotus-explore.css"
 # Note: dx ≥ 0.7 writes the web bundle to
 #   target/dx/<package-name>/release/web/public/
 # and ignores any `out_dir` key set here.
 
 [[hooks]]
-# Compile Tailwind (token theme + scanned Rust utilities) before each dx build.
-# Pin the CLI to an exact version so the committed lotus-explore.css stays
-# byte-identical to dx's build output. Unpinned `npx` fetches LATEST, which
-# drifts the generated CSS across builds (this is what caused the committed
-# file and the build output to disagree). dx 0.7 has no built-in auto-tailwind,
-# so this pre-build hook is the required 0.7 path.
+# Release builds consume the committed public asset. The native watcher writes
+# the debug target directly because dx serves that copied tree during `serve`.
 stage = "pre-build"
 command = "npx @tailwindcss/cli@4.3.3 -i ./tailwind/styles.css -o ./public/assets/lotus-explore.css --minify"
 
