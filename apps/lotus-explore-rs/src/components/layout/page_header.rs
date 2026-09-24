@@ -44,7 +44,7 @@ pub fn PageHeader() -> Element {
                     Link {
                          to: home.navigation_string(),
 
-                        class: "break-words text-inherit no-underline hover:no-underline",
+                        class: "break-words text-text no-underline hover:no-underline",
                         "{t(locale, TextKey::PageTitle)}"
                     }
                 }
