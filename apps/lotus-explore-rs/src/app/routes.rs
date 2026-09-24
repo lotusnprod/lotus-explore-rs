@@ -77,6 +77,26 @@ impl Route {
         }
     }
 
+    pub fn navigation_string(&self) -> String {
+        let path = match self {
+            Self::Explore { .. } => "/",
+            Self::Curation { .. } => "/curation",
+            Self::Draw { .. } => "/draw",
+        };
+        let query = self.query_value().to_string();
+        let hash = self.hash();
+        let mut url = path.to_string();
+        if !query.is_empty() {
+            url.push('?');
+            url.push_str(&query);
+        }
+        if !hash.is_empty() {
+            url.push('#');
+            url.push_str(hash);
+        }
+        url
+    }
+
     pub fn hash(&self) -> &str {
         match self {
             Self::Explore { hash, .. } | Self::Curation { hash, .. } | Self::Draw { hash, .. } => {
@@ -140,6 +160,32 @@ impl Route {
             Self::Explore { .. } => Self::Explore { query, hash },
             Self::Curation { .. } => Self::Curation { query, hash },
             Self::Draw { .. } => Self::Draw { query, hash },
+        }
+    }
+}
+
+pub fn normalize_empty_query() {
+    #[cfg(target_arch = "wasm32")]
+    {
+        let Some(window) = web_sys::window() else {
+            return;
+        };
+        let location = window.location();
+        let Ok(href) = location.href() else {
+            return;
+        };
+        let Some(query_index) = href.find('?') else {
+            return;
+        };
+        let after_query = &href[query_index + 1..];
+        let query_len = after_query.find('#').unwrap_or(after_query.len());
+        if query_len != 0 {
+            return;
+        }
+        let mut clean = href;
+        clean.remove(query_index);
+        if let Ok(history) = window.history() {
+            let _ = history.replace_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some(&clean));
         }
     }
 }
@@ -255,6 +301,20 @@ mod tests {
                 "/curation?dark_mode=true&lang=fr#main-panel"
             );
         }
+    }
+
+    #[test]
+    fn navigation_strings_omit_empty_query_delimiters() {
+        let route = Route::Explore {
+            query: RouteQuery::default(),
+            hash: String::new(),
+        };
+        assert_eq!(route.navigation_string(), "/");
+        assert_eq!(
+            route.clone().with_view("curation").navigation_string(),
+            "/curation"
+        );
+        assert_eq!(route.with_view("draw").navigation_string(), "/draw");
     }
 
     #[test]

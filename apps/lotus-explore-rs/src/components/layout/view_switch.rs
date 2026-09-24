@@ -46,8 +46,8 @@ pub fn ViewSwitch() -> Element {
                     },
                 ],
                 on_select: move |value: String| {
-                    let target = route.clone().with_view(&value);
-                    if target != route {
+                    let target = route.clone().with_view(&value).navigation_string();
+                    if target != route.navigation_string() {
                         let _ = navigator.push(target);
                     }
                 },

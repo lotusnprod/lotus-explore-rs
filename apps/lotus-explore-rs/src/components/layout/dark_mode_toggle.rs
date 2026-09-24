@@ -36,7 +36,9 @@ pub fn DarkModeToggle() -> Element {
             onclick: move |_| {
                 let new_dark_mode = !dark_mode;
                 app_state.with_mut(|s| s.dark_mode = new_dark_mode);
-                let _ = navigator.replace(route.clone().with_dark_mode(new_dark_mode));
+                let _ = navigator.replace(
+                    route.clone().with_dark_mode(new_dark_mode).navigation_string(),
+                );
 
                 // Persist to localStorage
                 #[cfg(target_arch = "wasm32")]

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 use super::bootstrap::{AppBootstrap, bootstrap_app};
-use super::routes::Route;
+use super::routes::{Route, normalize_empty_query};
 use crate::app_state::AppState;
 use crate::components::layout::footer::Footer;
 use crate::components::layout::header_meta::HeaderMetaSection;
@@ -121,6 +121,7 @@ fn AppRuntimeEffects() -> Element {
     let repo = use_context::<AppServices>().repository();
 
     use_effect(move || {
+        normalize_empty_query();
         let route = router().current::<Route>();
         let query = route.query_value();
         if let Some(lang) = query.get("lang") {

@@ -42,7 +42,8 @@ pub fn PageHeader() -> Element {
                 h1 { id: PAGE_TITLE_ID,
                     class: "text-display font-bold min-w-0 break-words overflow-hidden",
                     Link {
-                        to: home,
+                         to: home.navigation_string(),
+
                         class: "break-words text-inherit no-underline hover:no-underline",
                         "{t(locale, TextKey::PageTitle)}"
                     }

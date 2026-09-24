@@ -46,7 +46,10 @@ pub fn LangSwitch() -> Element {
                     };
                     if *locale_sig.peek() != next {
                         *locale_sig.write() = next;
-                        let _ = navigator.replace(route.clone().with_locale(next));
+                         let _ = navigator.replace(
+                             route.clone().with_locale(next).navigation_string(),
+                         );
+
                     }
                 },
             }
