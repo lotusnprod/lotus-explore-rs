@@ -75,22 +75,22 @@ nursery = { level = "deny", priority = -3 }
 # Note: multiple_crate_versions is allow-listed due to transitive deps from dioxus
 cargo = { level = "deny", priority = -1 }
 
+# Catch leftover debug macro calls in production code paths
+dbg_macro = "deny"
 expect_used = "deny"
 indexing_slicing = "deny"
+# Assertions must explain intent; makes test failures self-documenting
+missing_assert_message = "deny"
 panic = "deny"
 todo = "deny"
+# Any unsafe block must come with a justification comment
+undocumented_unsafe_blocks = "deny"
+# Detect non-canonical Unicode that could break identifier/normalization logic
+unicode_not_nfc = "deny"
 unimplemented = "deny"
 # Selectively enable valuable restriction lints
 # These catch real quality issues and are defensible
 unwrap_used = "deny"
-# Catch leftover debug macro calls in production code paths
-dbg_macro = "deny"
-# Any unsafe block must come with a justification comment
-undocumented_unsafe_blocks = "deny"
-# Assertions must explain intent; makes test failures self-documenting
-missing_assert_message = "deny"
-# Detect non-canonical Unicode that could break identifier/normalization logic
-unicode_not_nfc = "deny"
 
 # Allow multiple_crate_versions due to transitive deps from dioxus ecosystem
 multiple_crate_versions = "allow"
@@ -101,10 +101,10 @@ missing_debug_implementations = "deny"
 missing_docs = "deny"
 unreachable_pub = "deny"
 unsafe_code = "forbid"
-unused_crate_dependencies = "deny"
-unused_must_use = "deny"
 # Require an explicit unsafe block per unsafe operation inside unsafe fns
 unsafe_op_in_unsafe_fn = "deny"
+unused_crate_dependencies = "deny"
+unused_must_use = "deny"
 
 [profile.release]
 debug = false
