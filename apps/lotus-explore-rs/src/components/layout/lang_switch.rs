@@ -24,15 +24,15 @@ pub fn LangSwitch() -> Element {
             class: "lang-switch inline-flex items-center rounded-full overflow-hidden border border-border bg-surface shadow-xs",
             aria_label: t(locale, TextKey::Language).to_string(),
             SegmentedControl {
-                aria_label: t(locale, TextKey::Language).to_string(),
-                selected_value: locale.lang_code().to_string(),
+                aria_label: t(locale, TextKey::Language),
+                selected_value: locale.lang_code(),
                 dark: dark_mode,
                 wrap: false,
                 items: vec![
-                    SegmentedControlItem { label: "EN".to_string(), value: "en".to_string() },
-                    SegmentedControlItem { label: "FR".to_string(), value: "fr".to_string() },
-                    SegmentedControlItem { label: "DE".to_string(), value: "de".to_string() },
-                    SegmentedControlItem { label: "IT".to_string(), value: "it".to_string() },
+                    SegmentedControlItem { label: "EN", value: "en" },
+                    SegmentedControlItem { label: "FR", value: "fr" },
+                    SegmentedControlItem { label: "DE", value: "de" },
+                    SegmentedControlItem { label: "IT", value: "it" },
                 ],
                 on_select: move |value: String| {
                     let next = match value.as_str() {

@@ -20,7 +20,7 @@ pub const fn de_t(key: TextKey) -> &'static str {
         TextKey::FiltersShow => "Filter anzeigen",
         TextKey::FiltersHide => "Filter ausblenden",
         TextKey::Language => "Sprache",
-        TextKey::PageTitle => "LOTUS Explorer für verknüpfte offene Daten",
+        TextKey::PageTitle => "LOTUS Explorer",
         TextKey::DarkModeToggle => "Thema hell/dunkel umschalten",
         TextKey::DarkMode => "Dunkel",
         TextKey::LightMode => "Hell",

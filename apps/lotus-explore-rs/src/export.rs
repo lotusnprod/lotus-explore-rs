@@ -11,4 +11,4 @@ mod filters;
 mod metadata;
 
 pub use filename::generate_filename;
-pub use metadata::{MetadataInputs, SparqlEndpoint, build_metadata_json};
+pub use metadata::{APP_NAME, MetadataInputs, SparqlEndpoint, build_metadata_json};

@@ -27,23 +27,23 @@ pub fn ViewSwitch() -> Element {
     rsx! {
         nav { class: "view-switch flex flex-wrap items-center rounded-full overflow-hidden border border-border bg-surface shadow-xs", aria_label: "{view_switch_aria(locale)}",
             SegmentedControl {
-                aria_label: view_switch_aria(locale).to_string(),
-                selected_value: view_key(current_view).to_string(),
+                aria_label: view_switch_aria(locale),
+                selected_value: view_key(current_view),
                 dark: dark_mode,
                 wrap: true,
                 active_aria_current: "page",
                 items: vec![
                     SegmentedControlItem {
-                        label: view_label_explorer(locale).to_string(),
-                        value: "explore".to_string(),
+                        label: view_label_explorer(locale),
+                        value: "explore",
                     },
                     SegmentedControlItem {
-                        label: view_label_curation_explorer(locale).to_string(),
-                        value: "curation".to_string(),
+                        label: view_label_curation_explorer(locale),
+                        value: "curation",
                     },
                     SegmentedControlItem {
-                        label: view_label_draw(locale).to_string(),
-                        value: "draw".to_string(),
+                        label: view_label_draw(locale),
+                        value: "draw",
                     },
                 ],
                 on_select: move |value: String| {

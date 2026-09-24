@@ -10,6 +10,7 @@
 // expression is an `asset!` invocation of exactly this shape.
 #![allow(clippy::volatile_composites)]
 
+use crate::export::APP_NAME;
 use crate::ui::document::DocumentHead;
 use dioxus::prelude::*;
 
@@ -111,12 +112,12 @@ pub fn LotusDocumentHead(lang: String) -> Element {
     });
     rsx! {
         DocumentHead {
-            title: "LOTUS Explore-rs".to_string(),
+            title: APP_NAME.to_string(),
             lang,
             description: Some(DESCRIPTION.to_string()),
             og_type: Some("website".to_string()),
             og_url: Some(canonical.clone()),
-            og_site_name: Some("LOTUS Explore-rs".to_string()),
+            og_site_name: Some(APP_NAME.to_string()),
             theme_colors: Some(("#f6f8fb", "#10141b")),
             json_ld: Some(json_ld(&canonical)),
             canonical: Some(canonical),

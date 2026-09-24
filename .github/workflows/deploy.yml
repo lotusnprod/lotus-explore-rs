@@ -42,9 +42,20 @@ jobs:
           docker buildx build \
             --target export \
             --build-arg DX_BASE_PATH="/${REPONAME}" \
-            --output "_final_site" .
+             --output "_final_site" .
+
+      - name: Verify single minified production CSS
+        run: |
+          test "$(find _final_site -type f -name lotus-explore.css | wc -l | tr -d ' ')" -eq 1
+          test "$(wc -l < _final_site/assets/lotus-explore.css | tr -d ' ')" -le 2
+          test -f _final_site/assets/lotus-explore.css
+          test -f _final_site/assets/lotus-explore.css.br
+          test ! -e _final_site/tailwind/styles.css
+          test ! -e _final_site/assets/styles.css
+          ! grep -Eq '(@import "tailwindcss"|@source)' _final_site/assets/lotus-explore.css
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
+
         with:
           path: _final_site
 

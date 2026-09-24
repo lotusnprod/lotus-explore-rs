@@ -56,7 +56,7 @@ serve app:
 
 build app:
 	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
-	dx build --release --package {{app}}
+	dx build --release --package {{app}} --rustc-args=-Copt-level=z
 
 # ── Supply-chain hygiene (skip gracefully if a tool is not installed) ─────────
 

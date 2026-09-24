@@ -20,7 +20,7 @@ pub const fn it_t(key: TextKey) -> &'static str {
         TextKey::FiltersShow => "Mostra filtri",
         TextKey::FiltersHide => "Nascondi filtri",
         TextKey::Language => "Lingua",
-        TextKey::PageTitle => "Esploratore LOTUS di dati aperti collegati",
+        TextKey::PageTitle => "Esploratore LOTUS",
         TextKey::DarkModeToggle => "Attiva/disattiva tema chiaro/scuro",
         TextKey::DarkMode => "Scuro",
         TextKey::LightMode => "Chiaro",

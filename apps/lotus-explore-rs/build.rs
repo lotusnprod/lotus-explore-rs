@@ -136,6 +136,7 @@ fn clean_dx_output() -> Result<(), Box<dyn Error>> {
         return Ok(());
     };
     let profile = std::env::var("PROFILE").unwrap_or_else(|_| "release".into());
+    let profile = profile.strip_prefix("wasm-").unwrap_or(profile.as_str());
     let output = target_dir
         .join("dx")
         .join("lotus-explore-rs")

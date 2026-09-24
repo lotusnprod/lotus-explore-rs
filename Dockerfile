@@ -62,7 +62,7 @@ ARG DX_BASE_PATH="/"
 # `public/assets/ketcher` lands inside the app crate's public/ dir.
 RUN cd apps/lotus-explore-rs && \
     cargo run --release -p lotus-deploy --bin fetch-ketcher && \
-    dx build --release --platform web --base-path "${DX_BASE_PATH}" --package lotus-explore-rs
+    dx build --release --platform web --base-path "${DX_BASE_PATH}" --package lotus-explore-rs --rustc-args=-Copt-level=z
 
 # ── Stage 3: export (for CI artifact extraction) ────────────────────────────────
 # Exposes the built web bundle via a scratch image so CI can extract it with

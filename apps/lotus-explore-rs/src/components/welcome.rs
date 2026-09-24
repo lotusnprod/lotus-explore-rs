@@ -23,7 +23,7 @@ pub fn WelcomeScreen() -> Element {
             div { class: "w-full",
                 div { class: "flex flex-col gap-3 px-4 py-6 sm:px-6 sm:py-8",
                     p {
-                        class: "text-body leading-relaxed text-muted",
+                        class: "max-w-[80ch] text-body leading-relaxed text-muted",
                         "{t(locale, TextKey::WelcomeLeadA)}"
                         "{t(locale, TextKey::WelcomeLeadB)}"
                         a {
@@ -75,6 +75,7 @@ pub fn WelcomeScreen() -> Element {
                                     } else {
                                         "inline-block text-subtle transition-transform duration-150 ease-[cubic-bezier(.4,0,.2,1)]"
                                     },
+                                    aria_hidden: "true",
                                     "▶"
                                 }
                                 "{t(locale, TextKey::ExampleApiUrls)}"

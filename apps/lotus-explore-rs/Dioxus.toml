@@ -21,6 +21,7 @@ pre_compress = true
 level = "z"
 debug = false
 keep_names = false
+extra_features = ["--converge"]
 
 [web.app]
 title = "LOTUS Explorer"

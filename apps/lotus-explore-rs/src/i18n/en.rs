@@ -20,7 +20,7 @@ pub const fn en_t(key: TextKey) -> &'static str {
         TextKey::FiltersShow => "Show filters",
         TextKey::FiltersHide => "Hide filters",
         TextKey::Language => "Language",
-        TextKey::PageTitle => "LOTUS Linked Open Data Explorer",
+        TextKey::PageTitle => "LOTUS Explorer",
         TextKey::DarkModeToggle => "Toggle dark/light mode",
         TextKey::DarkMode => "Dark",
         TextKey::LightMode => "Light",

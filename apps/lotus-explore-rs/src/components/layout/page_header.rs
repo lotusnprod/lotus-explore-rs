@@ -30,7 +30,8 @@ pub fn PageHeader() -> Element {
             div {
                 class: "flex flex-wrap items-start justify-between gap-3 sm:gap-4",
                 div {
-                    class: "w-[90px] shrink-0",
+                    class: "w-16 shrink-0",
+                    aria_hidden: "true",
                     dangerous_inner_html: LOTUS_LOGO_SVG,
                 }
                 div {

@@ -8,15 +8,15 @@ use dioxus::prelude::*;
 /// Item rendered inside a segmented control.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SegmentedControlItem {
-    pub label: String,
-    pub value: String,
+    pub label: &'static str,
+    pub value: &'static str,
 }
 
 /// Properties for the [`SegmentedControl`] component.
 #[derive(Clone, Props, Debug, PartialEq)]
 pub struct SegmentedControlProps {
-    pub aria_label: String,
-    pub selected_value: String,
+    pub aria_label: &'static str,
+    pub selected_value: &'static str,
     pub items: Vec<SegmentedControlItem>,
     pub on_select: EventHandler<String>,
     #[props(default = false)]
@@ -31,7 +31,6 @@ pub struct SegmentedControlProps {
 
 #[component]
 pub fn SegmentedControl(props: SegmentedControlProps) -> Element {
-    let selected_value = props.selected_value.clone();
     let stretch = props.stretch;
     let wrap = props.wrap;
     let on_select = props.on_select;
@@ -47,9 +46,9 @@ pub fn SegmentedControl(props: SegmentedControlProps) -> Element {
             },
             for item in &props.items {
                 SegmentedButton {
-                    label: item.label.clone(),
-                    value: item.value.clone(),
-                    selected_value: selected_value.clone(),
+                    label: item.label,
+                    value: item.value,
+                    selected_value: props.selected_value,
                     stretch,
                     active_aria_current: props.active_aria_current,
                     on_select,
@@ -61,9 +60,9 @@ pub fn SegmentedControl(props: SegmentedControlProps) -> Element {
 
 #[derive(Clone, Props, Debug, PartialEq)]
 struct SegmentedButtonProps {
-    pub label: String,
-    pub value: String,
-    pub selected_value: String,
+    pub label: &'static str,
+    pub value: &'static str,
+    pub selected_value: &'static str,
     pub on_select: EventHandler<String>,
     #[props(default = false)]
     pub stretch: bool,
@@ -76,8 +75,8 @@ fn SegmentedButton(props: SegmentedButtonProps) -> Element {
     let active = props.value == props.selected_value;
     let stretch = props.stretch;
     let on_select = props.on_select;
-    let value = props.value.clone();
-    let label = props.label.clone();
+    let value = props.value;
+    let label = props.label;
 
     let class = if active {
         if stretch {
@@ -98,7 +97,7 @@ fn SegmentedButton(props: SegmentedButtonProps) -> Element {
             aria_pressed: if active { "true" } else { "false" },
             aria_current: if active { props.active_aria_current } else { "false" },
             class: class,
-            onclick: move |_| on_select.call(value.clone()),
+             onclick: move |_| on_select.call(value.to_string()),
             "{label}"
         }
     }

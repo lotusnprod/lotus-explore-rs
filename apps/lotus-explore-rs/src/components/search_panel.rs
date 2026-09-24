@@ -27,6 +27,7 @@ pub fn SearchPanel() -> Element {
     let state = use_results_context();
     let form_ctx = use_form_criteria_context();
     let interactions = use_explore_interactions();
+    let locale = crate::hooks::use_locale();
 
     let loading = *use_lifecycle_selector(state.explore, |lifecycle| lifecycle.loading).read();
     let is_dirty = form_ctx.is_dirty();
@@ -37,6 +38,7 @@ pub fn SearchPanel() -> Element {
         form {
             id: "lotus-search-form",
             class: "search-panel flex-0-auto flex flex-col gap-2 p-3.5 bg-shell-page w-full min-w-0",
+            aria_label: t(locale, TextKey::Search).to_string(),
             "data-webmcp-id": "lotus-search-form",
             "data-webmcp-type": "form",
             "data-webmcp-name": "LOTUS search form",
