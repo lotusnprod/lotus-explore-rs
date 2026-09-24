@@ -4,9 +4,9 @@
 license](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Tests](https://img.shields.io/badge/tests-315-brightgreen)](https://github.com/lotusnprod/lotus-explore-rs/actions)
 
-`lotus-explore-rs` --- LOTUS Knowledge Explorer.
+`lotus-explore-rs` --- LOTUS Explorer.
 
-A linked open data (LOAD) explorer for the LOTUS compound-taxon-reference
+A linked open data (LOD) explorer for the LOTUS compound-taxon-reference
 knowledge graph from Wikidata, queried via SPARQL. Powered by the `lotus` shared
 crate and the QLever SPARQL endpoint.
 

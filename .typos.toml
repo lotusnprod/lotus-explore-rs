@@ -3,3 +3,6 @@ extend-exclude = [
   "**/public/assets/",
   "**/i18n/**",
 ]
+
+[default.extend-words]
+LOD = "LOD"

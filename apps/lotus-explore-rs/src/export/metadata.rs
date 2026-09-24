@@ -8,7 +8,7 @@ use serde::Serialize;
 use serde_json::{Map, Value, json};
 
 pub const APP_VERSION: &str = "0.1.0";
-pub const APP_NAME: &str = "LOTUS Knowledge Search";
+pub const APP_NAME: &str = "LOTUS Explorer";
 pub const APP_URL: &str = "https://github.com/lotusnprod/lotus-explore-rs";
 pub const QLEVER_ENDPOINT: &str = "https://qlever.dev/api/wikidata";
 pub const WDQS_ENDPOINT: &str = "https://query.wikidata.org/sparql";
@@ -175,7 +175,7 @@ pub fn build_metadata_json(inp: MetadataInputs<'_>) -> String {
             (
                 format!("LOTUS Data — {effective_taxon}"),
                 format!(
-                    "Chemical compounds from {effective_taxon}. Retrieved via LOTUS Knowledge Search."
+                    "Chemical compounds from {effective_taxon}. Retrieved via LOTUS  Explorer."
                 ),
             )
         },

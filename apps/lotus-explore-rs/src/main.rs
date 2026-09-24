@@ -21,9 +21,9 @@
 #![allow(unused_crate_dependencies)]
 #![allow(dead_code, unreachable_pub, clippy::missing_const_for_fn)]
 
-//! `lotus-explore-rs` — LOTUS Knowledge Explorer.
+//! `lotus-explore-rs` — LOTUS Explorer.
 //!
-//! A linked open data (LOAD) explorer for the LOTUS compound-taxon-reference
+//! A linked open data (LOD) explorer for the LOTUS compound-taxon-reference
 //! knowledge graph from Wikidata, queried via SPARQL.  Powered by the `lotus`
 //! shared crate and the `QLever` SPARQL endpoint.
 //!
