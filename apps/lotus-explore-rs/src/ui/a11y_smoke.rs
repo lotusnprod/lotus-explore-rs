@@ -66,4 +66,14 @@ mod tests {
         assert!(landing_src.contains("id: \"not-found-heading\""));
         assert!(landing_src.contains("href_with_current_query(\"/\")"));
     }
+
+    #[test]
+    fn boot_theme_uses_shared_tokens() {
+        let index_src = include_str!("../../index.html");
+        let logo_src = include_str!("../../public/favicon.svg");
+
+        assert!(index_src.contains("background: var(--shell-page-bg, #f7fafc)"));
+        assert!(index_src.contains("color: var(--text, #111827)"));
+        assert!(logo_src.contains("fill:currentColor"));
+    }
 }
