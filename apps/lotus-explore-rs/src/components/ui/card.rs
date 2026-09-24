@@ -22,7 +22,7 @@ pub fn Card(props: CardProps) -> Element {
     if let Some(href) = &props.href {
         rsx! {
             article {
-                class: "flex flex-col gap-4 rounded-xl border border-panel-border bg-panel-soft p-4 shadow-xs transition-shadow duration-200 hover:shadow-md {custom_class}",
+                class: "flex flex-col gap-4 rounded-xl border border-shell-border bg-shell-raised p-4 {custom_class}",
                 a {
                     href: href,
                     class: "block",
@@ -33,7 +33,7 @@ pub fn Card(props: CardProps) -> Element {
     } else {
         rsx! {
             article {
-                class: "flex flex-col gap-4 rounded-xl border border-panel-border bg-panel-soft p-4 shadow-xs {custom_class}",
+                class: "flex flex-col gap-4 rounded-xl border border-shell-border bg-shell-raised p-4 {custom_class}",
                 {props.children}
             }
         }

@@ -23,11 +23,16 @@ pub(in crate::components::results_table::row_cells) fn compound_cell(
         td { class: "min-w-0 px-3 py-2.5 align-middle text-ui shadow-[inset_3px_0_0_var(--footer-wd-compound)]",
             div { class: "flex flex-col gap-1 max-w-[30ch]",
                 a {
+                    "property": "name",
+                    "resource": "https://www.wikidata.org/entity/{compound_qid}",
                     href: "https://www.wikidata.org/entity/{compound_qid}",
                     target: "_blank",
                     rel: "noopener noreferrer",
                     class: "block break-words hyphens-auto line-clamp-2 font-semibold leading-snug hover:underline text-wd-compound",
                     "{prepared.display_name}"
+                }
+                if let Some(smiles) = entry.smiles.as_deref() {
+                    span { "property": "wdt:P233", "content": "{smiles}", class: "sr-only" }
                 }
             }
             div { class: "mt-1 flex flex-wrap items-center gap-1 max-w-[30ch]",
@@ -41,6 +46,8 @@ pub(in crate::components::results_table::row_cells) fn compound_cell(
                 }
                 if let Some(ik) = entry.inchikey.as_deref() {
                     a {
+                        "property": "wdt:P235",
+                        "resource": "https://www.wikidata.org/wiki/Special:Search?search={ik}",
                         href: "https://www.wikidata.org/wiki/Special:Search?search={ik}",
                         target: "_blank",
                         rel: "noopener noreferrer",

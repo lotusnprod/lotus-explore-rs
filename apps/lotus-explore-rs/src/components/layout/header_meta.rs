@@ -109,7 +109,7 @@ pub fn HeaderMetaSection() -> Element {
 
     rsx! {
         if has_meta {
-            div { class: "flex flex-wrap items-center gap-2 px-6 sm:px-8 lg:px-10 py-2 bg-panel/92 backdrop-blur-sm text-ui rounded-b-xl shadow-xs",
+            div { class: "flex flex-wrap items-center gap-2 px-6 sm:px-8 lg:px-10 py-2 bg-shell-chrome text-ui rounded-b-xl",
                 if let Some(qid) = resolved_qid_value.as_ref() {
                     ResolvedTaxonMetaItem { locale, qid: qid.clone() }
                 }

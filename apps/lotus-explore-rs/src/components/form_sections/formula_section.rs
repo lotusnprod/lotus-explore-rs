@@ -51,7 +51,7 @@ fn NumPair(
     let max_id = format!("{}-max", label.to_lowercase());
 
     rsx! {
-        div { class: "flex flex-col gap-1.5 rounded-xl border border-border bg-panel p-1.5 shadow-xs",
+        div { class: "flex flex-col gap-1.5 rounded-xl border border-shell-border bg-shell-raised p-1.5",
             p { class: "text-micro text-subtle", "{label}" }
             div { class: "formula-minmax-grid",
                 div { class: "flex flex-col gap-0.5",
@@ -122,7 +122,7 @@ pub fn FormulaSection() -> Element {
     let enabled = criteria.formula_enabled;
 
     rsx! {
-        div { class: "flex flex-col gap-1.5 rounded-xl border border-border bg-panel p-1.5 shadow-xs",
+        div { class: "flex flex-col gap-1.5 rounded-xl border border-shell-border bg-shell-raised p-1.5",
             label { class: "flex cursor-pointer items-center gap-1.5 text-ui text-muted",
                 input {
                     r#type: "checkbox",

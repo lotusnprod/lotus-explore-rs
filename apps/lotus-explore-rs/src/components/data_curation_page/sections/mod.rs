@@ -27,7 +27,7 @@ use crate::features::explore::absolute_share_url;
 #[component]
 pub fn ShareBar(locale: Locale, share: Arc<str>) -> Element {
     rsx! {
-        div { class: "flex flex-col gap-2 p-3 rounded-xl border border-panel-border bg-panel-soft shadow-xs", role: "status",
+        div { class: "flex flex-col gap-2 p-3 rounded-xl border border-shell-border bg-shell-raised", role: "status",
             span { class: "text-ui font-semibold text-text2", "{t(locale, TextKey::Share)}" }
             div { class: "flex flex-col gap-2",
                 input {
@@ -288,7 +288,7 @@ pub fn QueueRowsCard(
     let rows_snapshot = rows.read().clone();
 
     rsx! {
-        div { class: "flex flex-col gap-4 rounded-xl bg-panel-soft p-4 shadow-xs",
+        div { class: "flex flex-col gap-4 rounded-xl",
             div { class: "flex flex-wrap items-center justify-between gap-2.5",
                 h3 { "{heading_queued_rows(locale)}" }
                 Button {
@@ -303,7 +303,7 @@ pub fn QueueRowsCard(
                 }
             }
             div {
-                class: "w-full overflow-x-auto rounded-xl border border-panel-border focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
+                class: "w-full overflow-x-auto rounded-xl border border-shell-border focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                 role: "region",
                 tabindex: "0",
                 aria_label: "{heading_queued_rows(locale)}",
@@ -377,7 +377,7 @@ pub fn QuickStatementsCard(
     let qs_main_link = build_qs_dev_link(&qs_ref.main);
 
     rsx! {
-        div { class: "flex flex-col gap-4 rounded-xl bg-panel-soft p-4 shadow-xs",
+        div { class: "flex flex-col gap-4 rounded-xl",
             if !qs_ref.dependencies.is_empty() {
                 p { class: "text-ui text-subtle leading-snug", "{msg_two_step_hint(locale)}" }
                 p { class: "text-ui text-subtle leading-snug", "{msg_delay_advice(locale)}" }

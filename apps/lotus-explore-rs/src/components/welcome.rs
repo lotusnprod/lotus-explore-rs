@@ -16,7 +16,9 @@ pub fn WelcomeScreen() -> Element {
     let mut urls_open = use_signal(|| false);
 
     rsx! {
-        section {
+                        section {
+            "vocab": "https://schema.org/",
+            "prefix": "wd: http://www.wikidata.org/entity/ wdt: http://www.wikidata.org/prop/direct/",
             class: "page-section w-full max-w-none px-0",
             div { class: "w-full",
                 div { class: "flex flex-col gap-3 px-4 py-6 sm:px-6 sm:py-8",
@@ -120,7 +122,7 @@ fn DownloadExampleRow(
     let absolute = Arc::<str>::from(absolute);
     rsx! {
         div {
-            class: "flex items-center gap-2 rounded-xl border border-border bg-bg p-2 text-ui shadow-xs",
+            class: "flex items-center gap-2 rounded-xl border border-shell-border bg-shell-page p-2 text-ui",
             span {
                 class: "shrink-0 rounded-full bg-accent/12 px-2 py-0.5 text-micro font-semibold text-accent",
                 "{format}"

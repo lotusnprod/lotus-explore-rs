@@ -94,6 +94,7 @@ fn SegmentedButton(props: SegmentedButtonProps) -> Element {
     rsx! {
         button {
             r#type: "button",
+            "data-segmented-value": "{value}",
             aria_pressed: if active { "true" } else { "false" },
             aria_current: if active { props.active_aria_current } else { "false" },
             class: class,

@@ -173,7 +173,7 @@ fn ShellScaffold(lang: String) -> Element {
             "{t(locale, TextKey::SkipToResults)}"
         }
         div {
-            class: "app-shell",
+            class: "app-shell bg-shell-page",
             div {
                 class: "app-layout",
                 main {
@@ -186,7 +186,7 @@ fn ShellScaffold(lang: String) -> Element {
                 }
             }
             footer {
-                class: "flex flex-col shrink-0 w-full bg-panel border-t border-border min-h-[80px]",
+                class: "flex flex-col shrink-0 w-full bg-shell-chrome border-t border-shell-border min-h-[80px]",
                 div {
                     class: "w-full max-w-[1600px] mx-auto px-5 pt-[3px] pb-[6px] box-border lg:px-8",
                     Footer {}

@@ -19,7 +19,7 @@ pub fn TaxonInput() -> Element {
     let interactions = use_explore_interactions();
     let taxon = use_criteria_selector(ctx.criteria, |c| c.taxon.clone());
     rsx! {
-        div { class: "flex flex-col gap-1.5 rounded-xl border border-border bg-panel p-1.5 shadow-xs",
+        div { class: "flex flex-col gap-1.5 rounded-xl border border-shell-border bg-shell-raised p-1.5",
             label {
                 class: "text-body font-semibold text-text",
                 r#for: "taxon-input",
@@ -70,7 +70,7 @@ pub fn MassRangeInput() -> Element {
         div {
             role: "group",
             aria_labelledby: "mass-range-label",
-            class: "flex flex-col gap-1.5 rounded-xl border border-border bg-panel p-1.5 shadow-xs",
+            class: "flex flex-col gap-1.5 rounded-xl border border-shell-border bg-shell-raised p-1.5",
             p { id: "mass-range-label", class: "text-body font-semibold text-text", "{t(locale, TextKey::MolecularMass)}" }
             div { class: "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-2",
                 div { class: "flex min-w-0 flex-col gap-0.5",
@@ -137,7 +137,7 @@ pub fn YearRangeInput() -> Element {
         div {
             role: "group",
             aria_labelledby: "year-range-label",
-            class: "flex flex-col gap-1.5 rounded-xl border border-border bg-panel p-1.5 shadow-xs",
+            class: "flex flex-col gap-1.5 rounded-xl border border-shell-border bg-shell-raised p-1.5",
             p { id: "year-range-label", class: "text-body font-semibold text-text", "{t(locale, TextKey::PublicationYear)}" }
             div { class: "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-2",
                 div { class: "flex min-w-0 flex-col gap-0.5",

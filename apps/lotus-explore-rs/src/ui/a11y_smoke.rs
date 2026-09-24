@@ -30,6 +30,24 @@ mod tests {
     }
 
     #[test]
+    fn results_expose_stable_domain_rdfa_contract() {
+        let list_src = include_str!("../components/results_table.rs");
+        let row_src = include_str!("../components/results_table/row_cells/render.rs");
+        let compound_src = include_str!("../components/results_table/row_cells/cells/compound.rs");
+        let taxon_src = include_str!("../components/results_table/row_cells/cells/taxon.rs");
+        let reference_src =
+            include_str!("../components/results_table/row_cells/cells/reference.rs");
+
+        assert!(list_src.contains("\"vocab\": \"https://schema.org/\""));
+        assert!(list_src.contains("\"typeof\": \"ItemList\""));
+        assert!(row_src.contains("\"typeof\": \"ChemicalSubstance\""));
+        assert!(row_src.contains("\"data-lotus-id\": \"compound:{compound_qid}\""));
+        assert!(compound_src.contains("\"property\": \"wdt:P235\""));
+        assert!(taxon_src.contains("\"property\": \"wdt:P171\""));
+        assert!(reference_src.contains("\"typeof\": \"ScholarlyArticle\""));
+    }
+
+    #[test]
     fn page_header_exposes_single_home_link_and_heading_id() {
         let header_src = include_str!("../components/layout/page_header.rs");
         assert!(header_src.contains("h1 { id: PAGE_TITLE_ID"));

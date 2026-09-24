@@ -26,7 +26,7 @@ pub fn PageHeader() -> Element {
 
     rsx! {
         header {
-            class: "sticky top-0 z-3 min-h-[46px] bg-panel/92 backdrop-blur-sm rounded-t-xl shadow-xs px-4 sm:px-8",
+            class: "sticky top-0 z-3 min-h-[46px] bg-shell-chrome border-b border-shell-border rounded-t-xl px-4 sm:px-8",
             div {
                 class: "flex flex-wrap items-start justify-between gap-3 sm:gap-4",
                 div {

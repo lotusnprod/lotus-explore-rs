@@ -131,10 +131,13 @@ video {
     --critical-text: #172535;
     --critical-muted: #33475c;
 
-    /* Panels */
-    --panel-bg: var(--surface);
-    --panel-bg-soft: var(--surface);
-    --panel-border: color-mix(in srgb, var(--border) 82%, transparent);
+    /* Shell surfaces: page, raised panel, and sticky chrome. */
+    --shell-page-bg: var(--bg);
+    --shell-raised-bg: var(--surface);
+    --shell-chrome-bg: var(--surface);
+    --shell-border: var(--border);
+    --shell-radius: 12px;
+    --shell-control-radius: 8px;
 
     /* Footer organism colors */
     --footer-wd-taxon: color-mix(in srgb, var(--wd-taxon) 77%, #000);
@@ -213,9 +216,10 @@ video {
     --color-success: var(--green);
     --color-warning: var(--yellow);
     --color-purple: var(--purple);
-    --color-panel: var(--panel-bg);
-    --color-panel-soft: var(--panel-bg-soft);
-    --color-panel-border: var(--panel-border);
+    --color-shell-page: var(--shell-page-bg);
+    --color-shell-raised: var(--shell-raised-bg);
+    --color-shell-chrome: var(--shell-chrome-bg);
+    --color-shell-border: var(--shell-border);
     --color-glass: var(--glass);
     --color-critical: var(--critical-text);
     --color-critical-muted: var(--critical-muted);
@@ -288,7 +292,7 @@ video {
 
 /* Base styles */
 body {
-    background: var(--bg);
+    background: var(--shell-page-bg);
     color: var(--text);
     font-family: var(--sans), sans-serif;
     font-size: var(--fs-body);

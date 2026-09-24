@@ -53,7 +53,10 @@ fn row_view(
     rsx! {
         tr {
             key: "{row_key}",
-            class: "data-row border-b border-panel-border hover:bg-surface/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2 [contain:layout_paint]",
+            "typeof": "ChemicalSubstance",
+            "about": "https://www.wikidata.org/entity/{compound_qid}",
+            "data-lotus-id": "compound:{compound_qid}",
+            class: "data-row border-b border-shell-border hover:bg-surface/40 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2 [contain:layout_paint]",
             tabindex: "0",
             {structure_cell(locale, text, prepared.depict_url.clone(), name)}
             {compound_cell(locale, text, entry, prepared, name, compound_qid)}

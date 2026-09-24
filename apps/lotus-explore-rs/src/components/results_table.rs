@@ -69,10 +69,15 @@ pub fn ResultsTable() -> Element {
     rsx! {
         section {
             id: RESULTS_SECTION_ID,
+            "vocab": "https://schema.org/",
+            "prefix": "wd: http://www.wikidata.org/entity/ wdt: http://www.wikidata.org/prop/direct/",
+            "typeof": "ItemList",
             role: "region",
             aria_label: "{t(locale, TextKey::TableTriplesAria)}",
             aria_labelledby: RESULTS_SECTION_HEADING_ID,
             class: "results-wrap w-full max-w-none px-0",
+            "property": "numberOfItems",
+            content: "{total}",
             h2 { id: RESULTS_SECTION_HEADING_ID, class: "sr-only", "{t(locale, TextKey::TableTriplesAria)}" }
             ResultsToolbar {}
 

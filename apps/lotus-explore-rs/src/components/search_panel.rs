@@ -36,7 +36,7 @@ pub fn SearchPanel() -> Element {
     rsx! {
         form {
             id: "lotus-search-form",
-            class: "search-panel flex-0-auto flex flex-col gap-2 p-3.5 bg-panel w-full min-w-0",
+            class: "search-panel flex-0-auto flex flex-col gap-2 p-3.5 bg-shell-page w-full min-w-0",
             "data-webmcp-id": "lotus-search-form",
             "data-webmcp-type": "form",
             "data-webmcp-name": "LOTUS search form",
@@ -91,7 +91,7 @@ fn StructureSection() -> Element {
     let view_model = structure_model::build_structure_section_model(kind_value, smiles_search_type);
 
     rsx! {
-        div { class: "flex flex-col gap-1.5 rounded-xl border border-border bg-panel p-1.5 shadow-xs",
+        div { class: "flex flex-col gap-1.5 rounded-xl border border-shell-border bg-shell-raised p-1.5",
             label {
                 class: "text-body font-semibold text-text",
                 r#for: "smiles-input",

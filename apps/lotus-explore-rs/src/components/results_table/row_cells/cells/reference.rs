@@ -22,7 +22,7 @@ pub(in crate::components::results_table::row_cells) fn reference_cell(
     let doi = prepared.doi.as_deref();
     let statement_id = prepared.statement_id.as_deref();
     rsx! {
-        td { class: "min-w-0 px-3 py-2.5 align-middle text-ui shadow-[inset_3px_0_0_var(--footer-wd-reference)]",
+        td { "property": "wdt:P248", "typeof": "ScholarlyArticle", "resource": "https://www.wikidata.org/entity/{reference_qid}", class: "min-w-0 px-3 py-2.5 align-middle text-ui shadow-[inset_3px_0_0_var(--footer-wd-reference)]",
             div { class: "flex flex-col gap-1",
                 if let Some(full_title) = entry.ref_title.as_deref() {
                     a {
@@ -53,6 +53,8 @@ pub(in crate::components::results_table::row_cells) fn reference_cell(
                 }
                 if let Some(d) = doi {
                     a {
+                        "property": "identifier",
+                        "resource": "https://doi.org/{d}",
                         href: "https://doi.org/{d}",
                         target: "_blank",
                         rel: "noopener noreferrer",
