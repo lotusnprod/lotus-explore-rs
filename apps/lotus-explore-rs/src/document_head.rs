@@ -126,10 +126,6 @@ pub fn LotusDocumentHead(lang: String) -> Element {
             canonical: Some(canonical),
         }
 
-        document::Link {
-            rel: "stylesheet",
-            href: asset!("/public/assets/lotus-explore.css"),
-        }
         document::Script { src: asset!("/public/assets/js/bootstrap.js"), defer: true, "type": "text/javascript" }
     }
 }

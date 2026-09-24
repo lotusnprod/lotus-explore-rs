@@ -194,8 +194,8 @@ pub fn DocumentHead(props: DocumentHeadProps) -> Element {
             );
         }
 
-        // CSS is loaded as external <link> tags in the custom index.html template
-        // (public/index.html), no longer injected inline here.
+        // CSS is loaded by the static index.html head so the browser discovers
+        // it before the WASM bundle boots; do not inject it after first render.
 
         // Inline JavaScript — wrapped in an IIFE so `const`/`let` declarations
         // don't leak into the global scope (which causes
