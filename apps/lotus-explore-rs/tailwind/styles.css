@@ -118,6 +118,9 @@ video {
     --shell-raised-bg: var(--surface);
     --shell-chrome-bg: var(--surface);
     --shell-border: var(--border);
+    --panel-bg: var(--surface);
+    --panel-bg-soft: var(--surface);
+    --panel-border: color-mix(in srgb, var(--border) 82%, transparent);
     --shell-radius: 12px;
     --shell-control-radius: 8px;
 
@@ -201,8 +204,12 @@ video {
     --color-shell-page: var(--shell-page-bg);
     --color-shell-raised: var(--shell-raised-bg);
     --color-shell-chrome: var(--shell-chrome-bg);
-    --color-shell-border: var(--shell-border);
-    --color-glass: var(--glass);
+     --color-shell-border: var(--shell-border);
+     --color-panel: var(--panel-bg);
+     --color-panel-soft: var(--panel-bg-soft);
+     --color-panel-border: var(--panel-border);
+     --color-glass: var(--glass);
+
     --color-critical: var(--critical-text);
     --color-critical-muted: var(--critical-muted);
     --color-wd-compound: var(--footer-wd-compound);
@@ -553,6 +560,8 @@ footer { min-height: 80px; }
 .curation-results-table th,
 .curation-results-table td { white-space: nowrap; }
 .curation-results-table td:last-child { white-space: normal; }
+.curation-results-table tbody tr:last-child td,
+.curation-queued-table tbody tr:last-child td { border-bottom: 0; }
 
 /* Content wrappers - consistent max-width and padding */
 .results-wrap {

@@ -303,12 +303,13 @@ pub fn QueueRowsCard(
                 }
             }
             div {
-                class: "w-full overflow-x-auto rounded-xl border border-shell-border focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
+                class: "w-full overflow-x-auto rounded-xl border border-b-0 border-shell-border focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                 role: "region",
                 tabindex: "0",
                 aria_label: "{heading_queued_rows(locale)}",
                 table {
-                    class: "w-full min-w-max table-auto border-collapse text-ui",
+                     class: "curation-queued-table w-full min-w-max table-auto border-collapse text-ui",
+
                     thead {
                         tr { class: "text-left",
                             th { scope: "col", class: "border-b border-panel-border bg-panel-soft px-3 py-2 text-left text-micro font-semibold uppercase tracking-wide text-muted w-[110px] min-w-[110px]", "{col_action(locale)}" }
