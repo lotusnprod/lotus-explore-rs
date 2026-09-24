@@ -14,11 +14,6 @@ pub fn build_shareable_url(criteria: &SearchCriteria) -> Option<String> {
     Some(out)
 }
 
-#[cfg(target_arch = "wasm32")]
-pub fn build_query_string(params: &super::QueryParams) -> String {
-    build_query_string_from_pairs(params.iter().map(|(k, v)| (k.as_str(), v.as_str())))
-}
-
 fn build_query_string_from_pairs<'a>(iter: impl Iterator<Item = (&'a str, &'a str)>) -> String {
     let mut query = String::new();
     for (index, (key, value)) in iter.enumerate() {

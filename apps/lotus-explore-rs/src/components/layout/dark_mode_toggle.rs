@@ -3,6 +3,7 @@
 
 //! Light / dark theme toggle in the page header.
 
+use crate::app::routes::Route;
 use crate::hooks::use_locale;
 use crate::i18n::{TextKey, t};
 use crate::state::use_app_state_context;
@@ -17,6 +18,8 @@ pub fn DarkModeToggle() -> Element {
     let ctx = use_app_state_context();
     let mut app_state = ctx.state;
     let dark_mode = app_state.read().dark_mode;
+    let route: Route = use_route();
+    let navigator = use_navigator();
     let label = if dark_mode {
         t(locale, TextKey::DarkMode)
     } else {
@@ -33,6 +36,7 @@ pub fn DarkModeToggle() -> Element {
             onclick: move |_| {
                 let new_dark_mode = !dark_mode;
                 app_state.with_mut(|s| s.dark_mode = new_dark_mode);
+                let _ = navigator.replace(route.clone().with_dark_mode(new_dark_mode));
 
                 // Persist to localStorage
                 #[cfg(target_arch = "wasm32")]

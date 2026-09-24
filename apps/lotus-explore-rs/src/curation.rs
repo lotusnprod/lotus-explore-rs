@@ -207,7 +207,7 @@ mod tests {
     }
 
     #[test]
-    fn curation_share_url_contains_view_and_autorun() {
+    fn curation_share_url_contains_route_and_autorun() {
         let rows = vec![CurationInputRow {
             name: "Compound A".to_string(),
             smiles: "CCO".to_string(),
@@ -215,8 +215,10 @@ mod tests {
             doi: None,
         }];
         let url = build_curation_share_url(&rows, Locale::Fr, true).expect("share url");
-        assert!(url.contains("view=curation-explorer"));
+        assert!(url.starts_with("/curation?"));
+        assert!(!url.contains("view="));
         assert!(url.contains("lang=fr"));
+
         assert!(url.contains("curation_run=true"));
         assert!(url.contains("curation_rows="));
     }

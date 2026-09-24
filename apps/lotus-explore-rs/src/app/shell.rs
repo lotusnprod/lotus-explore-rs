@@ -2,9 +2,8 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 use super::bootstrap::{AppBootstrap, bootstrap_app};
-use super::view::AppView;
+use super::routes::Route;
 use crate::app_state::AppState;
-use crate::components::data_curation_page::DataCurationPage;
 use crate::components::layout::footer::Footer;
 use crate::components::layout::header_meta::HeaderMetaSection;
 use crate::components::layout::notices::{ErrorNotice, ShareNotice, TaxonNotice};
@@ -14,16 +13,14 @@ use crate::components::welcome::WelcomeScreen;
 use crate::document_head::LotusDocumentHead;
 use crate::features::explore::{
     ExploreInteractions, ExploreState, SearchTaskController, build_shareable_url,
-    initial_url_state, persist_dark_mode_query_param, persist_locale_query_param,
-    persist_view_query_param, use_download_dispatch_effect, use_startup_effect,
+    initial_url_state, is_true_flag, use_download_dispatch_effect, use_startup_effect,
 };
 use crate::hooks::LocaleProvider;
 use crate::i18n::{Locale, TextKey, t};
 use crate::models::SearchCriteria;
-use crate::pages::DrawPage;
 use crate::services::AppServices;
 use crate::state::{
-    AppStateContext, FormCriteriaContext, ResultsContext, use_app_selector, use_app_state_context,
+    AppStateContext, FormCriteriaContext, ResultsContext, use_app_state_context,
     use_form_criteria_context, use_results_context,
 };
 use crate::ui::a11y_contract::{MAIN_PANEL_ID, PAGE_TITLE_ID, SKIP_TO_RESULTS_HREF};
@@ -109,29 +106,36 @@ pub fn AppRoot() -> Element {
 
     rsx! {
         LocaleProvider { locale,
-            AppRuntimeEffects {
-                app_state,
-                explore,
-                criteria,
-            }
-            ShellScaffold { lang: locale.read().lang_code().to_string() }
+            Router::<Route> {}
         }
     }
 }
 
 #[component]
-fn AppRuntimeEffects(
-    app_state: Signal<AppState>,
-    explore: Signal<ExploreState>,
-    criteria: Signal<SearchCriteria>,
-) -> Element {
-    let locale = crate::hooks::use_locale_signal();
+fn AppRuntimeEffects() -> Element {
+    let mut locale = crate::hooks::use_locale_signal();
+    let mut app_state = use_app_state_context().state;
+    let explore = use_results_context().explore;
+    let criteria = use_form_criteria_context().criteria;
     let search_task_controller = use_context::<SearchTaskController>();
     let repo = use_context::<AppServices>().repository();
 
-    use_effect(move || persist_locale_query_param(*locale.read()));
-    use_effect(move || persist_view_query_param(app_state.read().view));
-    use_effect(move || persist_dark_mode_query_param(app_state.read().dark_mode));
+    use_effect(move || {
+        let route = router().current::<Route>();
+        let query = route.query_value();
+        if let Some(lang) = query.get("lang") {
+            let next_locale = Locale::detect(lang);
+            if *locale.read() != next_locale {
+                *locale.write() = next_locale;
+            }
+        }
+        if let Some(dark_mode) = query.get("dark_mode") {
+            let next_dark_mode = is_true_flag(dark_mode);
+            if app_state.read().dark_mode != next_dark_mode {
+                app_state.with_mut(|state| state.dark_mode = next_dark_mode);
+            }
+        }
+    });
 
     // Sync <html lang> and <html data-theme> in a single effect to batch DOM
     // reads (document_element) and writes (set_attribute) — avoids interleaved
@@ -170,11 +174,11 @@ fn AppRuntimeEffects(
 }
 
 #[component]
-fn ShellScaffold(lang: String) -> Element {
+pub fn AppShell() -> Element {
     let locale = crate::hooks::use_locale();
-    let app_state = use_app_state_context().state;
-    let current_view = *use_app_selector(app_state, |state| state.view).read();
+    let lang = locale.lang_code().to_string();
     rsx! {
+        AppRuntimeEffects {}
         LotusDocumentHead { lang }
         a {
             href: SKIP_TO_RESULTS_HREF,
@@ -191,7 +195,7 @@ fn ShellScaffold(lang: String) -> Element {
                     tabindex: "-1",
                     aria_labelledby: PAGE_TITLE_ID,
                     PageHeader {}
-                    RouteContent { current_view }
+                    Outlet::<Route> {}
                 }
             }
             footer {
@@ -206,16 +210,7 @@ fn ShellScaffold(lang: String) -> Element {
 }
 
 #[component]
-fn RouteContent(current_view: AppView) -> Element {
-    match current_view {
-        AppView::Explore => rsx! { ExplorePage {} },
-        AppView::Curation => rsx! { DataCurationPage {} },
-        AppView::Draw => rsx! { DrawPage {} },
-    }
-}
-
-#[component]
-fn ExplorePage() -> Element {
+pub(crate) fn ExplorePage() -> Element {
     let criteria = use_form_criteria_context().criteria;
     let searched_once = use_results_context().explore.read().lifecycle.searched_once;
     let shareable_url =

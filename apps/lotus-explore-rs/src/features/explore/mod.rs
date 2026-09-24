@@ -20,8 +20,7 @@ pub use selectors::{
 pub use types::{DomainError, ErrorKind, ParseFault, QueryStage, TaxonWarning, ValidationFault};
 pub use url_state::{
     InitialUrlState, absolute_current_url_with_query, absolute_share_url, build_shareable_url,
-    initial_url_state, persist_dark_mode_query_param, persist_locale_query_param,
-    persist_view_query_param,
+    initial_url_state, is_true_flag,
 };
 
 #[cfg(test)]
@@ -48,7 +47,6 @@ pub mod search_utils;
 pub mod selectors;
 pub mod service;
 mod sparql_errors;
-pub mod state;
 pub mod taxon_cache;
 mod transport_classification;
 pub mod types;

@@ -6,7 +6,6 @@
 //! This module intentionally contains no browser/runtime side effects so it can
 //! be tested on any target and reused by both startup parsing and URL builders.
 
-use crate::app::view::AppView;
 use crate::i18n::Locale;
 use crate::models::SearchCriteria;
 use std::collections::BTreeMap;
@@ -19,15 +18,11 @@ pub use criteria::parse_criteria_from_params;
 pub use encode::build_shareable_url;
 pub use startup::{InitialDownloadState, parse_startup_action_from_params};
 
-#[cfg(target_arch = "wasm32")]
-pub use encode::build_query_string;
-
 pub type QueryParams = BTreeMap<String, String>;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct InitialUrlState {
     pub criteria: SearchCriteria,
-    pub view: AppView,
     pub locale: Locale,
     pub download: InitialDownloadState,
     pub dark_mode: bool,

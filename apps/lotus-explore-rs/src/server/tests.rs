@@ -8,6 +8,7 @@
 
 use std::{
     collections::HashMap,
+    fs,
     time::{Duration, Instant},
 };
 
@@ -304,6 +305,42 @@ async fn unknown_route_returns_not_found() {
         .await
         .expect("not found response");
 
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[tokio::test]
+async fn client_routes_fall_back_to_index_without_masking_api_404s() {
+    let public_dir = tempfile::tempdir().expect("public directory");
+    fs::write(public_dir.path().join("index.html"), "index").expect("index file");
+    let mut config = test_config();
+    config.public_dir = Some(public_dir.path().to_path_buf());
+    let app = build_router(config.max_body_bytes, &config, AppState::new(&config));
+
+    let response = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri("/curation?lang=fr")
+                .body(Body::empty())
+                .expect("request"),
+        )
+        .await
+        .expect("client response");
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(
+        to_bytes(response.into_body(), usize::MAX).await.unwrap(),
+        "index"
+    );
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/v1/does-not-exist")
+                .body(Body::empty())
+                .expect("request"),
+        )
+        .await
+        .expect("api response");
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 

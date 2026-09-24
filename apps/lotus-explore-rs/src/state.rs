@@ -11,9 +11,9 @@ pub use form_context::{FormCriteriaContext, use_form_criteria_context};
 
 // ── App State Context ─────────────────────────────────────────────────────
 
-/// Root context: access to the unified `AppState` (view, download, metrics).
+/// Root context: access to the unified `AppState` (download, metrics, theme).
 ///
-/// Use this to read or mutate view-selection and download-orchestration state.
+/// Use this to read or mutate download-orchestration and theme state.
 /// For search form state use [`FormCriteriaContext`]; for results and lifecycle
 /// state use [`ResultsContext`].
 #[derive(Clone, Copy)]

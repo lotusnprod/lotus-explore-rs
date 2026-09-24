@@ -2,5 +2,5 @@
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
 pub mod bootstrap;
+pub mod routes;
 pub mod shell;
-pub mod view;

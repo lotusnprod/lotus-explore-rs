@@ -6,6 +6,7 @@
 //! Reads and writes the `Signal<Locale>` from `LocaleProvider` context via
 //! [`use_locale_signal`] — zero props required.
 
+use crate::app::routes::Route;
 use crate::hooks::{use_locale, use_locale_signal};
 use crate::i18n::{Locale, TextKey, t};
 use crate::state::use_app_state_context;
@@ -17,6 +18,8 @@ use dioxus::prelude::*;
 pub fn LangSwitch() -> Element {
     let mut locale_sig = use_locale_signal();
     let locale = use_locale();
+    let route: Route = use_route();
+    let navigator = use_navigator();
     let dark_mode = use_app_state_context().state.read().dark_mode;
 
     rsx! {
@@ -43,6 +46,7 @@ pub fn LangSwitch() -> Element {
                     };
                     if *locale_sig.peek() != next {
                         *locale_sig.write() = next;
+                        let _ = navigator.replace(route.clone().with_locale(next));
                     }
                 },
             }

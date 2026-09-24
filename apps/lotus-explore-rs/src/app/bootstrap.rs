@@ -29,7 +29,6 @@ pub fn bootstrap_app(startup: InitialUrlState) -> AppBootstrap {
 
     AppBootstrap {
         app_state: AppState {
-            view: startup.view,
             download: DownloadState {
                 pending_format: startup.download.pending_format,
                 pending_invalid_format: startup.download.pending_invalid_format,
@@ -48,15 +47,13 @@ pub fn bootstrap_app(startup: InitialUrlState) -> AppBootstrap {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::app::view::AppView;
     use crate::download::DownloadFormat;
     use crate::features::explore::InitialDownloadState;
 
     #[test]
-    fn bootstrap_app_copies_startup_view_locale_and_download_state() {
+    fn bootstrap_app_copies_startup_locale_and_download_state() {
         let startup = InitialUrlState {
             criteria: SearchCriteria::default(),
-            view: AppView::Curation,
             locale: Locale::Fr,
             download: InitialDownloadState {
                 pending_format: Some(DownloadFormat::Csv),
@@ -67,7 +64,6 @@ mod tests {
         };
 
         let bootstrap = bootstrap_app(startup);
-        assert_eq!(bootstrap.app_state.view, AppView::Curation);
         assert_eq!(bootstrap.locale, Locale::Fr);
         assert_eq!(
             bootstrap.app_state.download.pending_format,
@@ -91,7 +87,6 @@ mod tests {
                 taxon: "Rosa".into(),
                 ..SearchCriteria::default()
             },
-            view: AppView::Explore,
             locale: Locale::En,
             download: InitialDownloadState::default(),
             dark_mode: false,

@@ -50,6 +50,7 @@ jobs:
           test "$(wc -l < _final_site/assets/lotus-explore.css | tr -d ' ')" -le 2
           test -f _final_site/assets/lotus-explore.css
           test -f _final_site/assets/lotus-explore.css.br
+          test -f _final_site/404.html
           test ! -e _final_site/tailwind/styles.css
           test ! -e _final_site/assets/styles.css
           ! grep -Eq '(@import "tailwindcss"|@source)' _final_site/assets/lotus-explore.css

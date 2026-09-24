@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-//! Consolidated app-level state for view routing, download orchestration, and render telemetry.
+//! Consolidated app-level state for download orchestration and render telemetry.
 
-use crate::app::view::AppView;
 use crate::download::DownloadFormat;
 
 /// App-level state.  One signal of this type lives at the root of `App`.
 ///
 /// Scope is deliberately narrow:
-/// * **view** — which page is rendered (Search / Curation / Structure editor).
 /// * **download** — pending download format + direct-execute flag read by the
 ///   download-dispatch hook.
 /// * **metrics** — one-shot logging guards that prevent duplicate telemetry
@@ -22,11 +20,8 @@ use crate::download::DownloadFormat;
 ///   reducer and is exposed through `ResultsContext`.
 /// * `Locale` — provided via `LocaleProvider` context and accessed with
 ///   `use_locale()`.
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct AppState {
-    /// Currently active view / page.
-    pub view: AppView,
-
     /// Download orchestration (format pending, direct-execute mode).
     pub download: DownloadState,
 
@@ -35,17 +30,6 @@ pub struct AppState {
 
     /// Dark mode preference.
     pub dark_mode: bool,
-}
-
-impl Default for AppState {
-    fn default() -> Self {
-        Self {
-            view: AppView::Explore,
-            download: DownloadState::default(),
-            metrics: MetricsState::default(),
-            dark_mode: false,
-        }
-    }
 }
 
 // ── Download State: Orchestration ─────────────────────────────────────────────
@@ -82,9 +66,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn app_state_default_starts_on_explore_view() {
+    fn app_state_default_is_inactive() {
         let state = AppState::default();
-        assert_eq!(state.view, AppView::Explore);
+        assert_eq!(state.download, DownloadState::default());
     }
 
     #[test]

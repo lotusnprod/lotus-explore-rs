@@ -124,6 +124,12 @@ just serve lotus-explore-rs   # fetches Ketcher + dx serve
 
 ## URL automation
 
+The client uses typed routes:
+
+- `/` --- Explore
+- `/curation` --- Curation
+- `/draw` --- Structure editor
+
 URL-driven execution and exports:
 
 - `?execute=true` --- run query on load

@@ -44,16 +44,16 @@ use axum::{
     Router,
     body::Body,
     extract::DefaultBodyLimit,
-    http::{HeaderName, HeaderValue, header},
+    http::{HeaderName, HeaderValue, StatusCode, header},
     middleware::{self, Next},
     response::Response,
-    routing::{get, post},
+    routing::{any, get, post},
 };
 use handlers::{export_file, export_urls, health, metrics, search};
 use tower_http::{
     compression::CompressionLayer,
     request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer},
-    services::ServeDir,
+    services::{ServeDir, ServeFile},
     trace::{DefaultMakeSpan, DefaultOnFailure, DefaultOnRequest, DefaultOnResponse, TraceLayer},
 };
 use tracing::Level;
@@ -98,6 +98,10 @@ const X_REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
 )]
 struct ApiDoc;
 
+async fn api_not_found() -> StatusCode {
+    StatusCode::NOT_FOUND
+}
+
 pub fn build_router(max_body_bytes: usize, config: &AppConfig, state: AppState) -> Router {
     let mut router = Router::new()
         .route("/health", get(health))
@@ -105,6 +109,7 @@ pub fn build_router(max_body_bytes: usize, config: &AppConfig, state: AppState) 
         .route("/v1/search", post(search))
         .route("/v1/export-url", post(export_urls))
         .route("/v1/export-file/{cache_key}/{format}", get(export_file))
+        .route("/v1/{*path}", any(api_not_found))
         .merge(SwaggerUi::new("/docs").url("/openapi.json", ApiDoc::openapi()))
         .with_state(state)
         .layer(DefaultBodyLimit::max(max_body_bytes))
@@ -119,7 +124,11 @@ pub fn build_router(max_body_bytes: usize, config: &AppConfig, state: AppState) 
 
     // Optionally serve the Dioxus WASM build output as static files.
     if let Some(public_dir) = &config.public_dir {
-        router = router.fallback_service(ServeDir::new(public_dir).precompressed_br());
+        router = router.fallback_service(
+            ServeDir::new(public_dir.clone())
+                .precompressed_br()
+                .fallback(ServeFile::new(public_dir.join("index.html"))),
+        );
     }
 
     router

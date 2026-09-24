@@ -5,6 +5,7 @@
 //!
 //! Zero props -- all data comes from context (`use_locale`, `AppStateContext`).
 
+use crate::app::routes::Route;
 use crate::components::layout::dark_mode_toggle::DarkModeToggle;
 use crate::components::layout::lang_switch::LangSwitch;
 use crate::components::layout::view_switch::ViewSwitch;
@@ -19,10 +20,12 @@ const LOTUS_LOGO_SVG: &str = include_str!("../../../public/favicon.svg");
 ///
 /// Composes `LangSwitch` (EN/FR/DE/IT), `DarkModeToggle` (light/dark), and
 /// `ViewSwitch` (Search / Curation / Structure editor) as context-aware
-/// children. Zero props -- only re-renders when locale or view changes.
+/// children. Zero props -- only re-renders when locale or route changes.
 #[component]
 pub fn PageHeader() -> Element {
     let locale = use_locale();
+    let route: Route = use_route();
+    let home = route.with_view("explore");
 
     rsx! {
         header {
@@ -38,8 +41,8 @@ pub fn PageHeader() -> Element {
                     class: "min-w-0 max-w-full",
                 h1 { id: PAGE_TITLE_ID,
                     class: "text-display font-bold min-w-0 break-words overflow-hidden",
-                    a {
-                        href: "./",
+                    Link {
+                        to: home,
                         class: "break-words text-inherit no-underline hover:no-underline",
                         "{t(locale, TextKey::PageTitle)}"
                     }

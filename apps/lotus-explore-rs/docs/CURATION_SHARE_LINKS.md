@@ -1,11 +1,9 @@
 # Curation share-link schema
 
-`lotus-explore-rs` can reproduce curation sessions from a URL query string.
+`lotus-explore-rs` reproduces curation sessions from the `/curation` route.
 
 ## Parameters
 
-- `view=curation-explorer`
-  - opens the curation view
 - `lang=<en|fr|de|it>`
   - selects the UI language
 - `curation_rows=<url-encoded JSON array>`
@@ -21,7 +19,7 @@
 ## Example
 
 ```text
-?view=curation-explorer&lang=en&curation_rows=%5B%7B%22name%22%3A%22Caffeine%22%2C%22smiles%22%3A%22Cn1cnc2n%28C%29c%28%3DO%29n%28C%29c%28%3DO%29c12%22%2C%22taxon%22%3Anull%2C%22doi%22%3Anull%7D%5D&curation_run=true
+/curation?lang=en&curation_rows=%5B%7B%22name%22%3A%22Caffeine%22%2C%22smiles%22%3A%22Cn1cnc2n%28C%29c%28%3DO%29n%28C%29c%28%3DO%29c12%22%2C%22taxon%22%3Anull%2C%22doi%22%3Anull%7D%5D&curation_run=true
 ```
 
 ## Notes

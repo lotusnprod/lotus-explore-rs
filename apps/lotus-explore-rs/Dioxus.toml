@@ -28,6 +28,7 @@ title = "LOTUS Explorer"
 
 [web.watcher]
 reload_html = true
+index_on_404 = true
 watch_path = ["src", "public", "tailwind", "../../crates/lotus/src"]
 
 [[web.proxy]]

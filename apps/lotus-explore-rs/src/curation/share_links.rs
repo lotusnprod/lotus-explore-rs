@@ -40,7 +40,7 @@ pub fn build_curation_share_url(
         })
         .collect::<Vec<_>>()
         .join("&");
-    Some(format!("?{query}"))
+    Some(format!("/curation?{query}"))
 }
 
 fn curation_query_params(
@@ -49,7 +49,6 @@ fn curation_query_params(
     autorun: bool,
 ) -> BTreeMap<String, String> {
     let mut params = BTreeMap::new();
-    params.insert("view".into(), "curation-explorer".into());
     params.insert("lang".into(), locale.lang_code().into());
     params.insert(
         CURATION_ROWS_PARAM.into(),

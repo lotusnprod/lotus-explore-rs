@@ -70,6 +70,7 @@ RUN cd apps/lotus-explore-rs && \
 # a full runtime stage.
 FROM scratch AS export
 COPY --from=wasm-builder /build/target/dx/lotus-explore-rs/release/web/public /
+COPY --from=wasm-builder /build/target/dx/lotus-explore-rs/release/web/public/index.html /404.html
 
 # ── Stage 4: runtime ────────────────────────────────────────────────────────────
 FROM debian:bookworm-slim AS runtime
