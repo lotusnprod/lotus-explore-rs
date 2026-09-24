@@ -8,8 +8,9 @@ pub fn build_shareable_url(criteria: &SearchCriteria) -> Option<String> {
         return None;
     }
     let query = build_query_string_from_pairs(params.iter().map(|(k, v)| (k.as_str(), v.as_str())));
-    let mut out = String::with_capacity(query.len() + 1);
-    out.push('?');
+    let mut out = String::with_capacity(query.len() + 8);
+    out.push_str("/search?");
+
     out.push_str(&query);
     Some(out)
 }

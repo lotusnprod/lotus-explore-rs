@@ -4,6 +4,8 @@
 //! Light / dark theme toggle in the page header.
 
 use crate::app::routes::Route;
+#[cfg(target_arch = "wasm32")]
+use crate::features::explore::url_state::deployment_href;
 use crate::hooks::use_locale;
 use crate::i18n::{TextKey, t};
 use crate::state::use_app_state_context;
@@ -19,7 +21,7 @@ pub fn DarkModeToggle() -> Element {
     let mut app_state = ctx.state;
     let dark_mode = app_state.read().dark_mode;
     let route: Route = use_route();
-    let navigator = use_navigator();
+    let navigator = dioxus::router::navigator();
     let label = if dark_mode {
         t(locale, TextKey::DarkMode)
     } else {
@@ -28,7 +30,7 @@ pub fn DarkModeToggle() -> Element {
 
     rsx! {
         button {
-            class: "theme-toggle inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 text-muted shadow-xs hover:border-accent/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+            class: "theme-toggle inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 text-muted shadow-xs transition-colors hover:border-accent/50 hover:bg-bg hover:text-text focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
             r#type: "button",
             role: "switch",
             "aria-label": t(locale, TextKey::DarkModeToggle),
@@ -36,9 +38,22 @@ pub fn DarkModeToggle() -> Element {
             onclick: move |_| {
                 let new_dark_mode = !dark_mode;
                 app_state.with_mut(|s| s.dark_mode = new_dark_mode);
-                let _ = navigator.replace(
-                    route.clone().with_dark_mode(new_dark_mode).navigation_string(),
-                );
+                let target = route.clone().with_dark_mode(new_dark_mode);
+                #[cfg(target_arch = "wasm32")]
+                if route.view_key() == "landing" {
+                    let path = if new_dark_mode {
+                        "/?dark_mode=true"
+                    } else {
+                        "/"
+                    };
+                    if let Some(window) = web_sys::window() {
+                        let _ = window.location().set_href(&deployment_href(path));
+                    }
+                    return;
+                }
+                let _ = navigator.replace(NavigationTarget::Internal(
+                    target.navigation_string(),
+                ));
 
                 // Persist to localStorage
                 #[cfg(target_arch = "wasm32")]

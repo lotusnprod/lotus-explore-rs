@@ -4,48 +4,104 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title></title>
-  <link id="app-css" rel="stylesheet" href="assets/lotus-explore.css" media="print">
-
-  <!-- Favicons and Manifest (Loaded pre-WASM) -->
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" sizes="any">
-  <link rel="icon" href="favicon.ico" sizes="48x48">
-  <link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
-  <link rel="icon" href="favicon-16x16.png" type="image/png" sizes="16x16">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
-  <link rel="manifest" href="site.webmanifest" type="application/manifest+json">
-
-  <!-- External Third-Party APIs (DNS Prefetching) -->
+  <title>LOTUS Explorer</title>
+  <meta name="description" content="Explore LOTUS with taxon filters, structure search, and Wikidata curation workflows.">
+  <meta property="og:title" content="LOTUS Explorer">
+  <meta property="og:description" content="Explore LOTUS with taxon filters, structure search, and Wikidata curation workflows.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lotusnprod.github.io/lotus-explore-rs/">
+  <meta name="theme-color" content="#f6f8fb" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#10141b" media="(prefers-color-scheme: dark)">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"LOTUS Explorer","description":"Explore LOTUS with taxon filters, structure search, and Wikidata curation workflows.","url":"https://lotusnprod.github.io/lotus-explore-rs/","applicationCategory":"ScienceApplication","operatingSystem":"Web","inLanguage":["en","fr","de","it"]}</script>
+  <link rel="canonical" href="">
+  <link rel="alternate" hreflang="en" href="">
+  <link rel="alternate" hreflang="fr" href="">
+  <link rel="alternate" hreflang="de" href="">
+  <link rel="alternate" hreflang="it" href="">
+  <link rel="alternate" hreflang="x-default" href="">
+  <link rel="manifest" href="">
+  <link id="app-css" rel="stylesheet" href="" media="print">
+  <link rel="icon" href="" type="image/svg+xml">
   <link rel="preconnect" href="https://qlever.dev" crossorigin>
   <link rel="preconnect" href="https://query.wikidata.org" crossorigin>
+  <link rel="dns-prefetch" href="https://qlever.dev">
+  <link rel="dns-prefetch" href="https://query.wikidata.org">
+  <link rel="dns-prefetch" href="https://query-scholarly.wikidata.org">
   <link rel="dns-prefetch" href="https://unpkg.com">
   <link rel="dns-prefetch" href="https://tools-static.wmflabs.org">
+  <link rel="dns-prefetch" href="https://doi.org">
   <link rel="dns-prefetch" href="https://www.simolecule.com">
   <link rel="dns-prefetch" href="https://idsm.elixir-czech.cz">
-
-  <!-- Early synchronous language detection and Trusted Types initialization -->
+  <link rel="dns-prefetch" href="https://scripts.simpleanalyticscdn.com">
   <script>
     (function () {
-      var p = new URL(window.location.href).searchParams;
-      document.documentElement.lang =
-            p.get("lang") || p.get("locale") || "en";
-      var css = document.getElementById("app-css");
-      if (css) {
-        css.addEventListener("load", function () { css.media = "all"; });
-      }
-      var t = window.trustedTypes;
-      if (t) {
-        try {
-          t.createPolicy("default", {
-            createHTML: function (v) { return String(v); },
-            createScript: function (v) { return String(v); },
-            createScriptURL: function (v) { return String(v); },
-            createURL: function (v) { return String(v); }
-          });
-        } catch (e) {
-          // Policy "default" was already created or is disallowed by CSP; safe to ignore.
-        }
-      }
+       var path = window.location.pathname;
+        var cleanPath = path.length > 1 ? path.replace(/\/+$/, "") : path;
+        var basePath = cleanPath;
+        var routeSuffixes = ["/search", "/curation", "/draw"];
+        var knownRoute = path === "/" || /\/lotus-explore-rs$/.test(cleanPath);
+        routeSuffixes.forEach(function (suffix) {
+          if (cleanPath.endsWith(suffix)) {
+            basePath = cleanPath.slice(0, -suffix.length);
+            knownRoute = true;
+          }
+        });
+        var canonical = window.location.origin + cleanPath;
+
+       var languages = { en: "", fr: "fr", de: "de", it: "it", "x-default": "" };
+       Object.keys(languages).forEach(function (language) {
+         var link = document.querySelector('link[rel="alternate"][hreflang="' + language + '"]');
+         if (link) {
+           link.href = canonical + (languages[language] ? "?lang=" + languages[language] : "");
+         }
+       });
+       var canonicalLink = document.querySelector('link[rel="canonical"]');
+       if (canonicalLink) canonicalLink.href = canonical;
+       var openGraphUrl = document.querySelector('meta[property="og:url"]');
+       if (openGraphUrl) openGraphUrl.content = canonical;
+        var setAssetBase = function (basePath) {
+          document.documentElement.setAttribute("data-lotus-base-path", basePath);
+          var manifest = document.querySelector('link[rel="manifest"]');
+
+         if (manifest) manifest.href = basePath + "site.webmanifest";
+         var favicon = document.querySelector('link[rel="icon"]');
+         if (favicon) favicon.href = basePath + "favicon.svg";
+         var css = document.getElementById("app-css");
+         if (css) {
+           css.href = basePath + "assets/lotus-explore.css";
+           css.addEventListener("load", function () { css.media = "all"; });
+         }
+         var bootstrap = document.createElement("script");
+         bootstrap.src = basePath + "assets/js/bootstrap.js";
+         bootstrap.defer = true;
+         document.head.appendChild(bootstrap);
+       };
+        if (knownRoute) {
+          setAssetBase(basePath.endsWith("/") ? basePath : basePath + "/");
+
+       } else {
+         window.addEventListener("DOMContentLoaded", function () {
+           var loader = document.querySelector('script[src*="/assets/"]');
+           if (!loader) return;
+           var source = loader.getAttribute("src") || "";
+           var marker = source.indexOf("assets/");
+           if (marker >= 0) setAssetBase(source.slice(0, marker));
+         }, { once: true });
+       }
+        var params = new URLSearchParams(window.location.search);
+        document.documentElement.setAttribute("data-lotus-query", window.location.search);
+
+       document.documentElement.lang = params.get("lang") || params.get("locale") || "en";
+
+      if (!window.trustedTypes) return;
+      try {
+        trustedTypes.createPolicy("default", {
+          createHTML: function (value) { return String(value); },
+          createScript: function (value) { return String(value); },
+          createScriptURL: function (value) { return String(value); },
+          createURL: function (value) { return String(value); }
+        });
+      } catch (error) {}
     })();
   </script>
   <style>

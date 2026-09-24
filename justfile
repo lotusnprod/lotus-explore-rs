@@ -36,7 +36,7 @@ ci:
 
 # One `cargo check -p <app>` per app keeps the wasm build green.
 wasm:
-	cargo check -p lotus-explore-rs --target wasm32-unknown-unknown --locked
+	cargo check -p lotus-explore-rs --target wasm32-unknown-unknown --features dioxus/wasm-split --locked
 
 # Per-package WASM clippy (NOT `--workspace --target wasm32`: `lotus-deploy`
 # is a host-only bin — `reqwest::blocking` cannot exist on wasm — so a
@@ -52,11 +52,11 @@ clippy-wasm:
 
 serve app:
 	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
-	dx serve --package {{app}}
+	dx serve --package {{app}} --wasm-split --features dioxus/wasm-split
 
 build app:
 	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
-	dx build --release --package {{app}} --rustc-args=-Copt-level=z
+	dx build --release --package {{app}} --wasm-split --features dioxus/wasm-split --locked --debug-symbols=false --rustc-args=-Copt-level=z
 
 # ── Supply-chain hygiene (skip gracefully if a tool is not installed) ─────────
 

@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-use crate::curation::{CurationInputRow, CurationResultRow, QuickStatementsBundle, parse_tsv_rows};
+use crate::curation::{
+    CurationError, CurationInputRow, CurationResultRow, QuickStatementsBundle, parse_tsv_rows,
+};
 use crate::features::curation::queue::append_unique_rows;
 use crate::features::curation::workflow;
 use crate::hooks::use_add_row_form;
 use crate::hooks::use_add_row_form::AddRowForm;
-use crate::i18n::{Locale, msg_no_valid_tsv_rows, msg_running_checks, msg_tsv_import_complete};
+use crate::i18n::{
+    Locale, msg_no_valid_tsv_rows, msg_running_checks, msg_tsv_import_complete,
+    msg_tsv_missing_column,
+};
 use dioxus::prelude::*;
 use std::sync::Arc;
 
@@ -238,6 +243,9 @@ pub fn import_tsv_rows(
                     outcome.skipped,
                 )));
             }
+        }
+        Err(CurationError::MissingTsvColumn(column)) => {
+            status_message.set(Some(msg_tsv_missing_column(locale, column)));
         }
         Err(err) => {
             status_message.set(Some(err.to_string()));

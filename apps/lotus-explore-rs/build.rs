@@ -170,6 +170,21 @@ fn build_sitemap_xml(meta: &Metadata) -> String {
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>{base}/search</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>{base}/curation</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>{base}/draw</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
 "#
     )
@@ -183,8 +198,8 @@ fn build_llms_txt(meta: &Metadata) -> String {
         ## Core information\n\n\
         - **Official name**: {name}\n\
         - **Short name**: {short_name}\n\
-        - **Purpose**: Interactive exploration of natural-product occurrence data\n\
-        - **Data domain**: Natural products, compounds, taxonomy, scientific references\n\
+        - **Purpose**: Interactive exploration of chemical entities occurrence data\n\
+        - **Data domain**: Natural products, chemical compounds, taxonomy, scientific references\n\
         - **Access model**: Free, web-based, no authentication required\n\n\
         ## Features\n\n\
         - Search by taxon filters and structure input (SMILES or Molfile V2000/V3000)\n\
@@ -333,7 +348,7 @@ fn build_headers_txt() -> String {
     /*\n\
     \x20 Strict-Transport-Security: max-age=63072000; includeSubDomains; preload\n\
     \x20 X-Frame-Options: DENY\n\
-    \x20 Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; script-src 'self' 'wasm-unsafe-eval' https://scripts.simpleanalyticscdn.com https://unpkg.com https://tools-static.wmflabs.org; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://qlever.dev https://query.wikidata.org https://www.wikidata.org https://www.simolecule.com https://idsm.elixir-czech.cz https://doi.org https://api.naturalproducts.net https://pubchem.ncbi.nlm.nih.gov https://api.semanticscholar.org https://api.openalex.org https://unpkg.com https://tools-static.wmflabs.org; worker-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types default\n\
+    \x20 Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-o1bjP+VSHvcOzdkXHTYrHnMcZabetghZcgiacGCFMM0=' https://scripts.simpleanalyticscdn.com https://unpkg.com https://tools-static.wmflabs.org; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://qlever.dev https://query.wikidata.org https://query-scholarly.wikidata.org https://www.wikidata.org https://www.simolecule.com https://idsm.elixir-czech.cz https://doi.org https://pubchem.ncbi.nlm.nih.gov https://api.semanticscholar.org https://api.openalex.org https://unpkg.com https://tools-static.wmflabs.org; worker-src 'self' blob:; object-src 'none'; frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types default\n\
     \x20 X-Content-Type-Options: nosniff\n\
     \x20 Referrer-Policy: strict-origin-when-cross-origin\n\
     \x20 Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()\n\

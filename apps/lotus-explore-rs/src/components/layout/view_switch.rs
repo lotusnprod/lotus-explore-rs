@@ -6,6 +6,8 @@
 //! Reads the active route and `use_locale()` for labels — zero props required.
 
 use crate::app::routes::Route;
+#[cfg(target_arch = "wasm32")]
+use crate::features::explore::url_state::href_with_current_query;
 use crate::hooks::use_locale;
 use crate::i18n::{
     view_label_curation_explorer, view_label_draw, view_label_explorer, view_switch_aria,
@@ -20,7 +22,7 @@ pub fn ViewSwitch() -> Element {
     let ctx = use_app_state_context();
     let locale = use_locale();
     let route: Route = use_route();
-    let navigator = use_navigator();
+    let navigator = dioxus::router::navigator();
     let dark_mode = ctx.state.read().dark_mode;
 
     rsx! {
@@ -34,7 +36,7 @@ pub fn ViewSwitch() -> Element {
                 items: vec![
                     SegmentedControlItem {
                         label: view_label_explorer(locale),
-                        value: "explore",
+                        value: "search",
                     },
                     SegmentedControlItem {
                         label: view_label_curation_explorer(locale),
@@ -46,9 +48,23 @@ pub fn ViewSwitch() -> Element {
                     },
                 ],
                 on_select: move |value: String| {
-                    let target = route.clone().with_view(&value).navigation_string();
-                    if target != route.navigation_string() {
-                        let _ = navigator.push(target);
+                    let target = route.clone().with_view(&value);
+                    if target != route {
+                        #[cfg(target_arch = "wasm32")]
+                        if route.view_key() == "landing" {
+                            let target_path = match value.as_str() {
+                                "curation" => "/curation",
+                                "draw" => "/draw",
+                                _ => "/search",
+                            };
+                            if let Some(window) = web_sys::window() {
+                                let _ = window.location().set_href(&href_with_current_query(target_path));
+                            }
+                            return;
+                        }
+                        let _ = navigator.push(NavigationTarget::Internal(
+                            target.navigation_string(),
+                        ));
                     }
                 },
             }

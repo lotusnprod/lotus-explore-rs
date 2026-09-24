@@ -7,6 +7,8 @@
 //! [`use_locale_signal`] — zero props required.
 
 use crate::app::routes::Route;
+#[cfg(target_arch = "wasm32")]
+use crate::features::explore::url_state::deployment_href;
 use crate::hooks::{use_locale, use_locale_signal};
 use crate::i18n::{Locale, TextKey, t};
 use crate::state::use_app_state_context;
@@ -19,7 +21,7 @@ pub fn LangSwitch() -> Element {
     let mut locale_sig = use_locale_signal();
     let locale = use_locale();
     let route: Route = use_route();
-    let navigator = use_navigator();
+    let navigator = dioxus::router::navigator();
     let dark_mode = use_app_state_context().state.read().dark_mode;
 
     rsx! {
@@ -46,10 +48,22 @@ pub fn LangSwitch() -> Element {
                     };
                     if *locale_sig.peek() != next {
                         *locale_sig.write() = next;
-                         let _ = navigator.replace(
-                             route.clone().with_locale(next).navigation_string(),
-                         );
-
+                         let target = route.clone().with_locale(next);
+                         #[cfg(target_arch = "wasm32")]
+                         if route.view_key() == "landing" {
+                             let path = if next == Locale::En {
+                                 "/".to_string()
+                             } else {
+                                 format!("/?lang={}", next.lang_code())
+                             };
+                             if let Some(window) = web_sys::window() {
+                                 let _ = window.location().set_href(&deployment_href(&path));
+                             }
+                             return;
+                         }
+                         let _ = navigator.replace(NavigationTarget::Internal(
+                             target.navigation_string(),
+                         ));
                     }
                 },
             }

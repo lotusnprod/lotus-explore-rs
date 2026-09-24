@@ -75,7 +75,8 @@ pub fn ResultsTable() -> Element {
             role: "region",
             aria_label: "{t(locale, TextKey::TableTriplesAria)}",
             aria_labelledby: RESULTS_SECTION_HEADING_ID,
-            class: "results-wrap w-full max-w-none px-0",
+             class: "results-wrap min-h-0 w-full max-w-none px-0",
+
             "property": "numberOfItems",
             content: "{total}",
             h2 { id: RESULTS_SECTION_HEADING_ID, class: "sr-only", "{t(locale, TextKey::TableTriplesAria)}" }
@@ -91,9 +92,10 @@ pub fn ResultsTable() -> Element {
                         }
                     }
                 }
-            } else {
-                div { class: "w-full mt-5 px-0",
-                    VirtualizedResultsTable {
+             } else {
+                 div { class: "results-table-container min-h-0 w-full mt-5 px-0",
+                     VirtualizedResultsTable {
+
                         entries: entries_arc,
                         table_view_model,
                     }

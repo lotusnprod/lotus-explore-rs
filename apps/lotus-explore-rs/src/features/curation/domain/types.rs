@@ -63,6 +63,8 @@ pub enum CurationErrorKind {
 pub enum CurationError {
     #[error("{0}")]
     InvalidInput(String),
+    #[error("TSV is missing a '{0}' column")]
+    MissingTsvColumn(&'static str),
     #[error("{0}")]
     Http(String),
     #[error("{0}")]
@@ -72,7 +74,7 @@ pub enum CurationError {
 impl CurationError {
     pub const fn kind(&self) -> CurationErrorKind {
         match self {
-            Self::InvalidInput(_) => CurationErrorKind::InvalidInput,
+            Self::InvalidInput(_) | Self::MissingTsvColumn(_) => CurationErrorKind::InvalidInput,
             Self::Http(_) => CurationErrorKind::Transport,
             Self::Parse(_) => CurationErrorKind::Parse,
         }

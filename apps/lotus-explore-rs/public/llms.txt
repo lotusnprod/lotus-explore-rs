@@ -6,8 +6,8 @@
 
 - **Official name**: LOTUS Explore-rs
 - **Short name**: LOTUS-rs
-- **Purpose**: Interactive exploration of natural-product occurrence data
-- **Data domain**: Natural products, compounds, taxonomy, scientific references
+- **Purpose**: Interactive exploration of chemical entities occurrence data
+- **Data domain**: Natural products, chemical compounds, taxonomy, scientific references
 - **Access model**: Free, web-based, no authentication required
 
 ## Features

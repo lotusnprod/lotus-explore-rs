@@ -15,7 +15,7 @@ pub(super) const fn heading_queued_rows() -> &'static str {
 }
 
 pub(super) const fn heading_results() -> &'static str {
-    "Risultati della curation"
+    "Risultati della curazione"
 }
 
 pub(super) const fn heading_quickstatements() -> &'static str {
@@ -55,7 +55,7 @@ pub(super) const fn button_generate_quickstatements() -> &'static str {
 }
 
 pub(super) const fn button_generating() -> &'static str {
-    "Generazione..."
+    "Generazione in corso..."
 }
 
 pub(super) const fn button_remove() -> &'static str {
@@ -91,7 +91,7 @@ pub(super) const fn label_new_item() -> &'static str {
 }
 
 pub(super) const fn hint_expected_tsv_headers() -> &'static str {
-    "Intestazioni attese: name, smiles, organism/taxon, doi"
+    "Intestazioni attese: name, smiles, taxon (o organism), doi"
 }
 
 pub(super) const fn hint_scroll_curation_results() -> &'static str {
@@ -110,6 +110,10 @@ pub(super) fn msg_no_valid_tsv_rows() -> String {
     "Nessuna riga valida trovata nell'input TSV.".to_string()
 }
 
+pub(super) fn msg_tsv_missing_column(column: &str) -> String {
+    format!("Nel file TSV manca la colonna obbligatoria '{column}'.")
+}
+
 pub(super) fn msg_tsv_import_complete(added: usize, skipped: usize) -> String {
     format!("Import TSV completato: aggiunte {added} riga(e) uniche, saltati {skipped} duplicati.")
 }
@@ -123,7 +127,7 @@ pub(super) fn msg_add_row_before_generate() -> String {
 }
 
 pub(super) fn msg_running_checks() -> String {
-    "Esecuzione dei controlli curation con RDKit.js e Wikidata...".to_string()
+    "Esecuzione dei controlli di curazione con RDKit.js e Wikidata...".to_string()
 }
 
 pub(super) fn msg_done_review_copy() -> String {
@@ -149,20 +153,20 @@ pub(super) const fn msg_two_step_hint() -> &'static str {
 }
 
 pub(super) const fn button_second_pass() -> &'static str {
-    "Ho creato gli elementi mancanti, facciamo il resto"
+    "Ho creato gli elementi mancanti; completiamo il lavoro"
 }
 
 pub(super) const fn msg_second_pass_running() -> &'static str {
-    "Esecuzione del secondo passaggio sulle righe che dipendevano da elementi mancanti..."
+    "Esecuzione del secondo passaggio sulle righe che dipendono da elementi mancanti..."
 }
 
 pub(super) const fn msg_second_pass_done() -> &'static str {
-    "Secondo passaggio completato. I QuickStatements principali sono stati aggiornati con i QID risolti quando disponibili."
+    "Secondo passaggio completato. I QuickStatements principali usano ora i QID risolti quando disponibili."
 }
 
 pub(super) fn msg_second_pass_still_pending_count(count: usize) -> String {
     format!(
-        "{count} elemento/i prerequisito non è ancora stato trovato. Crea/unisci gli elementi e riprova dopo circa 30-120 secondi."
+        "{count} elementi prerequisito non sono ancora stati trovati. Creali o uniscili e riprova tra circa 30-120 secondi."
     )
 }
 
@@ -179,7 +183,7 @@ pub(super) const fn curation_badge_second_pass_required() -> &'static str {
 }
 
 pub(super) const fn curation_mass_warning_title() -> &'static str {
-    "La massa esatta non è stata risolta dagli endpoint dei descrittori"
+    "La massa esatta non è stata determinata dagli endpoint dei descrittori"
 }
 
 pub(super) const fn msg_delay_advice() -> &'static str {
@@ -207,7 +211,7 @@ pub(super) const fn curation_note_existing_updates() -> &'static str {
 }
 
 pub(super) const fn curation_note_new_compound() -> &'static str {
-    "Nessuna voce Wikidata trovata tramite InChIKey: generati QuickStatements di creazione."
+    "Nessuna voce Wikidata trovata tramite InChIKey; generati QuickStatements di creazione."
 }
 
 pub(super) const fn curation_note_dependencies_pending() -> &'static str {

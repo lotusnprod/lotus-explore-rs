@@ -1,5 +1,6 @@
 use super::shell::{AppShell, ExplorePage};
 use crate::components::data_curation_page::DataCurationPage;
+use crate::components::landing::{LandingPage, NotFoundPage};
 use crate::i18n::Locale;
 use crate::pages::DrawPage;
 use dioxus::prelude::*;
@@ -55,13 +56,19 @@ impl fmt::Display for RouteQuery {
 pub enum Route {
     #[layout(AppShell)]
     #[route("/?:..query#:hash")]
-    Explore { query: RouteQuery, hash: String },
+    Landing { query: RouteQuery, hash: String },
+
+    #[route("/search?:..query#:hash")]
+    Search { query: RouteQuery, hash: String },
 
     #[route("/curation?:..query#:hash")]
     Curation { query: RouteQuery, hash: String },
 
     #[route("/draw?:..query#:hash")]
     Draw { query: RouteQuery, hash: String },
+
+    #[route("/:..segments")]
+    NotFound { segments: Vec<String> },
 }
 
 impl Route {
@@ -71,21 +78,25 @@ impl Route {
 
     pub(crate) fn query_value(&self) -> RouteQuery {
         match self {
-            Self::Explore { query, .. }
+            Self::Landing { query, .. }
+            | Self::Search { query, .. }
             | Self::Curation { query, .. }
             | Self::Draw { query, .. } => query.clone(),
+            Self::NotFound { .. } => RouteQuery::default(),
         }
     }
 
     pub fn navigation_string(&self) -> String {
         let path = match self {
-            Self::Explore { .. } => "/",
-            Self::Curation { .. } => "/curation",
-            Self::Draw { .. } => "/draw",
+            Self::Landing { .. } => "/".to_string(),
+            Self::Search { .. } => "/search".to_string(),
+            Self::Curation { .. } => "/curation".to_string(),
+            Self::Draw { .. } => "/draw".to_string(),
+            Self::NotFound { segments } => format!("/{}", segments.join("/")),
         };
         let query = self.query_value().to_string();
         let hash = self.hash();
-        let mut url = path.to_string();
+        let mut url = path;
         if !query.is_empty() {
             url.push('?');
             url.push_str(&query);
@@ -99,17 +110,21 @@ impl Route {
 
     pub fn hash(&self) -> &str {
         match self {
-            Self::Explore { hash, .. } | Self::Curation { hash, .. } | Self::Draw { hash, .. } => {
-                hash
-            }
+            Self::Landing { hash, .. }
+            | Self::Search { hash, .. }
+            | Self::Curation { hash, .. }
+            | Self::Draw { hash, .. } => hash,
+            Self::NotFound { .. } => "",
         }
     }
 
     pub fn view_key(&self) -> &'static str {
         match self {
-            Self::Explore { .. } => "explore",
+            Self::Landing { .. } => "landing",
+            Self::Search { .. } => "search",
             Self::Curation { .. } => "curation",
             Self::Draw { .. } => "draw",
+            Self::NotFound { .. } => "not-found",
         }
     }
 
@@ -128,9 +143,10 @@ impl Route {
         let query = self.page_query();
         let hash = String::new();
         match view {
+            "search" => Self::Search { query, hash },
             "curation" => Self::Curation { query, hash },
             "draw" => Self::Draw { query, hash },
-            _ => Self::Explore { query, hash },
+            _ => Self::Landing { query, hash },
         }
     }
 
@@ -157,9 +173,11 @@ impl Route {
     fn with_query_and_hash(self, query: RouteQuery) -> Self {
         let hash = self.hash().to_string();
         match self {
-            Self::Explore { .. } => Self::Explore { query, hash },
+            Self::Landing { .. } => Self::Landing { query, hash },
+            Self::Search { .. } => Self::Search { query, hash },
             Self::Curation { .. } => Self::Curation { query, hash },
             Self::Draw { .. } => Self::Draw { query, hash },
+            Self::NotFound { segments } => Self::NotFound { segments },
         }
     }
 }
@@ -174,24 +192,44 @@ pub fn normalize_empty_query() {
         let Ok(href) = location.href() else {
             return;
         };
-        let Some(query_index) = href.find('?') else {
+        let Some(clean) = without_empty_url_delimiters(&href) else {
             return;
         };
-        let after_query = &href[query_index + 1..];
-        let query_len = after_query.find('#').unwrap_or(after_query.len());
-        if query_len != 0 {
-            return;
-        }
-        let mut clean = href;
-        clean.remove(query_index);
         if let Ok(history) = window.history() {
             let _ = history.replace_state_with_url(&wasm_bindgen::JsValue::NULL, "", Some(&clean));
         }
     }
 }
 
+fn without_empty_url_delimiters(href: &str) -> Option<String> {
+    let (without_hash, hash) = href
+        .split_once('#')
+        .map_or((href, None), |(path, hash)| (path, Some(hash)));
+    let (path, query) = without_hash
+        .split_once('?')
+        .map_or((without_hash, None), |(path, query)| (path, Some(query)));
+
+    let mut clean = String::with_capacity(href.len());
+    clean.push_str(path);
+    if let Some(query) = query.filter(|query| !query.is_empty()) {
+        clean.push('?');
+        clean.push_str(query);
+    }
+    if let Some(hash) = hash.filter(|hash| !hash.is_empty()) {
+        clean.push('#');
+        clean.push_str(hash);
+    }
+    (clean != href).then_some(clean)
+}
+
 #[component]
-pub fn Explore(query: RouteQuery, hash: String) -> Element {
+pub fn Landing(query: RouteQuery, hash: String) -> Element {
+    let _ = (query, hash);
+    rsx! { LandingPage {} }
+}
+
+#[component]
+pub fn Search(query: RouteQuery, hash: String) -> Element {
     let _ = (query, hash);
     rsx! { ExplorePage {} }
 }
@@ -206,6 +244,12 @@ pub fn Curation(query: RouteQuery, hash: String) -> Element {
 pub fn Draw(query: RouteQuery, hash: String) -> Element {
     let _ = (query, hash);
     rsx! { DrawPage {} }
+}
+
+#[component]
+pub fn NotFound(segments: Vec<String>) -> Element {
+    let _ = segments;
+    rsx! { NotFoundPage {} }
 }
 
 fn parse_encoded_query(query: &str) -> BTreeMap<String, String> {
@@ -285,7 +329,7 @@ fn encode_query(params: &BTreeMap<String, String>) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{Route, RouteQuery};
+    use super::{Route, RouteQuery, without_empty_url_delimiters};
     use crate::i18n::Locale;
 
     #[test]
@@ -304,12 +348,39 @@ mod tests {
     }
 
     #[test]
+    fn empty_url_delimiters_are_removed_without_losing_values() {
+        assert_eq!(
+            without_empty_url_delimiters("https://example.test/draw?"),
+            Some("https://example.test/draw".to_string())
+        );
+        assert_eq!(
+            without_empty_url_delimiters("https://example.test/draw#"),
+            Some("https://example.test/draw".to_string())
+        );
+        assert_eq!(
+            without_empty_url_delimiters("https://example.test/draw?#"),
+            Some("https://example.test/draw".to_string())
+        );
+        assert_eq!(
+            without_empty_url_delimiters("https://example.test/draw?dark_mode=true#editor"),
+            None
+        );
+        assert_eq!(
+            without_empty_url_delimiters("https://example.test/draw"),
+            None
+        );
+    }
+
+    #[test]
     fn navigation_strings_omit_empty_query_delimiters() {
-        let route = Route::Explore {
+        let route = Route::Landing {
             query: RouteQuery::default(),
             hash: String::new(),
         };
         assert_eq!(route.navigation_string(), "/");
+        let search = route.clone().with_view("search");
+        assert_ne!(search, route);
+        assert_eq!(search.navigation_string(), "/search");
         assert_eq!(
             route.clone().with_view("curation").navigation_string(),
             "/curation"
@@ -343,8 +414,29 @@ mod tests {
     }
 
     #[test]
+    fn root_and_search_are_distinct_routes() {
+        let landing = "/".parse::<Route>();
+        let search = "/search".parse::<Route>();
+        assert!(landing.is_ok(), "landing route should parse");
+        assert!(search.is_ok(), "search route should parse");
+        if let (Ok(landing), Ok(search)) = (landing, search) {
+            assert_eq!(landing.view_key(), "landing");
+            assert_eq!(search.view_key(), "search");
+        }
+    }
+
+    #[test]
+    fn unknown_paths_use_the_not_found_route() {
+        let route = "/missing/page".parse::<Route>();
+        assert!(route.is_ok(), "unknown route should parse");
+        if let Ok(route) = route {
+            assert_eq!(route.view_key(), "not-found");
+        }
+    }
+
+    #[test]
     fn changing_view_resets_page_query_and_hash() {
-        let route = Route::Explore {
+        let route = Route::Search {
             query: RouteQuery::from_encoded("taxon=Rosa&lang=fr"),
             hash: "results".into(),
         };

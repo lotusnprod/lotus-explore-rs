@@ -309,27 +309,59 @@ async fn unknown_route_returns_not_found() {
 }
 
 #[tokio::test]
-async fn client_routes_fall_back_to_index_without_masking_api_404s() {
+async fn client_routes_return_200_and_unknown_pages_return_404() {
     let public_dir = tempfile::tempdir().expect("public directory");
     fs::write(public_dir.path().join("index.html"), "index").expect("index file");
+    fs::write(public_dir.path().join("404.html"), "not found").expect("404 file");
+    for route in ["search", "curation", "draw"] {
+        let route_dir = public_dir.path().join(route);
+        fs::create_dir_all(&route_dir).expect("route directory");
+        fs::write(route_dir.join("index.html"), "index").expect("route index file");
+    }
     let mut config = test_config();
     config.public_dir = Some(public_dir.path().to_path_buf());
     let app = build_router(config.max_body_bytes, &config, AppState::new(&config));
+
+    for uri in [
+        "/search?lang=fr",
+        "/curation?lang=fr",
+        "/draw?dark_mode=true",
+    ] {
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri(uri)
+                    .body(Body::empty())
+                    .expect("request"),
+            )
+            .await
+            .expect("client response");
+        assert_eq!(response.status(), StatusCode::OK, "route: {uri}");
+        assert_eq!(
+            to_bytes(response.into_body(), usize::MAX)
+                .await
+                .expect("route body"),
+            "index"
+        );
+    }
 
     let response = app
         .clone()
         .oneshot(
             Request::builder()
-                .uri("/curation?lang=fr")
+                .uri("/missing")
                 .body(Body::empty())
                 .expect("request"),
         )
         .await
-        .expect("client response");
-    assert_eq!(response.status(), StatusCode::OK);
+        .expect("missing page response");
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
     assert_eq!(
-        to_bytes(response.into_body(), usize::MAX).await.unwrap(),
-        "index"
+        to_bytes(response.into_body(), usize::MAX)
+            .await
+            .expect("404 body"),
+        "not found"
     );
 
     let response = app
@@ -337,7 +369,7 @@ async fn client_routes_fall_back_to_index_without_masking_api_404s() {
             Request::builder()
                 .uri("/v1/does-not-exist")
                 .body(Body::empty())
-                .expect("request"),
+                .expect("api request"),
         )
         .await
         .expect("api response");

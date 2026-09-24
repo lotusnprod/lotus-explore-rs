@@ -27,8 +27,14 @@ pub const fn en_t(key: TextKey) -> &'static str {
         TextKey::GoToHomepage => "Go to homepage",
         TextKey::SkipToResults => "Skip to main content",
         TextKey::PageSubtitle => {
-            "Explore linked open data: natural products, organisms, and scientific literature."
+            "Explore linked open data: chemical entities, biological organisms, and scientific literature."
         }
+        TextKey::LandingTitle => "Welcome to LOTUS Explorer",
+        TextKey::OpenSearch => "Open search",
+
+        TextKey::PageNotFound => "Page not found",
+        TextKey::PageNotFoundDescription => "The page you requested does not exist.",
+        TextKey::ReturnHome => "Return to the home page",
         TextKey::ResolvedTaxon => "Resolved taxon",
         TextKey::QueryHash => "Query hash",
         TextKey::ResultHash => "Result hash",
@@ -58,10 +64,10 @@ pub const fn en_t(key: TextKey) -> &'static str {
         TextKey::ErrorHintParse => "Response parsing failed. Retry or refine query.",
         TextKey::ErrorHintUnknown => "Unexpected error. Retry may help.",
         TextKey::WelcomeLeadA => {
-            "This app demonstrates the power of linked open data by connecting natural products to organisms and scientific literature. "
+            "This app demonstrates the power of linked open data by connecting chemical entities to biological organisms and scientific literature. "
         }
         TextKey::WelcomeLeadB => {
-            "The data model links compounds, taxa, and references—sourced from the "
+            "The data model links compounds, taxa, and references, sourced from the "
         }
         TextKey::WelcomeLeadC => ", published as linked data on ",
         TextKey::WelcomeLeadD => ", and queried via SPARQL through ",
@@ -72,10 +78,14 @@ pub const fn en_t(key: TextKey) -> &'static str {
         TextKey::ExampleQueryTaxon | TextKey::DownloadCsvLabel => "Download CSV",
         TextKey::ExampleQueryStructure | TextKey::DownloadJsonLabel => "Download JSON",
         TextKey::ExampleQueryAdvanced | TextKey::DownloadRdfLabel => "Download RDF",
-        TextKey::ExampleApiUrls => "Example API URLs",
+        TextKey::ExampleApiUrls => "API URL examples",
+
+        TextKey::SearchExamples => "Search examples",
+
         TextKey::LabelLanguagePolicy => {
-            "Labels use 'mul' first, then 'en' fallback, for comparable results."
+            "Labels prefer 'mul' and fall back to 'en' so results remain comparable."
         }
+
         TextKey::SearchFilters => "Search filters",
         TextKey::Taxon | TextKey::TaxonCol => "Taxon",
         TextKey::TaxonPlaceholder => "Gentiana lutea - Q34317 - *",

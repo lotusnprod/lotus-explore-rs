@@ -47,7 +47,7 @@ use axum::{
     http::{HeaderName, HeaderValue, StatusCode, header},
     middleware::{self, Next},
     response::Response,
-    routing::{any, get, post},
+    routing::{any, get, get_service, post},
 };
 use handlers::{export_file, export_urls, health, metrics, search};
 use tower_http::{
@@ -124,11 +124,20 @@ pub fn build_router(max_body_bytes: usize, config: &AppConfig, state: AppState) 
 
     // Optionally serve the Dioxus WASM build output as static files.
     if let Some(public_dir) = &config.public_dir {
-        router = router.fallback_service(
-            ServeDir::new(public_dir.clone())
-                .precompressed_br()
-                .fallback(ServeFile::new(public_dir.join("index.html"))),
-        );
+        let route_index = |route: &str| {
+            get_service(
+                ServeFile::new(public_dir.join(route).join("index.html")).precompressed_br(),
+            )
+        };
+        router = router
+            .route("/search", route_index("search"))
+            .route("/curation", route_index("curation"))
+            .route("/draw", route_index("draw"))
+            .fallback_service(
+                ServeDir::new(public_dir.clone())
+                    .precompressed_br()
+                    .not_found_service(ServeFile::new(public_dir.join("404.html"))),
+            );
     }
 
     router

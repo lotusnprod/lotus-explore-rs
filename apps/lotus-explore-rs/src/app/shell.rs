@@ -9,8 +9,7 @@ use crate::components::layout::header_meta::HeaderMetaSection;
 use crate::components::layout::notices::{ErrorNotice, ShareNotice, TaxonNotice};
 use crate::components::layout::page_header::PageHeader;
 use crate::components::results_viewport::ResultsViewport;
-use crate::components::welcome::WelcomeScreen;
-use crate::document_head::LotusDocumentHead;
+use crate::components::welcome::SearchExamples;
 use crate::features::explore::{
     ExploreInteractions, ExploreState, SearchTaskController, build_shareable_url,
     initial_url_state, is_true_flag, use_download_dispatch_effect, use_startup_effect,
@@ -73,6 +72,7 @@ fn resolve_startup_dark_mode(startup: &crate::features::explore::InitialUrlState
 
 #[component]
 pub fn AppRoot() -> Element {
+    normalize_empty_query();
     let startup_url_state = initial_url_state();
     let startup_dark_mode = resolve_startup_dark_mode(&startup_url_state);
     let AppBootstrap {
@@ -177,10 +177,8 @@ fn AppRuntimeEffects() -> Element {
 #[component]
 pub fn AppShell() -> Element {
     let locale = crate::hooks::use_locale();
-    let lang = locale.lang_code().to_string();
     rsx! {
         AppRuntimeEffects {}
-        LotusDocumentHead { lang }
         a {
             href: SKIP_TO_RESULTS_HREF,
             class: "skip-link",
@@ -192,7 +190,8 @@ pub fn AppShell() -> Element {
                 class: "app-layout",
                 main {
                     id: MAIN_PANEL_ID,
-                    class: "main-content min-w-0 w-full max-w-none",
+                     class: "main-content min-w-0 min-h-0 w-full max-w-none",
+
                     tabindex: "-1",
                     aria_labelledby: PAGE_TITLE_ID,
                     PageHeader {}
@@ -200,7 +199,8 @@ pub fn AppShell() -> Element {
                 }
             }
             footer {
-                class: "flex flex-col shrink-0 w-full bg-shell-chrome border-t border-shell-border min-h-[80px]",
+                 class: "flex flex-col shrink-0 w-full bg-shell-chrome min-h-[80px]",
+
                 div {
                     class: "w-full max-w-[1600px] mx-auto px-5 pt-[3px] pb-[6px] box-border lg:px-8",
                     Footer {}
@@ -212,21 +212,30 @@ pub fn AppShell() -> Element {
 
 #[component]
 pub(crate) fn ExplorePage() -> Element {
+    let locale = crate::hooks::use_locale();
     let criteria = use_form_criteria_context().criteria;
     let searched_once = use_results_context().explore.read().lifecycle.searched_once;
     let shareable_url =
         use_memo(move || build_shareable_url(&criteria.read()).map(Arc::<str>::from));
 
     rsx! {
-        TaxonNotice {}
-        ErrorNotice {}
-        WelcomeScreen {}
-        SearchPanelInline {}
-        if searched_once {
-            ShareNotice { shareable_url }
-            HeaderMetaSection {}
+        section {
+            class: "page-section w-full max-w-none px-4 sm:px-6 lg:px-8",
+            h2 { class: "sr-only", id: "search-page-heading", "{t(locale, TextKey::Search)}" }
+            div { class: "w-full rounded-xl border border-shell-border bg-shell-raised overflow-hidden",
+                div { class: "page-body flex min-h-0 flex-col gap-4 px-4 pb-4 pt-5 sm:px-6 sm:pb-6 sm:pt-6",
+                    TaxonNotice {}
+                    ErrorNotice {}
+                    SearchPanelInline {}
+                    SearchExamples {}
+                    if searched_once {
+                        ShareNotice { shareable_url }
+                        HeaderMetaSection {}
+                    }
+                    ResultsViewport {}
+                }
+            }
         }
-        ResultsViewport {}
     }
 }
 

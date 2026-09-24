@@ -88,8 +88,8 @@
       {
         "name": "Search Compounds",
         "short_name": "Search",
-        "description": "Search for natural product compounds",
-        "url": "./?tab=search",
+        "description": "Search for chemical compounds",
+        "url": "./search",
         "icons": [
           {
             "src": "/favicon.ico",

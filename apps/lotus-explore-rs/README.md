@@ -126,7 +126,8 @@ just serve lotus-explore-rs   # fetches Ketcher + dx serve
 
 The client uses typed routes:
 
-- `/` --- Explore
+- `/` --- Welcome landing page
+- `/search` --- Explore
 - `/curation` --- Curation
 - `/draw` --- Structure editor
 

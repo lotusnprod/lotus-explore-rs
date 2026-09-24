@@ -35,7 +35,7 @@ fn StatusSummaryBadges(locale: Locale, rows: Arc<[CurationResultRow]>) -> Elemen
 
 fn render_curation_result_cells(locale: Locale, row: &CurationResultRow) -> Element {
     rsx! {
-        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui",
+        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text",
             span {
                 class: match row.status {
                     CurationStatus::ExistingComplete => "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-taxon",
@@ -68,7 +68,7 @@ fn render_curation_result_cells(locale: Locale, row: &CurationResultRow) -> Elem
                 div { class: "mt-1 whitespace-pre-line text-micro text-muted", "{row.note}" }
             }
         }
-        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui",
+        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text",
             if let Some(qid) = row.wikidata_qid.as_deref() {
                 a {
                     class: "font-mono text-micro text-wd-compound underline break-all",
@@ -81,13 +81,13 @@ fn render_curation_result_cells(locale: Locale, row: &CurationResultRow) -> Elem
                 span { class: "text-muted", "{label_new_item(locale)}" }
             }
         }
-        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui", "{row.input.name}" }
-        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro break-all", "{row.input.smiles}" }
-        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro break-all", "{row.canonical_smiles.as_deref().unwrap_or(NA_TEXT)}" }
-        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro break-all", "{row.inchikey.as_deref().unwrap_or(NA_TEXT)}" }
-        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro break-all", "{row.inchi.as_deref().unwrap_or(NA_TEXT)}" }
-        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro break-all", "{row.formula.as_deref().unwrap_or(NA_TEXT)}" }
-        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro break-all", "{format_mass(row.exact_mass)}" }
+        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text", "{row.input.name}" }
+        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro break-all", "{row.input.smiles}" }
+        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro break-all", "{row.canonical_smiles.as_deref().unwrap_or(NA_TEXT)}" }
+        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro break-all", "{row.inchikey.as_deref().unwrap_or(NA_TEXT)}" }
+        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro break-all", "{row.inchi.as_deref().unwrap_or(NA_TEXT)}" }
+        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro break-all", "{row.formula.as_deref().unwrap_or(NA_TEXT)}" }
+        td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro break-all", "{format_mass(row.exact_mass)}" }
     }
 }
 

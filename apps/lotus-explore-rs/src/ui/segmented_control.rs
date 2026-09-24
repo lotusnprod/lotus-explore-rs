@@ -80,9 +80,9 @@ fn SegmentedButton(props: SegmentedButtonProps) -> Element {
 
     let class = if active {
         if stretch {
-            "inline-flex flex-1 min-w-0 items-center justify-center px-5 py-1.5 text-ui leading-none font-semibold rounded-full border border-accent bg-accent text-bg shadow-xs transition-transform duration-150 active:scale-[0.98] min-h-[40px] whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2"
+            "inline-flex flex-1 min-w-0 items-center justify-center px-5 py-1.5 text-ui leading-none font-semibold rounded-full border border-accent bg-accent text-bg shadow-xs transition-transform duration-150 hover:bg-accent-2 active:bg-accent-2 active:scale-[0.98] min-h-[40px] whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2"
         } else {
-            "inline-flex flex-none items-center justify-center px-5 py-1.5 text-ui leading-none font-semibold rounded-full border border-accent bg-accent text-bg shadow-xs transition-transform duration-150 active:scale-[0.98] min-h-[40px] whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2"
+            "inline-flex flex-none items-center justify-center px-5 py-1.5 text-ui leading-none font-semibold rounded-full border border-accent bg-accent text-bg shadow-xs transition-transform duration-150 hover:bg-accent-2 active:bg-accent-2 active:scale-[0.98] min-h-[40px] whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2"
         }
     } else if stretch {
         "inline-flex flex-1 min-w-0 items-center justify-center px-5 py-1.5 text-ui leading-none font-semibold rounded-full border border-border bg-surface text-text hover:bg-bg transition-transform duration-150 active:scale-[0.98] min-h-[40px] whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2"

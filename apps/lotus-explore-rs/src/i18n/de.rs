@@ -27,8 +27,14 @@ pub const fn de_t(key: TextKey) -> &'static str {
         TextKey::GoToHomepage => "Zur Startseite",
         TextKey::SkipToResults => "Zum Hauptinhalt springen",
         TextKey::PageSubtitle => {
-            "Erkunden Sie verknüpfte offene Daten: Naturstoffe, Organismen und wissenschaftliche Literatur."
+            "Erkunden Sie verknüpfte offene Daten: chemische Entitäten, biologische Organismen und wissenschaftliche Literatur."
         }
+        TextKey::LandingTitle => "Willkommen bei LOTUS Explorer",
+        TextKey::OpenSearch => "Suche öffnen",
+
+        TextKey::PageNotFound => "Seite nicht gefunden",
+        TextKey::PageNotFoundDescription => "Die angeforderte Seite existiert nicht.",
+        TextKey::ReturnHome => "Zurück zur Startseite",
         TextKey::ResolvedTaxon => "Aufgelöstes Taxon",
         TextKey::QueryHash => "Abfrage-Hash",
         TextKey::ResultHash => "Ergebnis-Hash",
@@ -60,13 +66,16 @@ pub const fn de_t(key: TextKey) -> &'static str {
         }
         TextKey::ErrorHintUnknown => "Unerwarteter Fehler. Ein erneuter Versuch kann helfen.",
         TextKey::WelcomeLeadA => {
-            "Diese Anwendung demonstriert die Leistungsfähigkeit verknüpfter offener Daten durch Verbindung natürlicher Produkte mit Organismen und wissenschaftlicher Literatur. "
+            "Diese Anwendung veranschaulicht die Leistungsfähigkeit verknüpfter offener Daten, indem sie chemische Entitäten mit biologischen Organismen und wissenschaftlicher Literatur verknüpft. "
         }
+
         TextKey::WelcomeLeadB => {
-            "Das Datenmodell verknüpft Verbindungen, Taxa und Referenzen—aus der "
+            "Das Datenmodell verknüpft Verbindungen, Taxa und Referenzen, die aus der "
         }
+
         TextKey::WelcomeLeadC => ", veröffentlicht als verknüpfte offene Daten auf ",
-        TextKey::WelcomeLeadD => " und abgefragt via SPARQL durch ",
+        TextKey::WelcomeLeadD => " und über SPARQL abgefragt durch ",
+
         TextKey::WelcomeLeadE => ".",
         TextKey::ExampleGentiana => "Taxonname, Wikidata-QID oder * für alle Taxa eingeben",
         TextKey::ExampleSmilesOnly => "SMILES oder Molfile in das Strukturfeld einfügen",
@@ -74,10 +83,14 @@ pub const fn de_t(key: TextKey) -> &'static str {
         TextKey::ExampleQueryTaxon | TextKey::DownloadCsvLabel => "CSV herunterladen",
         TextKey::ExampleQueryStructure | TextKey::DownloadJsonLabel => "JSON herunterladen",
         TextKey::ExampleQueryAdvanced | TextKey::DownloadRdfLabel => "RDF herunterladen",
-        TextKey::ExampleApiUrls => "API-URL-Beispiele",
+        TextKey::ExampleApiUrls => "Beispiele für API-URLs",
+
+        TextKey::SearchExamples => "Suchbeispiele",
+
         TextKey::LabelLanguagePolicy => {
-            "Beschriftungen werden zuerst aus 'mul' und dann 'en' aufgelöst, damit Ergebnisse vergleichbar bleiben."
+            "Beschriftungen bevorzugen 'mul' und verwenden 'en' als Fallback, damit Ergebnisse vergleichbar bleiben."
         }
+
         TextKey::SearchFilters => "Suchfilter",
         TextKey::Taxon | TextKey::TaxonCol => "Taxon",
         TextKey::TaxonPlaceholder => "Gentiana lutea - Q34317 - *",
@@ -112,13 +125,14 @@ pub const fn de_t(key: TextKey) -> &'static str {
         TextKey::RunSearch => "Suche starten",
         TextKey::KetcherSummary => "Struktureditor (Ketcher)",
         TextKey::KetcherHintA => {
-            "Sie möchten eine Struktur zeichnen oder suchen? Öffnen Sie den Tab "
+            "Möchten Sie eine Struktur zeichnen oder nachschlagen? Öffnen Sie den Tab "
         }
-        TextKey::KetcherHintB => " und kopieren Sie dann mit ",
+
+        TextKey::KetcherHintB => " und kopieren Sie sie dann mit ",
+
         TextKey::KetcherHintC => " (oder ",
-        TextKey::KetcherHintD => {
-            ") und verwenden Sie den Inhalt im Strukturfeld der Registerkarte Suche."
-        }
+        TextKey::KetcherHintD => ") und verwenden Sie sie im Strukturfeld der Registerkarte Suche.",
+
         TextKey::KetcherIframeTitle => "Ketcher-Struktureditor",
         TextKey::KetcherClickToLoad => "Klicken Sie, um den Ketcher-Struktureditor zu laden.",
         TextKey::KindNoteSmiles => "  Wird als einzeiliges SPARQL-Literal gesendet.",

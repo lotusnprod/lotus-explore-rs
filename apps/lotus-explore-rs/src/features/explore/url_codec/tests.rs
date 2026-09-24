@@ -153,6 +153,15 @@ fn parse_criteria_clamps_low_positive_smiles_threshold() {
 }
 
 #[test]
+fn shareable_search_urls_use_the_search_route() {
+    let criteria = SearchCriteria::default();
+    assert_eq!(
+        build_shareable_url(&criteria),
+        Some("/search?taxon=Gentiana%20lutea".to_string())
+    );
+}
+
+#[test]
 fn build_shareable_url_encodes_query_pairs() {
     let mut params = QueryParams::new();
     params.insert("taxon name".into(), "Gentiana lutea".into());

@@ -90,7 +90,7 @@ pub fn StatusNotice(locale: Locale, message: Arc<str>) -> Element {
             role: "status",
             aria_live: "polite",
             span { class: "inline-flex items-center px-2 py-0.5 rounded-full font-semibold uppercase tracking-[0.08em] text-micro shrink-0 bg-warning/12 text-warning", "{t(locale, TextKey::Notice)}" }
-            span { class: "flex-1 min-w-0 text-ui break-words leading-snug text-inherit", "{message}" }
+            span { class: "flex-1 min-w-0 text-ui break-words leading-snug text-warning", "{message}" }
         }
     }
 }
@@ -111,12 +111,12 @@ pub fn AddRowCard(
             "data-webmcp-id": "lotus-curation-add-row-form",
             "data-webmcp-type": "form",
             "data-webmcp-name": "LOTUS curation add-row form",
-            "data-webmcp-description": "Add a single curated natural-product record with a name, SMILES, taxon, and DOI.",
+            "data-webmcp-description": "Add a single curated chemical compound record with a name, SMILES, taxon, and DOI.",
             "data-webmcp-schema": "{schema}",
             "data-mcp-id": "lotus-curation-add-row-form",
             "data-mcp-type": "form",
             "data-mcp-name": "LOTUS curation add-row form",
-            "data-mcp-description": "Add a single curated natural-product record with a name, SMILES, taxon, and DOI.",
+            "data-mcp-description": "Add a single curated chemical compound record with a name, SMILES, taxon, and DOI.",
             "data-mcp-schema": "{schema}",
             onsubmit: move |evt: Event<FormData>| {
                 evt.prevent_default();
@@ -249,7 +249,7 @@ pub fn TsvImportCard(
                     onclick: Some(EventHandler::new(move |_: Event<MouseData>| on_parse_tsv.call(()))),
                 }
                 input {
-                    class: "curation-file-input max-w-full text-ui text-muted",
+                    class: "curation-file-input w-full max-w-full cursor-pointer rounded-xl border border-border bg-surface px-3 py-2 text-ui text-muted shadow-xs transition-colors hover:border-accent/50 hover:bg-bg focus:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-ui file:font-semibold file:text-bg hover:file:bg-accent-2",
                     aria_label: "TSV file upload",
                     r#type: "file",
                     accept: ".tsv,text/tab-separated-values,text/plain",
@@ -323,18 +323,18 @@ pub fn QueueRowsCard(
                     tbody {
                         if rows_snapshot.is_empty() {
                             tr {
-                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui w-[110px] min-w-[110px] font-mono text-micro", "-" }
-                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui min-w-[3ch] font-mono text-micro", "-" }
-                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro", "-" }
-                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui min-w-[220px] font-mono text-micro", "-" }
-                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro", "-" }
-                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro", "-" }
+                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text w-[110px] min-w-[110px] font-mono text-micro", "-" }
+                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text min-w-[3ch] font-mono text-micro", "-" }
+                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro", "-" }
+                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text min-w-[220px] font-mono text-micro", "-" }
+                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro", "-" }
+                                td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro", "-" }
                             }
                         } else {
                             for (idx, row) in rows_snapshot.iter().enumerate() {
                                 tr { key: "{row.name}|{row.smiles}",
                                     class: "odd:bg-surface/30 hover:bg-surface/60",
-                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui w-[110px] min-w-[110px]",
+                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text w-[110px] min-w-[110px]",
                                         Button {
                                             label: button_remove(locale).to_string(),
                                             class: "inline-flex items-center justify-center font-sans select-none transition-transform duration-150 ease-[cubic-bezier(.4,0,.2,1)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2 rounded-xl border border-danger/35 bg-danger/10 text-danger font-semibold hover:bg-danger/15 active:bg-danger/20 min-h-[34px] gap-1.5 px-3 py-1.5 text-ui active:scale-[0.98]",
@@ -346,11 +346,11 @@ pub fn QueueRowsCard(
                                             })),
                                         }
                                     }
-                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui min-w-[3ch] font-mono text-micro", "{idx + 1}" }
-                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui", "{row.name}" }
-                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui min-w-[220px]", "{row.smiles}" }
-                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui", "{row.taxon.as_deref().unwrap_or(\"\")}" }
-                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui font-mono text-micro", "{row.doi.as_deref().unwrap_or(\"\")}" }
+                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text min-w-[3ch] font-mono text-micro", "{idx + 1}" }
+                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text", "{row.name}" }
+                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text min-w-[220px]", "{row.smiles}" }
+                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text", "{row.taxon.as_deref().unwrap_or(\"\")}" }
+                                    td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text font-mono text-micro", "{row.doi.as_deref().unwrap_or(\"\")}" }
                                 }
                             }
                         }

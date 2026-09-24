@@ -3,7 +3,7 @@
   "skills": [
     {
       "name": "Search Compounds",
-      "description": "Search for natural product compounds by name, SMILES, or Molfile",
+      "description": "Search for chemical compounds by name, SMILES, or Molfile",
       "instructions": "Use the search interface to query compounds. Support structural and text-based search, and respect the visible accessibility affordances in the page header and filters.",
       "triggers": ["compound search", "SMILES lookup", "chemical structure"]
     },

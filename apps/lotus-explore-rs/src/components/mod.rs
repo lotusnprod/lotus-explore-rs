@@ -5,6 +5,7 @@ pub mod copy_button;
 pub mod curation_results_table;
 pub mod data_curation_page;
 pub mod form_sections;
+pub mod landing;
 pub mod layout;
 pub mod loading;
 pub mod results_table;

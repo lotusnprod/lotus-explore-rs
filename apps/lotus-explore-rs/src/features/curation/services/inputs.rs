@@ -38,11 +38,11 @@ pub fn parse_tsv_rows(tsv: &str) -> Result<Vec<CurationInputRow>, CurationError>
     let name_idx = columns
         .iter()
         .position(|c| c == "name")
-        .ok_or_else(|| CurationError::InvalidInput("TSV is missing a 'name' column".into()))?;
+        .ok_or(CurationError::MissingTsvColumn("name"))?;
     let smiles_idx = columns
         .iter()
         .position(|c| c == "smiles")
-        .ok_or_else(|| CurationError::InvalidInput("TSV is missing a 'smiles' column".into()))?;
+        .ok_or(CurationError::MissingTsvColumn("smiles"))?;
     let taxon_idx = columns
         .iter()
         .position(|c| matches!(c.as_str(), "taxon" | "organism"));

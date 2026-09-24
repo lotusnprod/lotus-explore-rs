@@ -129,6 +129,7 @@ dispatch!(view_label_draw);
 dispatch!(msg_name_smiles_required => String);
 dispatch!(msg_duplicate_row_skipped => String);
 dispatch!(msg_no_valid_tsv_rows => String);
+dispatch!(msg_tsv_missing_column, column: &str -> String);
 dispatch!(msg_add_row_before_generate => String);
 dispatch!(msg_running_checks => String);
 dispatch!(msg_done_review_copy => String);

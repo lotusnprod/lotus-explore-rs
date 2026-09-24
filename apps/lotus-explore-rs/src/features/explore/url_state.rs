@@ -27,12 +27,60 @@ fn deployment_base_path(pathname: &str) -> String {
     if path.is_empty() {
         return String::new();
     }
-    for suffix in ["/curation", "/draw"] {
+    for suffix in ["/search", "/curation", "/draw"] {
         if let Some(base) = path.strip_suffix(suffix) {
             return base.to_string();
         }
     }
     path.to_string()
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn deployment_href(path: &str) -> String {
+    let mut prefix = web_sys::window()
+        .and_then(|window| window.document())
+        .and_then(|document| document.document_element())
+        .and_then(|element| element.get_attribute("data-lotus-base-path"))
+        .map(|value| value.trim_end_matches('/').to_string())
+        .unwrap_or_default();
+    if prefix.is_empty() {
+        let pathname = web_sys::window()
+            .and_then(|window| window.location().pathname().ok())
+            .unwrap_or_default();
+        prefix = deployment_base_path(&pathname);
+    }
+    prefix.push_str(path);
+    prefix
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn deployment_href(path: &str) -> String {
+    path.to_string()
+}
+
+#[cfg(target_arch = "wasm32")]
+fn current_search() -> String {
+    web_sys::window()
+        .and_then(|window| window.document())
+        .and_then(|document| document.document_element())
+        .and_then(|element| element.get_attribute("data-lotus-query"))
+        .unwrap_or_default()
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn current_search() -> String {
+    String::new()
+}
+
+pub fn href_with_current_query(path: &str) -> String {
+    let query = current_search();
+    let query = query.strip_prefix('?').unwrap_or(&query);
+    let path = if query.is_empty() {
+        path.to_string()
+    } else {
+        format!("{path}?{query}")
+    };
+    deployment_href(&path)
 }
 
 pub fn absolute_share_url(share: &str) -> String {
@@ -121,9 +169,14 @@ mod tests {
             "/lotus-explore-rs"
         );
         assert_eq!(
+            deployment_base_path("/lotus-explore-rs/search"),
+            "/lotus-explore-rs"
+        );
+        assert_eq!(
             deployment_base_path("/lotus-explore-rs/curation"),
             "/lotus-explore-rs"
         );
+
         assert_eq!(
             deployment_base_path("/lotus-explore-rs/draw"),
             "/lotus-explore-rs"

@@ -27,8 +27,15 @@ pub const fn it_t(key: TextKey) -> &'static str {
         TextKey::GoToHomepage => "Vai alla home page",
         TextKey::SkipToResults => "Vai al contenuto principale",
         TextKey::PageSubtitle => {
-            "Esplora dati aperti collegati: prodotti naturali, organismi e letteratura scientifica."
+            "Esplora dati aperti collegati: entità chimiche, organismi biologici e letteratura scientifica."
         }
+        TextKey::LandingTitle => "Benvenuti nell'esploratore LOTUS",
+
+        TextKey::OpenSearch => "Apri la ricerca",
+
+        TextKey::PageNotFound => "Pagina non trovata",
+        TextKey::PageNotFoundDescription => "La pagina richiesta non esiste.",
+        TextKey::ReturnHome => "Torna alla home page",
         TextKey::ResolvedTaxon => "Taxon risolto",
         TextKey::QueryHash => "Hash della query",
         TextKey::ResultHash => "Hash del risultato",
@@ -62,13 +69,16 @@ pub const fn it_t(key: TextKey) -> &'static str {
         }
         TextKey::ErrorHintUnknown => "Errore inatteso. Riprova.",
         TextKey::WelcomeLeadA => {
-            "Questa applicazione dimostra la potenza dei dati aperti collegati collegando i prodotti naturali agli organismi e alla letteratura scientifica. "
+            "Questa applicazione dimostra la potenza dei dati aperti collegati, mettendo in relazione entità chimiche, organismi biologici e letteratura scientifica. "
         }
+
         TextKey::WelcomeLeadB => {
-            "Il modello di dati collega gli composti, i taxa e i riferimenti—provenienti da "
+            "Il modello di dati collega composti, taxa e riferimenti provenienti da "
         }
+
         TextKey::WelcomeLeadC => ", pubblicati come dati aperti collegati su ",
-        TextKey::WelcomeLeadD => " e interrogati tramite SPARQL tramite ",
+        TextKey::WelcomeLeadD => " e interrogati tramite SPARQL da ",
+
         TextKey::WelcomeLeadE => ".",
         TextKey::ExampleGentiana => {
             "Inserisci un nome di taxon, un QID Wikidata o * per tutti i taxa"
@@ -79,9 +89,12 @@ pub const fn it_t(key: TextKey) -> &'static str {
         TextKey::ExampleQueryStructure | TextKey::DownloadJsonLabel => "Scarica JSON",
         TextKey::ExampleQueryAdvanced | TextKey::DownloadRdfLabel => "Scarica RDF",
         TextKey::ExampleApiUrls => "Esempi di URL API",
+        TextKey::SearchExamples => "Esempi di ricerca",
+
         TextKey::LabelLanguagePolicy => {
-            "Le etichette usano prima 'mul' e poi 'en' per risultati confrontabili."
+            "Le etichette preferiscono 'mul' e ricorrono a 'en' come fallback per mantenere confrontabili i risultati."
         }
+
         TextKey::SearchFilters => "Filtri di ricerca",
         TextKey::Taxon | TextKey::TaxonCol => "Taxon",
         TextKey::TaxonPlaceholder => "Gentiana lutea - Q34317 - *",
@@ -92,9 +105,11 @@ pub const fn it_t(key: TextKey) -> &'static str {
         }
         TextKey::Substructure => "Sottostruttura",
         TextKey::Similarity => "Somiglianza",
-        TextKey::StructureSearchMode => "Modalità di ricerca struttura",
+        TextKey::StructureSearchMode => "Modalità di ricerca per struttura",
+
         TextKey::EditCopyDaylightSmiles => "Modifica -> Copia come SMILES Daylight",
-        TextKey::CopyExtendedSmilesMol => "Copia come SMILES estesi / MOL V3000",
+        TextKey::CopyExtendedSmilesMol => "Copia come SMILES esteso / MOL V3000",
+
         TextKey::FormulaFilter => "Filtro formula",
         TextKey::ExactFormula => "Formula bruta",
         TextKey::MinCount => "min",

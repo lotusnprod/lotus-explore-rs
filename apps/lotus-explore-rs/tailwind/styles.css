@@ -329,7 +329,7 @@ legend {
 }
 
 /* Main layout containers - reserve space to prevent CLS */
-.app-shell { min-height: 100dvh; }
+.app-shell { display: flex; flex-direction: column; min-height: 100dvh; }
 .main-content { min-height: 400px; }
 .page-header { min-height: 46px; }
 footer { min-height: 80px; }
@@ -345,7 +345,7 @@ footer { min-height: 80px; }
 /* Desktop layout: main content side by side */
 .app-layout {
     display: flex;
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
     overflow: visible;
     gap: 10px;
@@ -485,6 +485,24 @@ footer { min-height: 80px; }
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text3);
+}
+
+@utility results-table-scroll {
+    min-height: 0;
+    height: min(78dvh, 1120px);
+    max-height: min(78dvh, 1120px);
+    contain: layout paint;
+}
+
+@utility scrollbar-hidden-x {
+    &::-webkit-scrollbar {
+        width: 6px;
+        height: 0;
+    }
+
+    &::-webkit-scrollbar:horizontal {
+        display: none;
+    }
 }
 
 /* ========================================

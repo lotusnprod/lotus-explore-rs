@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
-//! Welcome screen shown before the first search, with example queries.
+//! Search examples shown below the search form.
 
 use crate::components::copy_button::CopyButton;
 use crate::components::ui::Card;
@@ -11,56 +11,19 @@ use dioxus::prelude::*;
 use std::sync::Arc;
 
 #[component]
-pub fn WelcomeScreen() -> Element {
+pub fn SearchExamples() -> Element {
     let locale = crate::hooks::use_locale();
     let mut urls_open = use_signal(|| false);
 
     rsx! {
-                        section {
+        section {
             "vocab": "https://schema.org/",
             "prefix": "wd: http://www.wikidata.org/entity/ wdt: http://www.wikidata.org/prop/direct/",
-            class: "page-section w-full max-w-none px-0",
+            class: "w-full",
             div { class: "w-full",
-                div { class: "flex flex-col gap-3 px-4 py-6 sm:px-6 sm:py-8",
-                    p {
-                        class: "max-w-[80ch] text-body leading-relaxed text-muted",
-                        "{t(locale, TextKey::WelcomeLeadA)}"
-                        "{t(locale, TextKey::WelcomeLeadB)}"
-                        a {
-                            href: "https://www.wikidata.org/wiki/Q104225190",
-                            target: "_blank",
-                            rel: "noopener noreferrer",
-                            class: "mx-1 font-medium text-accent hover:underline",
-                            "LOTUS initiative"
-                        }
-                        "{t(locale, TextKey::WelcomeLeadC)}"
-                        a {
-                            href: "https://www.wikidata.org/",
-                            target: "_blank",
-                            rel: "noopener noreferrer",
-                            class: "mx-1 font-medium text-accent hover:underline",
-                            "Wikidata"
-                        }
-                        "{t(locale, TextKey::WelcomeLeadD)}"
-                        a {
-                            href: "https://qlever.dev/wikidata",
-                            target: "_blank",
-                            rel: "noopener noreferrer",
-                            class: "mx-1 font-medium text-accent hover:underline",
-                            "QLever"
-                        }
-                        "{t(locale, TextKey::WelcomeLeadE)}"
-                        " "
-                        span {
-                            class: "text-ui italic text-subtle",
-                            "{t(locale, TextKey::LabelLanguagePolicy)}"
-                        }
-                    }
-                }
-
-                div { class: "px-4 sm:px-6",
-                    Card {
+                Card {
                         class: "flex flex-col gap-3 pb-4 sm:pb-6",
+                        h2 { class: "text-body font-semibold text-text", "{t(locale, TextKey::SearchExamples)}" }
                         details {
                             class: "overflow-hidden",
                             ontoggle: move |_| {
@@ -109,7 +72,6 @@ pub fn WelcomeScreen() -> Element {
                     }
                 }
             }
-        }
     }
 }
 

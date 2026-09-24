@@ -55,7 +55,7 @@ pub(super) const fn button_generate_quickstatements() -> &'static str {
 }
 
 pub(super) const fn button_generating() -> &'static str {
-    "Erzeuge..."
+    "Wird erzeugt..."
 }
 
 pub(super) const fn button_remove() -> &'static str {
@@ -91,7 +91,7 @@ pub(super) const fn label_new_item() -> &'static str {
 }
 
 pub(super) const fn hint_expected_tsv_headers() -> &'static str {
-    "Erwartete Header: name, smiles, organism/taxon, doi"
+    "Erwartete Header: name, smiles, taxon (oder organism), doi"
 }
 
 pub(super) const fn hint_scroll_curation_results() -> &'static str {
@@ -108,6 +108,10 @@ pub(super) fn msg_duplicate_row_skipped() -> String {
 
 pub(super) fn msg_no_valid_tsv_rows() -> String {
     "Keine gültigen Zeilen in der TSV-Eingabe gefunden.".to_string()
+}
+
+pub(super) fn msg_tsv_missing_column(column: &str) -> String {
+    format!("Die erforderliche Spalte '{column}' fehlt in der TSV-Eingabe.")
 }
 
 pub(super) fn msg_tsv_import_complete(added: usize, skipped: usize) -> String {
@@ -154,7 +158,7 @@ pub(super) const fn msg_two_step_hint() -> &'static str {
 }
 
 pub(super) const fn button_second_pass() -> &'static str {
-    "Ich habe die fehlenden Einträge erstellt, jetzt den Rest"
+    "Ich habe die fehlenden Einträge erstellt; jetzt den Rest"
 }
 
 pub(super) const fn msg_second_pass_running() -> &'static str {
@@ -162,12 +166,12 @@ pub(super) const fn msg_second_pass_running() -> &'static str {
 }
 
 pub(super) const fn msg_second_pass_done() -> &'static str {
-    "Zweiter Durchlauf abgeschlossen. Haupt-QuickStatements wurden mit aufgelösten QIDs aktualisiert, sofern verfügbar."
+    "Zweiter Durchlauf abgeschlossen. Haupt-QuickStatements verwenden jetzt aufgelöste QIDs, sofern verfügbar."
 }
 
 pub(super) fn msg_second_pass_still_pending_count(count: usize) -> String {
     format!(
-        "{count} vorausgesetzte Einträge wurden noch nicht gefunden. Erstellen/vereinigen Sie sie und versuchen Sie es nach etwa 30-120 Sekunden erneut."
+        "{count} vorausgesetzte Einträge fehlen weiterhin. Erstellen oder vereinigen Sie sie und versuchen Sie es in etwa 30-120 Sekunden erneut."
     )
 }
 
@@ -184,7 +188,7 @@ pub(super) const fn curation_badge_second_pass_required() -> &'static str {
 }
 
 pub(super) const fn curation_mass_warning_title() -> &'static str {
-    "Die exakte Masse konnte von den Descriptor-Endpunkten nicht aufgelöst werden"
+    "Die exakte Masse konnte von den Endpunkten für Deskriptoren nicht ermittelt werden"
 }
 
 pub(super) const fn msg_delay_advice() -> &'static str {
@@ -196,7 +200,7 @@ pub(super) const fn curation_qs_dev_label() -> &'static str {
 }
 
 pub(super) const fn curation_qs_dev_prereq_hint() -> &'static str {
-    "Öffnen Sie QS-Dev, fügen Sie den Voraussetzungen-Block ein, führen Sie ihn aus, erstellen oder vereinigen Sie die neuen Einträge in Wikidata, warten Sie kurz und kehren Sie dann für den zweiten Durchlauf hierher zurück."
+    "Öffnen Sie QS-Dev, fügen Sie den Voraussetzungenblock ein, führen Sie ihn aus, erstellen oder vereinigen Sie die neuen Einträge in Wikidata, warten Sie kurz und kehren Sie dann für den zweiten Durchlauf hierher zurück."
 }
 
 pub(super) const fn curation_qs_dev_main_hint() -> &'static str {
@@ -212,7 +216,7 @@ pub(super) const fn curation_note_existing_updates() -> &'static str {
 }
 
 pub(super) const fn curation_note_new_compound() -> &'static str {
-    "Kein Wikidata-Eintrag über InChIKey gefunden: Erstellungs-QuickStatements wurden erzeugt."
+    "Kein Wikidata-Eintrag über InChIKey gefunden; Erstellungs-QuickStatements wurden erzeugt."
 }
 
 pub(super) const fn curation_note_dependencies_pending() -> &'static str {

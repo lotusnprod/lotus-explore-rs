@@ -18,8 +18,12 @@ use crate::i18n::{
     curation_note_existing_updates, curation_note_new_compound, curation_pending_reference,
     curation_pending_taxon,
 };
-use lotus::queries::{is_scholarly_reference_query, transform_query_for_wdqs};
-use lotus::transport::{QLEVER_WIKIDATA, ResponseFormat, WDQS_SCHOLARLY, WDQS_WIKIDATA};
+#[cfg(not(target_arch = "wasm32"))]
+use futures::future::BoxFuture;
+#[cfg(target_arch = "wasm32")]
+use futures::future::LocalBoxFuture;
+use lotus::queries::wdqs_download_query;
+use lotus::transport::{FetchError, QLEVER_WIKIDATA, ResponseFormat};
 
 mod chemical;
 mod enrichment;
@@ -55,6 +59,11 @@ pub use enrichment::curate_single_row;
 #[cfg(test)]
 pub use helpers::{extract_formula_from_inchi, normalize_formula_for_wikidata, qs_mass_statement};
 
+#[cfg(not(target_arch = "wasm32"))]
+type SparqlExecution<'a> = BoxFuture<'a, Result<String, FetchError>>;
+#[cfg(target_arch = "wasm32")]
+type SparqlExecution<'a> = LocalBoxFuture<'a, Result<String, FetchError>>;
+
 /// Execute a SPARQL query against QLever, falling back to WDQS on 502.
 ///
 /// - Reference lookups (queries containing `SELECT ?ref WHERE {` and `wdt:P356`)
@@ -64,23 +73,106 @@ pub use helpers::{extract_formula_from_inchi, normalize_formula_for_wikidata, qs
 pub async fn execute_sparql_with_wdqs_fallback(
     query: &str,
     format: ResponseFormat,
-) -> Result<String, lotus::transport::FetchError> {
-    let result = lotus::transport::execute_sparql_with_format(query, QLEVER_WIKIDATA, format).await;
+) -> Result<String, FetchError> {
+    execute_sparql_with_wdqs_fallback_with(query, format, |query, endpoint, format| {
+        Box::pin(lotus::transport::execute_sparql_with_format(
+            query, endpoint, format,
+        ))
+    })
+    .await
+}
+
+async fn execute_sparql_with_wdqs_fallback_with<F>(
+    query: &str,
+    format: ResponseFormat,
+    mut execute: F,
+) -> Result<String, FetchError>
+where
+    F: Send + for<'a> FnMut(&'a str, &'static str, ResponseFormat) -> SparqlExecution<'a>,
+{
+    let result = execute(query, QLEVER_WIKIDATA, format).await;
 
     match result {
         Ok(response) => Ok(response),
-        Err(lotus::transport::FetchError::Http(502, _)) => {
+        Err(FetchError::Http(502, _)) => {
             log::warn!("event=curation_sparql phase=fallback reason=qlever_502");
-            // For simple reference lookups, use scholarly endpoint directly
-            if is_scholarly_reference_query(query) {
-                lotus::transport::execute_sparql_with_format(query, WDQS_SCHOLARLY, format).await
-            } else {
-                // For complex queries, apply transformation and use regular WDQS
-                let wdqs_query = transform_query_for_wdqs(query);
-                lotus::transport::execute_sparql_with_format(&wdqs_query, WDQS_WIKIDATA, format)
-                    .await
-            }
+            let (endpoint, fallback_query) = wdqs_download_query(query);
+            execute(&fallback_query, endpoint, format).await
         }
-        Err(e) => Err(e),
+        Err(error) => Err(error),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::expect_used)]
+
+    use super::*;
+    use futures::executor::block_on;
+    use lotus::transport::{QLEVER_WIKIDATA, WDQS_SCHOLARLY, WDQS_WIKIDATA};
+    use std::sync::{Arc, Mutex};
+
+    fn run_with_mock(
+        query: &str,
+        first_result: Result<String, FetchError>,
+    ) -> (Vec<(String, &'static str)>, Result<String, FetchError>) {
+        let calls = Arc::new(Mutex::new(Vec::new()));
+        let calls_for_executor = Arc::clone(&calls);
+        let result = block_on(execute_sparql_with_wdqs_fallback_with(
+            query,
+            ResponseFormat::SparqlJson,
+            move |query, endpoint, _| {
+                let call_index = calls_for_executor.lock().expect("calls lock").len();
+                calls_for_executor
+                    .lock()
+                    .expect("calls lock")
+                    .push((query.to_owned(), endpoint));
+                let response = if call_index == 0 {
+                    first_result.clone()
+                } else {
+                    Ok("ok".to_owned())
+                };
+                Box::pin(async move { response })
+            },
+        ));
+        let recorded = calls.lock().expect("calls lock").clone();
+        (recorded, result)
+    }
+
+    #[test]
+    fn qlever_success_never_uses_wdqs() {
+        let query = "SELECT ?ref WHERE { ?ref wdt:P356 \"10.1/x\" }";
+        let (calls, result) = run_with_mock(query, Ok("qlever".to_owned()));
+
+        assert!(result.is_ok());
+        assert_eq!(calls, vec![(query.to_owned(), QLEVER_WIKIDATA)]);
+    }
+
+    #[test]
+    fn qlever_502_falls_back_by_query_kind() {
+        let cases = [
+            (
+                "SELECT ?item WHERE { ?item wdt:P31 wd:Q16521 }",
+                WDQS_WIKIDATA,
+            ),
+            (
+                "SELECT ?ref WHERE { ?ref wdt:P356 \"10.1/x\" }",
+                WDQS_SCHOLARLY,
+            ),
+        ];
+
+        for (query, expected_endpoint) in cases {
+            let (calls, result) =
+                run_with_mock(query, Err(FetchError::Http(502, "bad gateway".to_owned())));
+
+            assert!(result.is_ok());
+            assert_eq!(calls.len(), 2);
+            let first = calls.first().expect("QLever call");
+            let second = calls.get(1).expect("fallback call");
+            assert_eq!(first.1, QLEVER_WIKIDATA);
+            assert_eq!(second.1, expected_endpoint);
+            assert_eq!(first.0, query);
+            assert_eq!(second.0, query);
+        }
     }
 }

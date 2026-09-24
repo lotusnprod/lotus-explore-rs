@@ -113,7 +113,13 @@ pub enum TextKey {
     GoToHomepage,
     SkipToResults,
     PageSubtitle,
+    LandingTitle,
+    OpenSearch,
+    PageNotFound,
+    PageNotFoundDescription,
+    ReturnHome,
     ResolvedTaxon,
+
     QueryHash,
     ResultHash,
     CopyTaxonQid,
@@ -145,6 +151,7 @@ pub enum TextKey {
     ExampleSmilesOnly,
     ExampleQueryExecute,
     ExampleApiUrls,
+    SearchExamples,
     ExampleQueryTaxon,
     ExampleQueryStructure,
     ExampleQueryAdvanced,
@@ -260,3 +267,31 @@ pub fn t(locale: Locale, key: TextKey) -> &'static str {
 mod helpers;
 
 pub use helpers::*;
+
+#[cfg(test)]
+mod tests {
+    use super::{Locale, TextKey, msg_tsv_missing_column, t};
+
+    #[test]
+    fn landing_copy_uses_chemical_entities_in_every_locale() {
+        let expected = [
+            (Locale::En, "chemical entities"),
+            (Locale::Fr, "entités chimiques"),
+            (Locale::De, "chemische Entitäten"),
+            (Locale::It, "entità chimiche"),
+        ];
+        for (locale, phrase) in expected {
+            assert!(t(locale, TextKey::PageSubtitle).contains(phrase));
+            assert!(t(locale, TextKey::WelcomeLeadA).contains(phrase));
+        }
+    }
+
+    #[test]
+    fn tsv_missing_column_messages_are_localized() {
+        for locale in [Locale::En, Locale::Fr, Locale::De, Locale::It] {
+            let message = msg_tsv_missing_column(locale, "name");
+            assert!(message.contains("name"));
+            assert!(!message.is_empty());
+        }
+    }
+}

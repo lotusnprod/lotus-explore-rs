@@ -91,11 +91,11 @@ pub(super) const fn label_new_item() -> &'static str {
 }
 
 pub(super) const fn hint_expected_tsv_headers() -> &'static str {
-    "Expected headers: name, smiles, organism/taxon, doi"
+    "Expected headers: name, smiles, taxon (or organism), doi"
 }
 
 pub(super) const fn hint_scroll_curation_results() -> &'static str {
-    "Tip: swipe sideways to review every results column."
+    "Tip: Swipe horizontally to review every results column."
 }
 
 pub(super) fn msg_name_smiles_required() -> String {
@@ -108,6 +108,10 @@ pub(super) fn msg_duplicate_row_skipped() -> String {
 
 pub(super) fn msg_no_valid_tsv_rows() -> String {
     "No valid rows found in TSV input.".to_string()
+}
+
+pub(super) fn msg_tsv_missing_column(column: &str) -> String {
+    format!("The required '{column}' column is missing from the TSV input.")
 }
 
 pub(super) fn msg_tsv_import_complete(added: usize, skipped: usize) -> String {
@@ -149,20 +153,20 @@ pub(super) const fn msg_two_step_hint() -> &'static str {
 }
 
 pub(super) const fn button_second_pass() -> &'static str {
-    "I created the missing items, let's do the rest"
+    "I created the missing items; let's finish"
 }
 
 pub(super) const fn msg_second_pass_running() -> &'static str {
-    "Running second pass on rows that depended on missing items..."
+    "Running a second pass on rows that depend on missing items..."
 }
 
 pub(super) const fn msg_second_pass_done() -> &'static str {
-    "Second pass complete. Main QuickStatements are refreshed with resolved QIDs where available."
+    "Second pass complete. Main QuickStatements now use resolved QIDs where available."
 }
 
 pub(super) fn msg_second_pass_still_pending_count(count: usize) -> String {
     format!(
-        "{count} prerequisite item(s) are still not found. Create/merge them and retry after about 30-120 seconds."
+        "{count} prerequisite item(s) are still missing. Create or merge them, then retry in about 30-120 seconds."
     )
 }
 
@@ -179,11 +183,11 @@ pub(super) const fn curation_badge_second_pass_required() -> &'static str {
 }
 
 pub(super) const fn curation_mass_warning_title() -> &'static str {
-    "Exact mass could not be resolved from descriptor endpoints"
+    "Exact mass could not be resolved from the descriptor endpoints"
 }
 
 pub(super) const fn msg_delay_advice() -> &'static str {
-    "Advice: Wikidata and query endpoints may need 30-120 seconds to expose newly created items."
+    "Tip: Wikidata and query endpoints may take 30-120 seconds to expose newly created items."
 }
 
 pub(super) const fn curation_qs_dev_label() -> &'static str {
@@ -207,7 +211,7 @@ pub(super) const fn curation_note_existing_updates() -> &'static str {
 }
 
 pub(super) const fn curation_note_new_compound() -> &'static str {
-    "No Wikidata entry found by InChIKey: generated creation QuickStatements."
+    "No Wikidata entry was found by InChIKey; creation QuickStatements were generated."
 }
 
 pub(super) const fn curation_note_dependencies_pending() -> &'static str {
@@ -215,7 +219,7 @@ pub(super) const fn curation_note_dependencies_pending() -> &'static str {
 }
 
 pub(super) fn curation_pending_taxon(taxon: &str) -> String {
-    format!("Taxon '{taxon}' was not found yet in Wikidata.")
+    format!("Taxon '{taxon}' has not been found in Wikidata yet.")
 }
 
 pub(super) fn curation_pending_reference(doi: &str) -> String {
@@ -223,7 +227,7 @@ pub(super) fn curation_pending_reference(doi: &str) -> String {
 }
 
 pub(super) const fn view_switch_aria() -> &'static str {
-    "Choose section"
+    "Choose a section"
 }
 
 pub(super) const fn view_label_explorer() -> &'static str {

@@ -27,8 +27,15 @@ pub const fn fr_t(key: TextKey) -> &'static str {
         TextKey::GoToHomepage => "Aller à la page d'accueil",
         TextKey::SkipToResults => "Passer au contenu principal",
         TextKey::PageSubtitle => {
-            "Explorez des données ouvertes liées : produits naturels, organismes et littérature scientifique."
+            "Explorez des données ouvertes liées : entités chimiques, organismes biologiques et littérature scientifique."
         }
+        TextKey::LandingTitle => "Bienvenue dans l'explorateur LOTUS",
+
+        TextKey::OpenSearch => "Ouvrir la recherche",
+
+        TextKey::PageNotFound => "Page introuvable",
+        TextKey::PageNotFoundDescription => "La page demandée n'existe pas.",
+        TextKey::ReturnHome => "Retour à l'accueil",
         TextKey::ResolvedTaxon => "Taxon résolu",
         TextKey::QueryHash => "Hash de la requête",
         TextKey::ResultHash => "Hash du résultat",
@@ -60,26 +67,33 @@ pub const fn fr_t(key: TextKey) -> &'static str {
         }
         TextKey::ErrorHintUnknown => "Erreur inattendue. Réessayer peut aider.",
         TextKey::WelcomeLeadA => {
-            "Cette application démontre la puissance des données ouvertes liées en connectant les produits naturels aux organismes et à la littérature scientifique. "
+            "Cette application démontre la puissance des données ouvertes liées en reliant des entités chimiques à des organismes biologiques et à la littérature scientifique. "
         }
+
         TextKey::WelcomeLeadB => {
-            "Le modèle de données relie les composés, les taxa et les références—provenant de "
+            "Le modèle de données relie les composés, les taxa et les références, qui proviennent de "
         }
+
         TextKey::WelcomeLeadC => ", publiées en tant que données ouvertes liées sur ",
         TextKey::WelcomeLeadD => " et interrogées via SPARQL par ",
         TextKey::WelcomeLeadE => ".",
         TextKey::ExampleGentiana => {
             "Saisir un nom de taxon, un QID Wikidata ou * pour tous les taxa"
         }
-        TextKey::ExampleSmilesOnly => "Collez un SMILES ou un Molfile dans la zone structure",
+        TextKey::ExampleSmilesOnly => "Collez un SMILES ou un Molfile dans le champ Structure",
+
         TextKey::ExampleQueryExecute => "Exécuter",
         TextKey::ExampleQueryTaxon | TextKey::DownloadCsvLabel => "Télécharger CSV",
         TextKey::ExampleQueryStructure | TextKey::DownloadJsonLabel => "Télécharger JSON",
         TextKey::ExampleQueryAdvanced | TextKey::DownloadRdfLabel => "Télécharger RDF",
-        TextKey::ExampleApiUrls => "Exemples d'URLs API",
+        TextKey::ExampleApiUrls => "Exemples d'URL d'API",
+
+        TextKey::SearchExamples => "Exemples de recherche",
+
         TextKey::LabelLanguagePolicy => {
-            "Les libellés utilisent d'abord 'mul', puis 'en', pour des résultats comparables."
+            "Les libellés privilégient 'mul' et utilisent 'en' en repli afin de garantir des résultats comparables."
         }
+
         TextKey::SearchFilters => "Filtres de recherche",
         TextKey::Taxon | TextKey::TaxonCol => "Taxon",
         TextKey::TaxonPlaceholder => "Gentiana lutea - Q34317 - *",
@@ -88,9 +102,11 @@ pub const fn fr_t(key: TextKey) -> &'static str {
         TextKey::StructurePlaceholder => "c1ccccc1   - ou collez un Molfile (V2000 / V3000)",
         TextKey::Substructure => "Sous-structure",
         TextKey::Similarity => "Similarité",
-        TextKey::StructureSearchMode => "Mode de recherche structure",
+        TextKey::StructureSearchMode => "Mode de recherche par structure",
+
         TextKey::EditCopyDaylightSmiles => "Édition -> Copier en tant que SMILES Daylight",
-        TextKey::CopyExtendedSmilesMol => "Copier en tant que SMILES étendus / MOL V3000",
+        TextKey::CopyExtendedSmilesMol => "Copier au format SMILES étendu / MOL V3000",
+
         TextKey::FormulaFilter => "Filtre formule",
         TextKey::ExactFormula | TextKey::Formula => "Formule brute",
         TextKey::MinCount => "min",
@@ -111,7 +127,10 @@ pub const fn fr_t(key: TextKey) -> &'static str {
         TextKey::YearTo => "À",
         TextKey::RunSearch => "Lancer la recherche",
         TextKey::KetcherSummary => "Éditeur de structure (Ketcher)",
-        TextKey::KetcherHintA => "Besoin de dessiner ou trouver une structure ? Ouvrez l'onglet ",
+        TextKey::KetcherHintA => {
+            "Besoin de dessiner une structure ou d'en trouver une ? Ouvrez l'onglet "
+        }
+
         TextKey::KetcherHintB => ", puis copiez avec ",
         TextKey::KetcherHintC => " (ou ",
         TextKey::KetcherHintD => {

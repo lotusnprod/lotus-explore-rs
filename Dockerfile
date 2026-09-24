@@ -62,7 +62,7 @@ ARG DX_BASE_PATH="/"
 # `public/assets/ketcher` lands inside the app crate's public/ dir.
 RUN cd apps/lotus-explore-rs && \
     cargo run --release -p lotus-deploy --bin fetch-ketcher && \
-    dx build --release --platform web --base-path "${DX_BASE_PATH}" --package lotus-explore-rs --rustc-args=-Copt-level=z
+    dx build --release --platform web --base-path "${DX_BASE_PATH}" --package lotus-explore-rs --wasm-split --features dioxus/wasm-split --locked --debug-symbols=false --rustc-args=-Copt-level=z
 
 # ── Stage 3: export (for CI artifact extraction) ────────────────────────────────
 # Exposes the built web bundle via a scratch image so CI can extract it with
@@ -71,6 +71,9 @@ RUN cd apps/lotus-explore-rs && \
 FROM scratch AS export
 COPY --from=wasm-builder /build/target/dx/lotus-explore-rs/release/web/public /
 COPY --from=wasm-builder /build/target/dx/lotus-explore-rs/release/web/public/index.html /404.html
+COPY --from=wasm-builder /build/target/dx/lotus-explore-rs/release/web/public/index.html /search/index.html
+COPY --from=wasm-builder /build/target/dx/lotus-explore-rs/release/web/public/index.html /curation/index.html
+COPY --from=wasm-builder /build/target/dx/lotus-explore-rs/release/web/public/index.html /draw/index.html
 
 # ── Stage 4: runtime ────────────────────────────────────────────────────────────
 FROM debian:bookworm-slim AS runtime

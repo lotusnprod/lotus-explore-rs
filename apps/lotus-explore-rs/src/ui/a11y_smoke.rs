@@ -57,4 +57,13 @@ mod tests {
         // Home link uses visible text as accessible name (no redundant aria_label)
         assert!(header_src.contains("\"{t(locale, TextKey::PageTitle)}\""));
     }
+
+    #[test]
+    fn landing_and_not_found_expose_headings_and_actions() {
+        let landing_src = include_str!("../components/landing.rs");
+        assert!(landing_src.contains("id: \"landing-welcome-heading\""));
+        assert!(landing_src.contains("href_with_current_query(\"/search\")"));
+        assert!(landing_src.contains("id: \"not-found-heading\""));
+        assert!(landing_src.contains("href_with_current_query(\"/\")"));
+    }
 }

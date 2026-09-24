@@ -24,7 +24,7 @@ pub fn Footer() -> Element {
                     "{t(locale, TextKey::FooterArchive)}"
                 }
                 ul {
-                    class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-thin scrollbar-thumb-current/20 scrollbar-track-transparent flex-nowrap",
+                    class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-hidden-x flex-nowrap",
                     li {
                         class: "shrink-0",
                         a {
@@ -48,7 +48,7 @@ pub fn Footer() -> Element {
                     "{t(locale, TextKey::FooterCode)}"
                 }
                 ul {
-                    class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-thin scrollbar-thumb-current/20 scrollbar-track-transparent flex-nowrap",
+                    class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-hidden-x flex-nowrap",
                     li {
                         class: "shrink-0",
                         a {
@@ -68,7 +68,7 @@ pub fn Footer() -> Element {
                     "{t(locale, TextKey::FooterData)}"
                 }
                 ul {
-                    class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-thin scrollbar-thumb-current/20 scrollbar-track-transparent flex-nowrap",
+                    class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-hidden-x flex-nowrap",
                     li {
                         class: "shrink-0",
                         a {
@@ -101,7 +101,7 @@ pub fn Footer() -> Element {
                     "{t(locale, TextKey::FooterPrograms)}"
                 }
                 ul {
-                    class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-thin scrollbar-thumb-current/20 scrollbar-track-transparent flex-nowrap",
+                    class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-hidden-x flex-nowrap",
                     li {
                         class: "shrink-0",
                         a {
@@ -179,7 +179,7 @@ fn FooterCitationRow(locale: Locale) -> Element {
                 "{t(locale, TextKey::FooterCitation)}"
             }
             ul {
-                class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-thin scrollbar-thumb-current/20 scrollbar-track-transparent flex-nowrap",
+                class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-hidden-x flex-nowrap",
                 li {
                     class: "shrink-0",
                     a {
@@ -214,7 +214,7 @@ fn FooterLicenseRow(locale: Locale) -> Element {
                 "{t(locale, TextKey::FooterLicense)}"
             }
             ul {
-                class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-thin scrollbar-thumb-current/20 scrollbar-track-transparent flex-nowrap",
+                class: "flex items-center gap-x-2.5 list-none m-0 p-0 min-w-0 overflow-x-auto whitespace-nowrap pb-1 scrollbar-hidden-x flex-nowrap",
                 li {
                     class: "shrink-0",
                     a {

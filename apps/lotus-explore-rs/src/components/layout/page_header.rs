@@ -25,11 +25,12 @@ const LOTUS_LOGO_SVG: &str = include_str!("../../../public/favicon.svg");
 pub fn PageHeader() -> Element {
     let locale = use_locale();
     let route: Route = use_route();
-    let home = route.with_view("explore");
+    let home = route.with_view("landing");
 
     rsx! {
         header {
-            class: "sticky top-0 z-3 min-h-[46px] bg-shell-chrome border-b border-shell-border rounded-t-xl px-4 sm:px-8",
+             class: "sticky top-0 z-3 min-h-[46px] bg-shell-chrome rounded-t-xl px-4 sm:px-8",
+
             div {
                 class: "flex flex-wrap items-start justify-between gap-3 sm:gap-4",
                 div {
@@ -42,7 +43,7 @@ pub fn PageHeader() -> Element {
                 h1 { id: PAGE_TITLE_ID,
                     class: "text-display font-bold min-w-0 break-words overflow-hidden",
                     Link {
-                         to: home.navigation_string(),
+                         to: NavigationTarget::Internal(home.navigation_string()),
 
                         class: "break-words text-text no-underline hover:no-underline",
                         "{t(locale, TextKey::PageTitle)}"
