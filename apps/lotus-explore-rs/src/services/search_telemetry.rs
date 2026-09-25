@@ -14,6 +14,10 @@ pub fn search_inflight_cancelled() {
     log_debug_evt("search", "start", "inflight_cancelled", None);
 }
 
+pub fn search_duplicate_suppressed() {
+    log_debug_evt("search", "start", "duplicate_suppressed", None);
+}
+
 pub fn ignored_stale_result(request_token: u64) {
     log_debug_evt(
         "search",

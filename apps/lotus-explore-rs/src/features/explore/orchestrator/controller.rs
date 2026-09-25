@@ -1,14 +1,25 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
 
+use crate::features::explore::command::SearchCommand;
+use crate::models::SearchCriteria;
 use crate::services::search_telemetry as telemetry;
 use dioxus::core::Task;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 #[derive(Clone, Default)]
 pub struct SearchTaskController {
     in_flight: Rc<RefCell<Option<Task>>>,
+    active: Rc<RefCell<Option<ActiveSearch>>>,
+    next_run_id: Rc<Cell<u64>>,
+}
+
+#[derive(PartialEq)]
+struct ActiveSearch {
+    run_id: u64,
+    criteria: SearchCriteria,
+    command: SearchCommand,
 }
 
 impl SearchTaskController {
@@ -16,10 +27,114 @@ impl SearchTaskController {
         Self::default()
     }
 
+    pub(super) fn try_begin(
+        &self,
+        criteria: &SearchCriteria,
+        command: SearchCommand,
+    ) -> Option<u64> {
+        let mut active = self.active.borrow_mut();
+        if active
+            .as_ref()
+            .is_some_and(|active| active.criteria == *criteria && active.command == command)
+        {
+            return None;
+        }
+
+        let run_id = self.next_run_id.get().wrapping_add(1);
+        self.next_run_id.set(run_id);
+        *active = Some(ActiveSearch {
+            run_id,
+            criteria: criteria.clone(),
+            command,
+        });
+        Some(run_id)
+    }
+
+    pub(super) fn finish(&self, run_id: u64) {
+        let mut active = self.active.borrow_mut();
+        if active
+            .as_ref()
+            .is_some_and(|active| active.run_id == run_id)
+        {
+            *active = None;
+            *self.in_flight.borrow_mut() = None;
+        }
+    }
+
     pub fn replace_in_flight(&self, next: Task) {
         if let Some(prev) = self.in_flight.borrow_mut().replace(next) {
             prev.cancel();
             telemetry::search_inflight_cancelled();
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn duplicate_search_is_suppressed_until_the_run_finishes() {
+        let controller = SearchTaskController::new();
+        let criteria = SearchCriteria::default();
+
+        let first = controller.try_begin(&criteria, SearchCommand::Interactive);
+        assert!(first.is_some());
+        assert!(
+            controller
+                .try_begin(&criteria, SearchCommand::Interactive)
+                .is_none()
+        );
+
+        let run_id = first.unwrap_or_default();
+        controller.finish(run_id);
+        assert!(
+            controller
+                .try_begin(&criteria, SearchCommand::Interactive)
+                .is_some()
+        );
+    }
+
+    #[test]
+    fn a_different_command_starts_a_new_run() {
+        let controller = SearchTaskController::new();
+        let criteria = SearchCriteria::default();
+
+        assert!(
+            controller
+                .try_begin(&criteria, SearchCommand::Interactive)
+                .is_some()
+        );
+        assert!(
+            controller
+                .try_begin(&criteria, SearchCommand::StartupDownload)
+                .is_some()
+        );
+    }
+
+    #[test]
+    fn a_stale_completion_does_not_clear_the_current_run() {
+        let controller = SearchTaskController::new();
+        let criteria = SearchCriteria::default();
+        let first = controller.try_begin(&criteria, SearchCommand::Interactive);
+        let second = controller.try_begin(&criteria, SearchCommand::StartupDownload);
+        assert!(first.is_some());
+        assert!(second.is_some());
+        let first = first.unwrap_or_default();
+        let second = second.unwrap_or_default();
+
+        controller.finish(first);
+        assert!(
+            controller
+                .try_begin(&criteria, SearchCommand::StartupDownload)
+                .is_none()
+        );
+
+        controller.finish(second);
+        assert!(
+            controller
+                .try_begin(&criteria, SearchCommand::StartupDownload)
+                .is_some()
+        );
     }
 }

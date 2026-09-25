@@ -33,10 +33,7 @@ pub fn start_search<R: LotusRepository>(
     task_controller: SearchTaskController,
     repo: R,
 ) {
-    // Reset WDQS fallback flag for new search
-    reset_wdqs_fallback_flag();
-
-    let request = match prepare_search_request(criteria, command, explore) {
+    let request = match prepare_search_request(criteria, command) {
         Ok(request) => request,
         Err(error) => {
             dispatch_explore_action(explore, ExploreAction::SearchFailed { error, query: None });
@@ -44,9 +41,17 @@ pub fn start_search<R: LotusRepository>(
         }
     };
 
+    let Some(run_id) = task_controller.try_begin(request.criteria(), request.command()) else {
+        telemetry::search_duplicate_suppressed();
+        return;
+    };
+    reset_wdqs_fallback_flag();
+    let request = dispatch_search_request(explore, request);
     let coordinator = SearchLifecycleCoordinator::new(explore);
+    let completion_controller = task_controller.clone();
     let task = spawn(async move {
         execute_search_with_retries(request, repo, coordinator).await;
+        completion_controller.finish(run_id);
     });
     task_controller.replace_in_flight(task);
 }
@@ -54,11 +59,10 @@ pub fn start_search<R: LotusRepository>(
 fn prepare_search_request(
     criteria: Signal<SearchCriteria>,
     command: SearchCommand,
-    explore: Signal<ExploreState>,
 ) -> Result<SearchRequest, DomainError> {
     let request = SearchRequest::new(criteria.peek().clone(), command);
     validate_search_criteria(request.criteria())?;
-    Ok(dispatch_search_request(explore, request))
+    Ok(request)
 }
 
 fn dispatch_search_request(explore: Signal<ExploreState>, request: SearchRequest) -> SearchRequest {

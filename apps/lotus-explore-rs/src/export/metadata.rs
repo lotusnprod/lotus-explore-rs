@@ -19,7 +19,7 @@ pub enum SparqlEndpoint {
     /// `QLever` endpoint (default/preferred)
     #[default]
     Qlever,
-    /// Wikidata Query Service (fallback on 502 from `QLever`)
+    /// Wikidata Query Service (fallback when `QLever` is unavailable)
     Wdqs,
 }
 
@@ -43,7 +43,7 @@ impl SparqlEndpoint {
             Self::Wdqs => (
                 WDQS_ENDPOINT,
                 "Wikidata Query Service",
-                "Wikidata Query Service (fell back from QLever 502)",
+                "Wikidata Query Service (QLever fallback)",
             ),
         }
     }
@@ -400,6 +400,6 @@ mod tests {
         });
         assert!(body.contains(&format!("\"url\": \"{WDQS_ENDPOINT}\"")));
         assert!(body.contains("Wikidata Query Service"));
-        assert!(body.contains("fell back from QLever 502"));
+        assert!(body.contains("QLever fallback"));
     }
 }

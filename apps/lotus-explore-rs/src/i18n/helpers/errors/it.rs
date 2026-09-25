@@ -66,11 +66,11 @@ pub fn warn_ambiguous_taxon(best_name: &str, best_qid: &str, names: &str) -> Str
 }
 
 pub fn warn_qlever_bad_gateway() -> String {
-    "QLever ha restituito un errore; ripetizione con Wikidata Query Service.".to_string()
+    "QLever non era disponibile; nuova prova con Wikidata Query Service.".to_string()
 }
 
 pub fn warn_wdqs_fallback() -> String {
-    ".query eseguita tramite Wikidata Query Service (fallback da QLever 502).".to_string()
+    "Query eseguita tramite Wikidata Query Service (fallback da QLever).".to_string()
 }
 
 #[cfg(target_arch = "wasm32")]

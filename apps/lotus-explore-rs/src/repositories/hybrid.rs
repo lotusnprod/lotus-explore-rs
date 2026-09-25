@@ -9,11 +9,11 @@
 //! 2. On API error or when not configured, return `None` / `Some(Err(…))`
 //!    so the caller falls back to direct SPARQL execution.
 //! 3. Direct SPARQL execution targets `QLever` (`QLEVER_WIKIDATA`) by
-//!    default. If `QLever` answers with a 502 Bad Gateway — a known
-//!    transient failure mode on the public instance — the same query is
-//!    immediately re-sent to the Wikidata Query Service (`WDQS_WIKIDATA`)
-//!    as a fallback, using the scholarly subgraph for reference metadata,
-//!    rather than surfacing the gateway error to the user.
+//!    default. If `QLever` is unavailable due to a network failure or 502
+//!    Bad Gateway, the same query is immediately re-sent to the Wikidata
+//!    Query Service (`WDQS_WIKIDATA`) as a fallback, using the scholarly
+//!    subgraph for reference metadata, rather than surfacing the upstream
+//!    failure to the user.
 
 use crate::api;
 use crate::api::SearchResponse;
@@ -140,8 +140,8 @@ impl LotusRepository for HybridRepository {
         query: &str,
     ) -> Result<lotus::transport::ResponseBody, RepositoryError> {
         match sparql::execute_sparql_body(query).await {
-            Err(err) if is_bad_gateway(&err) => {
-                log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly");
+            Err(err) if is_qlever_unavailable(&err) => {
+                log::warn!("event=qlever_unavailable action=fallback_wdqs_scholarly");
                 let wdqs_query = prepare_wdqs_fallback_query(query);
                 transport::execute_sparql_body(&wdqs_query, WDQS_WIKIDATA)
                     .await
@@ -157,8 +157,8 @@ impl LotusRepository for HybridRepository {
         query: &str,
     ) -> Result<tempfile::NamedTempFile, RepositoryError> {
         match sparql::execute_sparql_tempfile(query).await {
-            Err(err) if is_bad_gateway(&err) => {
-                log::warn!("event=qlever_bad_gateway action=fallback_wdqs_scholarly");
+            Err(err) if is_qlever_unavailable(&err) => {
+                log::warn!("event=qlever_unavailable action=fallback_wdqs_scholarly");
                 let wdqs_query = prepare_wdqs_fallback_query(query);
                 transport::execute_sparql_tempfile(&wdqs_query, WDQS_WIKIDATA)
                     .await
@@ -169,13 +169,11 @@ impl LotusRepository for HybridRepository {
     }
 }
 
-/// True when `QLever` failed with a 502 Bad Gateway — the signal to retry the
-/// same query against the WDQS fallback endpoint instead of surfacing the
-/// error. `QLever`'s own transport layer already retries transient network
-/// failures and gateway errors internally (see `MAX_HTTP_ATTEMPTS`), so a 502
-/// reaching this layer means those in-endpoint retries were exhausted.
-fn is_bad_gateway(err: &FetchError) -> bool {
-    matches!(err, FetchError::Http(502, _))
+/// True when `QLever` is unavailable and the query should be retried against
+/// WDQS. The transport layer already retries transient failures, so reaching
+/// this layer means the in-endpoint attempts were exhausted.
+fn is_qlever_unavailable(err: &FetchError) -> bool {
+    matches!(err, FetchError::Http(502, _) | FetchError::Network(_))
 }
 
 fn map_fetch_error(err: FetchError) -> RepositoryError {
@@ -244,14 +242,22 @@ mod tests {
     }
 
     #[test]
-    fn is_bad_gateway_matches_only_502() {
-        assert!(is_bad_gateway(&FetchError::Http(
+    fn qlever_unavailability_includes_502_and_network_failures() {
+        assert!(is_qlever_unavailable(&FetchError::Http(
             502,
             "upstream gateway error (HTML payload)".into()
         )));
-        assert!(!is_bad_gateway(&FetchError::Http(500, "boom".into())));
-        assert!(!is_bad_gateway(&FetchError::Http(400, "bad query".into())));
-        assert!(!is_bad_gateway(&FetchError::Network("timeout".into())));
-        assert!(!is_bad_gateway(&FetchError::Empty));
+        assert!(is_qlever_unavailable(&FetchError::Network(
+            "connection failed".into()
+        )));
+        assert!(!is_qlever_unavailable(&FetchError::Http(
+            500,
+            "boom".into()
+        )));
+        assert!(!is_qlever_unavailable(&FetchError::Http(
+            400,
+            "bad query".into()
+        )));
+        assert!(!is_qlever_unavailable(&FetchError::Empty));
     }
 }

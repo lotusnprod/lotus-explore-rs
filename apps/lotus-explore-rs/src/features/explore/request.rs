@@ -48,6 +48,10 @@ impl SearchRequest {
         self.command.direct_download()
     }
 
+    pub(super) const fn command(&self) -> SearchCommand {
+        self.command
+    }
+
     #[must_use]
     pub const fn request_token(&self) -> u64 {
         self.request_token

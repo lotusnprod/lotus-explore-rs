@@ -36,7 +36,7 @@ ci:
 
 # One `cargo check -p <app>` per app keeps the wasm build green.
 wasm:
-	cargo check -p lotus-explore-rs --target wasm32-unknown-unknown --features dioxus/wasm-split --locked
+	cargo check -p lotus-explore-rs --target wasm32-unknown-unknown --locked
 
 # Per-package WASM clippy (NOT `--workspace --target wasm32`: `lotus-deploy`
 # is a host-only bin — `reqwest::blocking` cannot exist on wasm — so a
@@ -56,7 +56,16 @@ serve app:
 
 build app:
 	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
-	dx build --release --package {{app}} --wasm-split --features dioxus/wasm-split --locked --debug-symbols=false --rustc-args=-Copt-level=z
+	dx build --release --package {{app}} --locked --debug-symbols=false --rustc-args=-Copt-level=z
+
+web-size:
+	@out="target/dx/lotus-explore-rs/release/web/public"; \
+	if [ ! -f "$out/index.html" ]; then \
+		dx build --release --platform web --base-path "/lotus-explore-rs" --package lotus-explore-rs --locked --debug-symbols=false --rustc-args=-Copt-level=z; \
+	fi; \
+	printf '%s\n' 'Web asset sizes:'; \
+	for file in "$out"/assets/*.wasm; do [ -f "$file" ] && du -h "$file"; done; \
+	du -h "$out/assets/lotus-explore.css" "$out/index.html"
 
 # ── Supply-chain hygiene (skip gracefully if a tool is not installed) ─────────
 

@@ -64,7 +64,8 @@ type SparqlExecution<'a> = BoxFuture<'a, Result<String, FetchError>>;
 #[cfg(target_arch = "wasm32")]
 type SparqlExecution<'a> = LocalBoxFuture<'a, Result<String, FetchError>>;
 
-/// Execute a SPARQL query against QLever, falling back to WDQS on 502.
+/// Execute a SPARQL query against QLever, falling back to WDQS when QLever is
+/// unavailable.
 ///
 /// - Reference lookups (queries containing `SELECT ?ref WHERE {` and `wdt:P356`)
 ///   use the WDQS scholarly subgraph endpoint directly.
@@ -94,13 +95,17 @@ where
 
     match result {
         Ok(response) => Ok(response),
-        Err(FetchError::Http(502, _)) => {
-            log::warn!("event=curation_sparql phase=fallback reason=qlever_502");
+        Err(error) if should_fallback_to_wdqs(&error) => {
+            log::warn!("event=curation_sparql phase=fallback reason=qlever_unavailable");
             let (endpoint, fallback_query) = wdqs_download_query(query);
             execute(&fallback_query, endpoint, format).await
         }
         Err(error) => Err(error),
     }
+}
+
+fn should_fallback_to_wdqs(error: &FetchError) -> bool {
+    matches!(error, FetchError::Http(502, _) | FetchError::Network(_))
 }
 
 #[cfg(test)]
@@ -146,6 +151,20 @@ mod tests {
 
         assert!(result.is_ok());
         assert_eq!(calls, vec![(query.to_owned(), QLEVER_WIKIDATA)]);
+    }
+
+    #[test]
+    fn qlever_network_failure_falls_back() {
+        let query = "SELECT ?item WHERE { ?item wdt:P31 wd:Q16521 }";
+        let (calls, result) = run_with_mock(
+            query,
+            Err(FetchError::Network("connection failed".to_owned())),
+        );
+
+        assert!(result.is_ok());
+        assert_eq!(calls.len(), 2);
+        assert_eq!(calls.first().expect("QLever call").1, QLEVER_WIKIDATA);
+        assert_eq!(calls.get(1).expect("fallback call").1, WDQS_WIKIDATA);
     }
 
     #[test]
