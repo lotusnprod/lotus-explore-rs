@@ -30,7 +30,7 @@ body,
 #main {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
 }
 
 /* Reserve viewport height before the WASM bundle mounts so the rendered
