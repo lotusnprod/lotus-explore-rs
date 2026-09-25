@@ -49,22 +49,34 @@ pub fn SearchExamples() -> Element {
                                         locale,
                                         format: t(locale, TextKey::ExampleQueryExecute),
                                         query: "?taxon=Gentiana%20lutea&execute=true",
+                                        id: "example-query-execute",
+                                        name: "example-query-execute",
                                     }
+
                                     DownloadExampleRow {
                                         locale,
                                         format: t(locale, TextKey::ExampleQueryTaxon),
                                         query: "?taxon=*&download=true&format=csv",
+                                        id: "example-query-taxon",
+                                        name: "example-query-taxon",
                                     }
+
                                     DownloadExampleRow {
                                         locale,
                                         format: t(locale, TextKey::ExampleQueryStructure),
                                         query: "?structure=c1ccccc1&structure_search_type=similarity&smiles_threshold=0.85&download=true&format=json",
+                                        id: "example-query-structure",
+                                        name: "example-query-structure",
                                     }
+
                                     DownloadExampleRow {
                                         locale,
                                         format: t(locale, TextKey::ExampleQueryAdvanced),
                                         query: "?taxon=Fungi&mass_filter=true&mass_min=0&mass_max=300&year_filter=true&year_start=2000&year_end=2026&formula_filter=true&c_min=1&c_max=10&cl_state=required&br_state=excluded&download=true&format=rdf",
+                                        id: "example-query-advanced",
+                                        name: "example-query-advanced",
                                     }
+
                                 }
                             }
                         }
@@ -78,6 +90,8 @@ fn DownloadExampleRow(
     locale: crate::i18n::Locale,
     format: &'static str,
     query: &'static str,
+    id: &'static str,
+    name: &'static str,
 ) -> Element {
     let absolute = absolute_current_url_with_query(query.trim_start_matches('?'));
     let absolute = Arc::<str>::from(absolute);
@@ -89,7 +103,10 @@ fn DownloadExampleRow(
                 "{format}"
             }
             input {
+                id: "{id}",
+                name: "{name}",
                 r#type: "text",
+                autocomplete: "off",
                 readonly: true,
                 value: "{absolute}",
                 aria_label: "{format}",

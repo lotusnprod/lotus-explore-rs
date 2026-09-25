@@ -25,6 +25,8 @@ fn ElemStateSelect(
             label { class: "text-micro font-semibold uppercase tracking-wide text-subtle", r#for: "{select_id}", "{label}" }
             select {
                 id: "{select_id}",
+                name: "{select_id}",
+                autocomplete: "off",
                 class: "w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-body text-text shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                 aria_label: "{label} {t(locale, TextKey::ElementRequirement)}",
                 value: "{value.as_str()}",
@@ -59,6 +61,8 @@ fn NumPair(
                     input {
                         r#type: "number",
                         id: "{min_id}",
+                        name: "{min_id}",
+                        autocomplete: "off",
                         class: "tabular-nums w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-body text-text shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                         min: "0",
                         max: "10000",
@@ -76,6 +80,8 @@ fn NumPair(
                     input {
                         r#type: "number",
                         id: "{max_id}",
+                        name: "{max_id}",
+                        autocomplete: "off",
                         class: "tabular-nums w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-body text-text shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                         min: "0",
                         max: "10000",
@@ -127,6 +133,8 @@ pub fn FormulaSection() -> Element {
                 input {
                     r#type: "checkbox",
                     id: "formula-enabled",
+                    name: "formula_enabled",
+                    autocomplete: "off",
                     class: "accent-accent",
                     checked: enabled,
                     onchange: move |e| ctx.update(FormAction::FormulaEnabled(e.checked())),

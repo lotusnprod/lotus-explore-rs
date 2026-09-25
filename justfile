@@ -52,16 +52,16 @@ clippy-wasm:
 
 serve app:
 	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
-	dx serve --package {{app}} --locked
+	dx serve --package {{app}} --platform web --locked --open=false
 
 build app:
-	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
-	dx build --release --package {{app}} --locked --debug-symbols=false --rustc-args=-Copt-level=z
+	cd apps/{{app}} && npm run build:css --silent && cargo run -p lotus-deploy --bin fetch-ketcher
+	BROWSERSLIST='chrome >= 100, firefox >= 100, safari >= 15' dx build --release --package {{app}} --locked --debug-symbols=false --rustc-args=-Copt-level=z
 
 web-size:
 	@out="target/dx/lotus-explore-rs/release/web/public"; \
 	if [ ! -f "$out/index.html" ]; then \
-		dx build --release --platform web --base-path "/lotus-explore-rs" --package lotus-explore-rs --locked --debug-symbols=false --rustc-args=-Copt-level=z; \
+		BROWSERSLIST='chrome >= 100, firefox >= 100, safari >= 15' dx build --release --platform web --base-path "/lotus-explore-rs" --package lotus-explore-rs --locked --debug-symbols=false --rustc-args=-Copt-level=z; \
 	fi; \
 	printf '%s\n' 'Web asset sizes:'; \
 	for file in "$out"/assets/*.wasm; do [ -f "$file" ] && du -h "$file"; done; \

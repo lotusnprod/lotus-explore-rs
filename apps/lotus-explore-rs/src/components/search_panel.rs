@@ -102,6 +102,7 @@ fn StructureSection() -> Element {
             textarea {
                 id: "smiles-input",
                 name: "smiles",
+                autocomplete: "off",
                 spellcheck: "false",
                 placeholder: "{t(locale, TextKey::StructurePlaceholder)}",
                 value: "{smiles}",
@@ -130,7 +131,9 @@ fn StructureSection() -> Element {
                 label { class: "inline-flex items-center gap-1.5 text-ui text-muted",
                     input {
                         r#type: "radio",
+                        id: "smiles-search-type-substructure",
                         name: "stype",
+                        autocomplete: "off",
                         class: "accent-accent h-4 w-4 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                         checked: smiles_search_type == SmilesSearchType::Substructure,
                         onchange: move |_| {
@@ -142,7 +145,9 @@ fn StructureSection() -> Element {
                 label { class: "inline-flex items-center gap-1.5 text-ui text-muted",
                     input {
                         r#type: "radio",
+                        id: "smiles-search-type-similarity",
                         name: "stype",
+                        autocomplete: "off",
                         class: "accent-accent h-4 w-4 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                         checked: smiles_search_type == SmilesSearchType::Similarity,
                         onchange: move |_| {
@@ -161,6 +166,8 @@ fn StructureSection() -> Element {
                     }
                     input {
                         id: "threshold-input",
+                        name: "smiles_threshold",
+                        autocomplete: "off",
                         r#type: "range",
                         min: "0.0",
                         max: "1.0",

@@ -22,10 +22,19 @@ pub fn asset_url(path: &str) -> String {
     let path = path.trim_start_matches('/');
     let base = web_sys::window()
         .and_then(|win| win.document())
-        .and_then(|doc| doc.query_selector("script[src]").ok())
-        .flatten()
-        .and_then(|el| el.get_attribute("src"))
-        .and_then(|src| src.find("assets/").map(|pos| src[..pos].to_string()))
+        .and_then(|doc| {
+            doc.document_element()
+                .and_then(|html| html.get_attribute("data-lotus-base-path"))
+                .filter(|base| !base.is_empty())
+                .or_else(|| {
+                    doc.query_selector("script[src*='assets/']")
+                        .ok()
+                        .flatten()
+                        .and_then(|el| el.get_attribute("src"))
+                        .and_then(|src| src.find("assets/").map(|pos| src[..pos].to_string()))
+                        .filter(|base| !base.is_empty())
+                })
+        })
         .unwrap_or_else(|| String::from("/"));
     format!("{base}{path}")
 }

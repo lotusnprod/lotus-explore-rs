@@ -69,7 +69,7 @@ where
             }
         }
 
-        let pipeline_outcome = results_pipeline::execute(
+        let pipeline_outcome = match results_pipeline::execute(
             request,
             &smiles,
             &self.repo,
@@ -77,7 +77,14 @@ where
             &self.on_phase,
             strategy.is_download_only(),
         )
-        .await?;
+        .await
+        {
+            Ok(outcome) => outcome,
+            Err(error) => {
+                let _ = perf::end_timer("LOTUS:search_total", search_timer);
+                return Err(error);
+            }
+        };
 
         if strategy.is_download_only() {
             let total_elapsed = perf::end_timer("LOTUS:search_total", search_timer);

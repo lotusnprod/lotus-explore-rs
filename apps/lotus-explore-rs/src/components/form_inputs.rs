@@ -35,7 +35,9 @@ pub fn TextInput(
 
             input {
                 id: "{id}",
+                name: "{id}",
                 r#type: "text",
+                autocomplete: "off",
                 class: "w-full rounded-xl border border-border bg-surface px-3 py-2 text-body text-text placeholder:text-subtle shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                 value: "{value}",
                 placeholder: placeholder.unwrap_or_default(),
@@ -73,7 +75,9 @@ pub fn RangeInput(
                     label { class: "text-micro font-semibold uppercase tracking-wide text-subtle", r#for: "{min_id}", "{min_label}" }
                     input {
                         id: "{min_id}",
+                        name: "{min_id}",
                         r#type: "number",
+                        autocomplete: "off",
                         class: "w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-body text-text shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                         value: "{min_value}",
                         oninput: move |e| on_min_change.call(parse_f64(&e.value())),
@@ -84,7 +88,9 @@ pub fn RangeInput(
                     label { class: "text-micro font-semibold uppercase tracking-wide text-subtle", r#for: "{max_id}", "{max_label}" }
                     input {
                         id: "{max_id}",
+                        name: "{max_id}",
                         r#type: "number",
+                        autocomplete: "off",
                         class: "w-full rounded-xl border border-border bg-surface px-2.5 py-1.5 text-body text-text shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                         value: "{max_value}",
                         oninput: move |e| on_max_change.call(parse_f64(&e.value())),

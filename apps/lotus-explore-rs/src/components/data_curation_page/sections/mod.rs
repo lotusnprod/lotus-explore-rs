@@ -31,6 +31,9 @@ pub fn ShareBar(locale: Locale, share: Arc<str>) -> Element {
             span { class: "text-ui font-semibold text-text2", "{t(locale, TextKey::Share)}" }
             div { class: "flex flex-col gap-2",
                 input {
+                    id: "curation-share-url-field",
+                    name: "share_url",
+                    autocomplete: "off",
                     aria_label: "{t(locale, TextKey::CopyShareableLink)}",
                     class: "w-full font-mono rounded-xl border border-border bg-surface px-3 py-2 text-body text-text placeholder:text-subtle shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                     r#type: "text",
@@ -131,6 +134,7 @@ pub fn AddRowCard(
                 input {
                     id: "curation-name-input",
                     name: "name",
+                    autocomplete: "off",
                     class: "form-input w-full rounded-xl border border-border bg-surface px-3 py-2 text-body text-text placeholder:text-subtle shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                     r#type: "text",
                     placeholder: "{placeholder_molecule_name(locale)}",
@@ -145,6 +149,7 @@ pub fn AddRowCard(
                 input {
                     id: "curation-smiles-input",
                     name: "smiles",
+                    autocomplete: "off",
                     class: "form-input w-full rounded-xl border border-border bg-surface px-3 py-2 text-body text-text placeholder:text-subtle shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                     r#type: "text",
                     placeholder: "SMILES",
@@ -159,6 +164,7 @@ pub fn AddRowCard(
                 input {
                     id: "curation-taxon-input",
                     name: "taxon",
+                    autocomplete: "off",
                     class: "form-input w-full rounded-xl border border-border bg-surface px-3 py-2 text-body text-text placeholder:text-subtle shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                     r#type: "text",
                     placeholder: "{placeholder_taxon_optional(locale)}",
@@ -171,6 +177,7 @@ pub fn AddRowCard(
                 input {
                     id: "curation-doi-input",
                     name: "doi",
+                    autocomplete: "off",
                     class: "form-input w-full rounded-xl border border-border bg-surface px-3 py-2 text-body text-text placeholder:text-subtle shadow-xs focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                     r#type: "text",
                     placeholder: "{placeholder_doi_optional(locale)}",
@@ -233,6 +240,7 @@ pub fn TsvImportCard(
             textarea {
                 id: "curation-tsv-input",
                 name: "tsv",
+                autocomplete: "off",
                 class: "form-textarea mono w-full min-h-[130px] rounded-xl border border-border bg-surface p-2.5 font-mono text-body text-text shadow-xs focus:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                 aria_describedby: "curation-tsv-hint",
                 value: "{tsv_input}",
@@ -249,6 +257,9 @@ pub fn TsvImportCard(
                     onclick: Some(EventHandler::new(move |_: Event<MouseData>| on_parse_tsv.call(()))),
                 }
                 input {
+                    id: "curation-tsv-file-input",
+                    name: "tsv_file",
+                    autocomplete: "off",
                     class: "curation-file-input w-full max-w-full cursor-pointer rounded-xl border border-border bg-surface px-3 py-2 text-ui text-muted shadow-xs transition-colors hover:border-accent/50 hover:bg-bg focus:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-ui file:font-semibold file:text-bg hover:file:bg-accent-2",
                     aria_label: "TSV file upload",
                     r#type: "file",
@@ -399,6 +410,9 @@ pub fn QuickStatementsCard(
                     }
                 }
                 textarea {
+                    id: "curation-quickstatements-dependencies",
+                    name: "quickstatements_dependencies",
+                    autocomplete: "off",
                     class: "form-textarea mono w-full min-h-[220px] rounded-xl border border-border bg-surface p-2.5 font-mono text-body text-text shadow-xs focus:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                     aria_label: "{heading_quickstatements_dependencies(locale)}",
                     readonly: true,
@@ -430,6 +444,9 @@ pub fn QuickStatementsCard(
                     }
                 }
                 textarea {
+                    id: "curation-quickstatements-main",
+                    name: "quickstatements_main",
+                    autocomplete: "off",
                     class: "form-textarea mono w-full min-h-[220px] rounded-xl border border-border bg-surface p-2.5 font-mono text-body text-text shadow-xs focus:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2",
                     aria_label: "{heading_quickstatements(locale)}",
                     readonly: true,

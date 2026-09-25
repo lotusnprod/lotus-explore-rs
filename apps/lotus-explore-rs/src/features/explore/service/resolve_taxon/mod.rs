@@ -98,10 +98,16 @@ pub async fn resolve<R: LotusRepository>(
 
     // Slow path: SPARQL query.
     let query = queries::query_taxon_search(&sanitized);
-    let csv = repo
-        .sparql_body(&query)
-        .await
-        .map_err(DomainError::transport_at(QueryStage::TaxonSearch))?;
+    let csv = match repo.sparql_body(&query).await {
+        Ok(csv) => csv,
+        Err(error) => {
+            let _ = perf::end_timer("LOTUS:taxon_resolution", taxon_timer);
+            return Err(DomainError::Transport {
+                stage: QueryStage::TaxonSearch,
+                source: error,
+            });
+        }
+    };
 
     let taxon_elapsed = perf::end_timer("LOTUS:taxon_resolution", taxon_timer);
     metrics.add_network(taxon_elapsed);

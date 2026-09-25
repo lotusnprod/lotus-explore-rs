@@ -9,10 +9,8 @@ tailwind_output = "../../target/dx/lotus-explore-rs/debug/web/public/assets/lotu
 # and ignores any `out_dir` key set here.
 
 [[hooks]]
-# Release builds consume the committed public asset. The native watcher writes
-# the debug target directly because dx serves that copied tree during `serve`.
 stage = "pre-build"
-command = "npx @tailwindcss/cli@4.3.3 -i ./tailwind/styles.css -o ./public/assets/lotus-explore.css --minify"
+command = "npm run build:css --silent"
 
 [web]
 pre_compress = true
@@ -24,7 +22,7 @@ keep_names = false
 extra_features = ["--converge"]
 
 [web.app]
-title = "LOTUS Explorer"
+title = ""
 
 [web.watcher]
 reload_html = true

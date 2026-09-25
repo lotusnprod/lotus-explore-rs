@@ -38,6 +38,8 @@ pub fn ShareNotice(shareable_url: Memo<Option<Arc<str>>>) -> Element {
                 dark: dark_mode,
                 input {
                     id: share_input_id,
+                    name: "share_url",
+                    autocomplete: "off",
                     r#type: "text",
                     readonly: true,
                     value: "{share}",

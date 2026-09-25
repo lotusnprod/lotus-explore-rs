@@ -78,7 +78,7 @@ pub fn ResultsTable() -> Element {
              class: "results-wrap min-h-0 w-full max-w-none px-0",
 
             "property": "numberOfItems",
-            content: "{total}",
+            "content": "{total}",
             h2 { id: RESULTS_SECTION_HEADING_ID, class: "sr-only", "{t(locale, TextKey::TableTriplesAria)}" }
             ResultsToolbar {}
 

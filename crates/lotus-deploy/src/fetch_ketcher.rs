@@ -32,6 +32,8 @@ use zip::ZipArchive;
 const DEFAULT_VERSION: &str = "3.18.0";
 const OWNER_REPO: &str = "epam/ketcher";
 const DEFAULT_DIR: &str = "public/assets/ketcher";
+const FOCUS_GUARD_MARKER: &str = "ketcher-focus-guard.js";
+const FOCUS_GUARD_SCRIPT: &str = "<script src=\"../js/ketcher-focus-guard.js\"></script>";
 
 /// Unused standalone "entry" bundles (and their license files) that ketcher's
 /// `index.html` never references — only `main.<hash>.js` is loaded by the
@@ -77,6 +79,13 @@ fn release_url(version: &str) -> String {
     )
 }
 
+fn add_focus_guard(index: &str) -> String {
+    if index.contains(FOCUS_GUARD_MARKER) {
+        return index.to_owned();
+    }
+    index.replacen("</head>", &format!("{FOCUS_GUARD_SCRIPT}</head>"), 1)
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let version = env::var("KETCHER_VERSION").unwrap_or_else(|_| DEFAULT_VERSION.to_string());
     let ketcher_dir =
@@ -84,12 +93,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let index_html = ketcher_dir.join("index.html");
 
     if index_html.is_file() {
-        println!(
-            "✓ Ketcher v{version} already present in {}",
-            ketcher_dir.display()
-        );
-        println!("  (set KETCHER_VERSION to upgrade, then re-run)");
-        return Ok(());
+        let index = fs::read_to_string(&index_html)?;
+        if index.contains(&format!("Ketcher v{version}")) {
+            let patched = add_focus_guard(&index);
+            if patched != index {
+                fs::write(&index_html, patched)?;
+            }
+            println!(
+                "✓ Ketcher v{version} already present in {}",
+                ketcher_dir.display()
+            );
+            return Ok(());
+        }
+        fs::remove_dir_all(&ketcher_dir)?;
+        println!("Updating Ketcher to v{version}");
     }
 
     let url = env::var("KETCHER_URL").unwrap_or_else(|_| release_url(&version));
@@ -172,6 +189,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         entries += 1;
     }
 
+    let index = fs::read_to_string(&index_html)?;
+    fs::write(&index_html, add_focus_guard(&index))?;
+
     println!("  extracted {entries} file(s) to {}", ketcher_dir.display());
     if skipped_bytes > 0 {
         println!("  skipped {skipped_bytes} bytes of unused entry bundles (closable/duo/popup)");
@@ -182,6 +202,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn adds_focus_guard_once() {
+        let index = "<html><head></head></html>";
+        let patched = add_focus_guard(index);
+        assert!(patched.contains(FOCUS_GUARD_MARKER));
+        assert_eq!(add_focus_guard(&patched), patched);
+    }
 
     #[test]
     fn classifies_unused_entries() {
