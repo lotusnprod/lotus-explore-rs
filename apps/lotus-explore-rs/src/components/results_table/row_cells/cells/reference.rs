@@ -29,7 +29,7 @@ pub(in crate::components::results_table::row_cells) fn reference_cell(
                         href: "https://www.wikidata.org/entity/{reference_qid}",
                         target: "_blank",
                         rel: "noopener noreferrer",
-                        class: "block break-words line-clamp-2 font-semibold leading-snug hover:underline text-wd-reference",
+                        class: "block min-h-6 break-words line-clamp-2 font-semibold leading-snug hover:underline text-wd-reference",
                         "{full_title}"
                     }
                 } else {
@@ -37,7 +37,7 @@ pub(in crate::components::results_table::row_cells) fn reference_cell(
                         href: "https://www.wikidata.org/entity/{reference_qid}",
                         target: "_blank",
                         rel: "noopener noreferrer",
-                        class: "block break-words line-clamp-2 font-semibold leading-snug hover:underline text-wd-reference",
+                        class: "block min-h-6 break-words line-clamp-2 font-semibold leading-snug hover:underline text-wd-reference",
                         "{reference_qid}"
                     }
                 }
@@ -48,7 +48,7 @@ pub(in crate::components::results_table::row_cells) fn reference_cell(
                     target: "_blank",
                     rel: "noopener noreferrer",
                     aria_label: "{reference_qid} • {t(locale, TextKey::OpenInReferenceScholia)}",
-                    class: "inline-flex items-center rounded-full border border-wd-reference/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
+                    class: "inline-flex min-h-7 items-center rounded-full border border-wd-reference/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
                     "{reference_qid} • Scholia"
                 }
                 if let Some(d) = doi {
@@ -58,7 +58,7 @@ pub(in crate::components::results_table::row_cells) fn reference_cell(
                         href: "https://doi.org/{d}",
                         target: "_blank",
                         rel: "noopener noreferrer",
-                        class: "inline-flex items-center rounded-full border border-wd-reference/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
+                        class: "inline-flex min-h-7 items-center rounded-full border border-wd-reference/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
                         aria_label: "{text.open_doi}",
                         "{d}"
                     }
@@ -68,7 +68,7 @@ pub(in crate::components::results_table::row_cells) fn reference_cell(
                         href: "https://www.wikidata.org/entity/statement/{stmt}",
                         target: "_blank",
                         rel: "noopener noreferrer",
-                        class: "inline-flex items-center rounded-full border border-wd-reference/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
+                        class: "inline-flex min-h-7 items-center rounded-full border border-wd-reference/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
                         aria_label: "{aria_wikidata_statement(locale, stmt)}",
                         "{stmt}"
                     }

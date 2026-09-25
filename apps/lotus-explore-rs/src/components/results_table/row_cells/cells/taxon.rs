@@ -23,7 +23,7 @@ pub(in crate::components::results_table::row_cells) fn taxon_cell(
                     href: "https://www.wikidata.org/entity/{taxon_qid}",
                     target: "_blank",
                     rel: "noopener noreferrer",
-                    class: "block break-words line-clamp-2 font-semibold italic leading-snug hover:underline text-wd-taxon",
+                    class: "block min-h-6 break-words line-clamp-2 font-semibold italic leading-snug hover:underline text-wd-taxon",
                     "{entry.taxon_name}"
                 }
             }
@@ -33,7 +33,7 @@ pub(in crate::components::results_table::row_cells) fn taxon_cell(
                     target: "_blank",
                     rel: "noopener noreferrer",
                     aria_label: "{taxon_qid} • {t(_locale, TextKey::OpenInTaxonScholia)}",
-                    class: "inline-flex items-center rounded-full border border-wd-taxon/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-taxon hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
+                    class: "inline-flex min-h-7 items-center rounded-full border border-wd-taxon/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-taxon hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
                     "{taxon_qid} • Scholia"
                 }
             }

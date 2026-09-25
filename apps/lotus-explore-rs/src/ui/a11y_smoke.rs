@@ -59,6 +59,17 @@ mod tests {
     }
 
     #[test]
+    fn qs_dev_links_have_a_non_color_cue() {
+        let curation_src = include_str!("../components/data_curation_page/sections/mod.rs");
+        assert_eq!(
+            curation_src
+                .matches("class: \"font-medium text-accent underline\"")
+                .count(),
+            2
+        );
+    }
+
+    #[test]
     fn landing_and_not_found_expose_headings_and_actions() {
         let landing_src = include_str!("../components/landing.rs");
         assert!(landing_src.contains("id: \"landing-welcome-heading\""));

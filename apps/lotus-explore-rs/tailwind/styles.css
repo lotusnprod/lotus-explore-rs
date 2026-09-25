@@ -1,11 +1,3 @@
-/* ============================================================
-   Tailwind CSS — Single Source of Truth
-   ============================================================
-   Compiled by the Dioxus.toml `[[hooks]] pre-build` hook, which runs
-   automatically on `dx build` / `dx serve`:
-     npx @tailwindcss/cli -i ./tailwind/styles.css -o ./public/assets/lotus-explore.css --minify
-   ============================================================ */
-
 @import "tailwindcss";
 
 /* Scan Dioxus/Rust class strings for utilities. */
@@ -27,6 +19,7 @@
 
 html,
 body {
+    text-size-adjust: 100%;
     height: 100%;
     margin: 0;
     padding: 0;

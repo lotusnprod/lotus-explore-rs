@@ -3,14 +3,10 @@ name = "lotus-explore-rs"
 default_platform = "web"
 asset_dir = "public"
 tailwind_input = "tailwind/styles.css"
-tailwind_output = "../../target/dx/lotus-explore-rs/debug/web/public/assets/lotus-explore.css"
+tailwind_output = "public/assets/lotus-explore.css"
 # Note: dx ≥ 0.7 writes the web bundle to
 #   target/dx/<package-name>/release/web/public/
 # and ignores any `out_dir` key set here.
-
-[[hooks]]
-stage = "pre-build"
-command = "npm run build:css --silent"
 
 [web]
 pre_compress = true

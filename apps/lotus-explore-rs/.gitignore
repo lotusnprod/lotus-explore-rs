@@ -1,11 +1,9 @@
 # Ketcher assets (downloaded by fetch-ketcher)
 public/assets/ketcher/
+public/assets/lotus-explore.css
 
 # Build artifacts
 target/
 
 # Cargo
 Cargo.lock
-
-# Node
-node_modules/

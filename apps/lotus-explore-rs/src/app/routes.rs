@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
 use super::shell::{AppShell, ExplorePage};
 use crate::components::data_curation_page::DataCurationPage;
 use crate::components::landing::{LandingPage, NotFoundPage};

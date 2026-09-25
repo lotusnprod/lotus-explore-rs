@@ -28,7 +28,7 @@ pub(in crate::components::results_table::row_cells) fn compound_cell(
                     href: "https://www.wikidata.org/entity/{compound_qid}",
                     target: "_blank",
                     rel: "noopener noreferrer",
-                    class: "block break-words hyphens-auto line-clamp-2 font-semibold leading-snug hover:underline text-wd-compound",
+                    class: "block min-h-6 break-words hyphens-auto line-clamp-2 font-semibold leading-snug hover:underline text-wd-compound",
                     "{prepared.display_name}"
                 }
                 if let Some(smiles) = entry.smiles.as_deref() {
@@ -41,7 +41,7 @@ pub(in crate::components::results_table::row_cells) fn compound_cell(
                     target: "_blank",
                     rel: "noopener noreferrer",
                     aria_label: "{compound_qid} • {t(locale, TextKey::OpenInCompoundScholia)}",
-                    class: "inline-flex items-center rounded-full border border-wd-compound/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-compound hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
+                    class: "inline-flex min-h-7 items-center rounded-full border border-wd-compound/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-compound hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
                     "{compound_qid} • Scholia"
                 }
                 if let Some(ik) = entry.inchikey.as_deref() {
@@ -52,7 +52,7 @@ pub(in crate::components::results_table::row_cells) fn compound_cell(
                         target: "_blank",
                         rel: "noopener noreferrer",
                         aria_label: "{aria_search_inchikey(locale, ik)}",
-                        class: "inline-flex max-w-full break-all items-center rounded-full border border-wd-compound/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-compound hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
+                        class: "inline-flex min-h-7 max-w-full break-all items-center rounded-full border border-wd-compound/35 bg-surface px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-compound hover:bg-bg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28",
                         "{ik}"
                     }
                 }

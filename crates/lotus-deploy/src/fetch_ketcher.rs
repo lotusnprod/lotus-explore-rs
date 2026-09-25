@@ -26,7 +26,10 @@ use std::fs;
 use std::io::{self, BufWriter, Cursor, Write};
 use std::path::{Path, PathBuf};
 
+use gimli as _;
 use reqwest::blocking::Client;
+use serde_json as _;
+use wasmparser as _;
 use zip::ZipArchive;
 
 const DEFAULT_VERSION: &str = "3.18.0";

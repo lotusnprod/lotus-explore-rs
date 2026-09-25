@@ -50,13 +50,19 @@ clippy-wasm:
 # `public/assets/ketcher` default lands inside apps/<app>/public,
 # not at the repo-root public/.
 
-serve app:
+serve app="lotus-explore-rs":
 	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
-	dx serve --package {{app}} --platform web --locked --open=false
+	cargo run --locked -p lotus-deploy --bin serve-with-source-map -- \
+		target/dx/{{app}}/debug/web/public/wasm/{{app}}_bg.wasm -- \
+		dx serve --package {{app}} --platform web --locked --open=false
 
-build app:
-	cd apps/{{app}} && npm run build:css --silent && cargo run -p lotus-deploy --bin fetch-ketcher
-	BROWSERSLIST='chrome >= 100, firefox >= 100, safari >= 15' dx build --release --package {{app}} --locked --debug-symbols=false --rustc-args=-Copt-level=z
+preview app="lotus-explore-rs":
+	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
+	cd apps/{{app}} && BROWSERSLIST='chrome >= 100, firefox >= 100, safari >= 15' dx serve --package {{app}} --platform web --release --debug-symbols=false --locked --rustc-args=-Copt-level=z --open=false
+
+build app="lotus-explore-rs":
+	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
+	cd apps/{{app}} && BROWSERSLIST='chrome >= 100, firefox >= 100, safari >= 15' dx build --release --package {{app}} --locked --debug-symbols=false --rustc-args=-Copt-level=z
 
 web-size:
 	@out="target/dx/lotus-explore-rs/release/web/public"; \

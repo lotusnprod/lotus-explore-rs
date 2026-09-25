@@ -12,8 +12,10 @@ crate and the QLever SPARQL endpoint.
 
 ## Quick start
 
+From the repository root:
+
 ```bash
-dx serve --package lotus-explore-rs
+just serve
 ```
 
 To also run the optional API:
@@ -66,6 +68,16 @@ Run the workspace test suite:
 cargo test --workspace --all-targets --locked
 ```
 
+For production-sized local performance and Lighthouse checks, run the release
+server:
+
+```bash
+just preview
+```
+
+`just serve` intentionally serves the debug WASM bundle for hot reload and
+source maps.
+
 ## Setup: external assets
 
 RDKit.js and citation-js are loaded from CDN (no local download needed). The
@@ -74,16 +86,8 @@ static `index.html` owns early metadata, CSS, and bootstrap discovery;
 
 ### CSS Build Dependencies (Tailwind)
 
-The project uses Tailwind CSS for styling. Install build dependencies:
-
-```bash
-npm install
-npm run build:css  # Build CSS once, or run 'npm run watch:css' during development
-```
-
-The `Dioxus.toml` pre-build hook automatically runs `build:css` during
-`dx serve` and `dx build`, so manual CSS rebuilds are only needed for local
-development outside the Dioxus build pipeline.
+`dx serve` and `dx build` generate and watch Tailwind automatically. Node.js and
+npm are not required.
 
 ### Ketcher (115 MB)
 
@@ -97,8 +101,8 @@ cargo run -p lotus-deploy --bin fetch-ketcher
 Or simply use the `just` recipes, which fetch Ketcher automatically:
 
 ```bash
-just build lotus-explore-rs   # fetches Ketcher + dx build --release
-just serve lotus-explore-rs   # fetches Ketcher + dx serve
+just build   # fetches Ketcher + dx build --release
+just serve   # fetches Ketcher + dx serve
 ```
 
 ## Citation

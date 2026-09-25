@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-FileCopyrightText: Contributors to the lotus-explore-rs project
+
 use crate::features::explore::url_state::href_with_current_query;
 use crate::hooks::use_locale;
 use crate::i18n::{TextKey, t};

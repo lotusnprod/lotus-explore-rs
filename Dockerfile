@@ -28,10 +28,10 @@ COPY --from=builder /build/target /build/target
 
 WORKDIR /build
 
-# System deps: nodejs/npm (for Tailwind pre-build), curl (for dx download),
-# gcc (C linker for native build scripts), pkg-config + libssl-dev (crypto crates)
+# System deps: curl (for dx download), gcc (C linker for native build scripts),
+# pkg-config + libssl-dev (crypto crates)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    nodejs npm curl gcc pkg-config libssl-dev \
+    curl gcc pkg-config libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Download the pre-built `dx` binary matching the host architecture
@@ -61,7 +61,6 @@ ARG DX_BASE_PATH="/"
 # fetch-ketcher runs from apps/lotus-explore-rs/ so the relative
 # `public/assets/ketcher` lands inside the app crate's public/ dir.
 RUN cd apps/lotus-explore-rs && \
-    npm run build:css --silent && \
     cargo run --release -p lotus-deploy --bin fetch-ketcher && \
     BROWSERSLIST='chrome >= 100, firefox >= 100, safari >= 15' dx build --release --platform web --base-path "${DX_BASE_PATH}" --package lotus-explore-rs --locked --debug-symbols=false --rustc-args=-Copt-level=z
 

@@ -398,6 +398,7 @@ pub fn QuickStatementsCard(
                         href: "{qs_dependency_link}",
                         target: "_blank",
                         rel: "noopener noreferrer",
+                        class: "font-medium text-accent underline",
                         "{curation_qs_dev_label(locale)}"
                     }
                     " - {curation_qs_dev_prereq_hint(locale)}"
@@ -432,6 +433,7 @@ pub fn QuickStatementsCard(
                         href: "{qs_main_link}",
                         target: "_blank",
                         rel: "noopener noreferrer",
+                        class: "font-medium text-accent underline",
                         "{curation_qs_dev_label(locale)}"
                     }
                     " - {curation_qs_dev_main_hint(locale)}"

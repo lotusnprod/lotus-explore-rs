@@ -13,8 +13,7 @@ crate and the QLever SPARQL endpoint.
 ## Quick start
 
 ```bash
-cd apps/lotus-explore-rs
-dx serve
+just serve
 ```
 
 To also run the optional API:
@@ -65,20 +64,18 @@ The repo pins Rust 1.97, `clippy`, `rustfmt`, and `wasm32-unknown-unknown` in
 `rust-toolchain.toml`. Running any `cargo` command will auto-download the pinned
 toolchain via `rustup`.
 
+The repository commands use the `just` task runner; install it with your
+platform's package manager.
+
 To serve or build the WASM app, also install the Dioxus CLI:
 
 ```bash
 cargo install dioxus-cli --version 0.7.10 --locked
 ```
 
-For local CSS rebuilds (optional --- the `Dioxus.toml` pre-build hook runs this
-automatically during `dx serve`/`dx build`):
-
-```bash
-cd apps/lotus-explore-rs
-npm install
-npm run build:css  # Build CSS once, or run 'npm run watch:css' during development
-```
+Dioxus 0.7.10 builds and watches Tailwind automatically during `dx serve` and
+`dx build`, so Node.js and npm are not required for local development or release
+builds.
 
 ## Continuous integration
 

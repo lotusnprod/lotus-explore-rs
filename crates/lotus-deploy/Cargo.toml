@@ -16,8 +16,15 @@ publish = false
 name = "fetch-ketcher"
 path = "src/fetch_ketcher.rs"
 
+[[bin]]
+name = "serve-with-source-map"
+path = "src/serve_with_source_map.rs"
+
 [dependencies]
+gimli = { version = "0.34", default-features = false, features = ["read", "std"] }
 reqwest = { version = "0.13", features = ["blocking", "gzip"] }
+serde_json = { workspace = true }
+wasmparser = { version = "0.259", default-features = false }
 zip = "8.6"
 
 [lints]

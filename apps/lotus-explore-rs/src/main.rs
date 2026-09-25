@@ -30,7 +30,7 @@
 //! # Quick start
 //!
 //! ```bash
-//! dx serve --package lotus-explore-rs
+//! just serve
 //! ```
 //!
 //! The LOTUS API server is built into this package. Run it natively and serve
@@ -38,7 +38,7 @@
 //!
 //! ```bash
 //! cargo run --locked --features server -p lotus-explore-rs     # API on :8787
-//! dx serve --package lotus-explore-rs --platform web           # client on :8080
+//! just serve                                           # client on :8080
 //! ```
 //!
 //! The dev server proxies `/v1` requests to `http://127.0.0.1:8787`.
@@ -152,7 +152,7 @@ fn main() {
     eprintln!(
         "lotus-explore-rs (native): enable the `server` feature to host the API \
          (cargo run --features server -p lotus-explore-rs), \
-         or build the WASM client with `dx serve --platform web`."
+         or build the WASM client with `just serve`."
     );
 }
 

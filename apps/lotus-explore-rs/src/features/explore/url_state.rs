@@ -86,11 +86,8 @@ pub fn href_with_current_query(path: &str) -> String {
 pub fn absolute_share_url(share: &str) -> String {
     #[cfg(target_arch = "wasm32")]
     {
-        if let Some((origin, pathname)) = origin_and_pathname() {
-            if share.starts_with('/') {
-                return format!("{origin}{}{share}", deployment_base_path(&pathname));
-            }
-            return format!("{origin}{pathname}{share}");
+        if let Some((origin, _pathname)) = origin_and_pathname() {
+            return format!("{origin}{}", deployment_href(share));
         }
     }
     share.into()
