@@ -6,7 +6,8 @@
 
 use super::super::download_model::{
     DOWNLOAD_METADATA_SPEC, DOWNLOAD_QUERY_CSV_SPEC, DOWNLOAD_QUERY_JSON_SPEC,
-    DOWNLOAD_QUERY_RDF_SPEC, DownloadQuerySpec, build_download_toolbar_model_with_endpoint,
+    DOWNLOAD_QUERY_RDF_SPEC, DownloadQuerySpec, SparqlEndpointUI,
+    build_download_toolbar_model_with_endpoint,
 };
 use crate::components::ui::Button;
 use crate::download::{DownloadFormat, execute_download, trigger_download};
@@ -242,8 +243,6 @@ pub fn DownloadActionsGroup() -> Element {
     });
 
     let download_results_label = t(locale, TextKey::DownloadResults);
-    let open_in_title = t(locale, TextKey::OpenInEndpointTitle);
-    let _open_in_label = t(locale, TextKey::OpenInEndpoint);
 
     // Local download state — busy flag and status text.
     let download_busy = use_signal(|| false);
@@ -255,6 +254,16 @@ pub fn DownloadActionsGroup() -> Element {
     let export_available = toolbar.export_available;
     let ui_url_for_click = toolbar.ui_url.clone();
     let endpoint_name = toolbar.sparql_endpoint_ui.to_string();
+    let (open_in_label, open_in_title) = match toolbar.sparql_endpoint_ui {
+        SparqlEndpointUI::Qlever => (
+            t(locale, TextKey::OpenInQlever),
+            t(locale, TextKey::OpenInQleverTitle),
+        ),
+        SparqlEndpointUI::Wdqs => (
+            t(locale, TextKey::OpenInEndpoint),
+            t(locale, TextKey::OpenInEndpointTitle),
+        ),
+    };
     drop(snapshot);
     drop(toolbar);
 
@@ -324,7 +333,7 @@ pub fn DownloadActionsGroup() -> Element {
                                 class: "inline-flex shrink-0 items-center justify-center font-sans select-none transition-transform duration-150 ease-[cubic-bezier(.4,0,.2,1)] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent/28 focus-visible:ring-offset-2 rounded-xl border border-border bg-surface text-text font-semibold shadow-xs hover:bg-bg active:bg-bg min-h-9 px-4 py-1.5 text-ui active:scale-[0.98]",
                                 title: Some(format!("{open_in_title} ({endpoint_name})")),
                                 aria_label: Some(format!("{open_in_title} ({endpoint_name})")),
-                                label: Some(format!("Open in {endpoint_name}")),
+                                 label: Some(open_in_label.to_string()),
                                 onclick: move |_| {
                                     #[cfg(target_arch = "wasm32")]
                                     {
