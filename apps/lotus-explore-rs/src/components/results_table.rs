@@ -26,7 +26,7 @@ use toolbar::ResultsToolbar;
 use virtualized_table::VirtualizedResultsTable;
 
 const TABLE_SCROLL_ID: &str = "results-table-scroll";
-const VIRTUAL_OVERSCAN_ROWS: usize = 12;
+const VIRTUAL_OVERSCAN_ROWS: usize = 4;
 const ROW_HEIGHT_PX_COMFORTABLE: usize = 138;
 const TABLE_VIEWPORT_FALLBACK_PX: usize = 760;
 

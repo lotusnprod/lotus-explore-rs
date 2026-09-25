@@ -55,17 +55,20 @@
 //!
 //! # Setup: external assets
 //!
-//! RDKit.js and citation.js are loaded from CDN on demand by the curation
-//! workflow when their respective operations first need them (no local
-//! download needed). The @citation-js/plugin-quickstatements output formatter
-//! is registered inline with citation.js after it loads.
+//! RDKit.js and the Scholia Citation.js bundle are fetched into
+//! `public/assets/vendor` before serving or deploying. Their source refs are
+//! configurable with `RDKIT_VERSION` and `CITATION_JS_REF`; both default to
+//! the latest available ref. The curation bridges load the files on demand
+//! when their respective operations first need them. The
+//! `@citation-js/plugin-quickstatements` output formatter is registered inline
+//! with citation.js after it loads.
 //! The initial document metadata is defined in `index.html`; route-specific
 //! curation scripts are added from `src/document_head.rs`.
 //!
-//! Ketcher (115 MB) must be fetched before serving or deploying:
+//! The `just` recipes fetch these assets automatically. To fetch them directly:
 //!
 //! ```bash
-//! cargo run --release -p lotus-deploy --bin fetch-ketcher
+//! cd apps/lotus-explore-rs && cargo run --release -p lotus-deploy --bin fetch-assets
 //! ```
 //!
 //! # Citation

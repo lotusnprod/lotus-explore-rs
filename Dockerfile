@@ -57,11 +57,11 @@ COPY apps/ apps/
 # "/${REPNAME}" for GitHub Pages. Override with --build-arg.
 ARG DX_BASE_PATH="/"
 
-# Fetch Ketcher (115 MB) then build the WASM web bundle.
-# fetch-ketcher runs from apps/lotus-explore-rs/ so the relative
-# `public/assets/ketcher` lands inside the app crate's public/ dir.
+# Fetch configured curation assets and Ketcher (115 MB) then build the WASM web bundle.
+# fetch-assets runs from apps/lotus-explore-rs/ so its relative asset
+# directories land inside the app crate's public/ dir.
 RUN cd apps/lotus-explore-rs && \
-    cargo run --release -p lotus-deploy --bin fetch-ketcher && \
+    cargo run --release -p lotus-deploy --bin fetch-assets && \
     BROWSERSLIST='chrome >= 100, firefox >= 100, safari >= 15' dx build --release --platform web --base-path "${DX_BASE_PATH}" --package lotus-explore-rs --locked --debug-symbols=false --rustc-args=-Copt-level=z
 
 # ── Stage 3: export (for CI artifact extraction) ────────────────────────────────

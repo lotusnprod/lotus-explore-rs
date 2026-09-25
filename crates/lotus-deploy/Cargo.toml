@@ -3,7 +3,7 @@ name = "lotus-deploy"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.97"
-description = "Host-only deploy helpers for lotus-explore-rs: bake <html lang> into shipped index.html and fetch/slim the Ketcher editor bundle"
+description = "Host-only deploy helpers for lotus-explore-rs: fetch frontend assets and slim the Ketcher editor bundle"
 repository = "https://github.com/lotusnprod/lotus-explore-rs"
 license = "AGPL-3.0-only"
 keywords = ["deploy", "dioxus", "i18n", "ketcher", "lotus"]
@@ -11,20 +11,14 @@ categories = ["development-tools::build-utils", "web-programming"]
 publish = false
 
 # Independent host-only binary; build with
-# `cargo build --release -p lotus-deploy --bin fetch-ketcher`.
+# `cargo build --release -p lotus-deploy --bin fetch-assets`.
 [[bin]]
-name = "fetch-ketcher"
-path = "src/fetch_ketcher.rs"
-
-[[bin]]
-name = "serve-with-source-map"
-path = "src/serve_with_source_map.rs"
+name = "fetch-assets"
+path = "src/fetch_assets.rs"
 
 [dependencies]
-gimli = { version = "0.34", default-features = false, features = ["read", "std"] }
 reqwest = { version = "0.13", features = ["blocking", "gzip"] }
 serde_json = { workspace = true }
-wasmparser = { version = "0.259", default-features = false }
 zip = "8.6"
 
 [lints]

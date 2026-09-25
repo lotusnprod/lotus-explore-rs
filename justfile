@@ -46,22 +46,19 @@ clippy-wasm:
 	cargo clippy --target wasm32-unknown-unknown -p lotus -p lotus-explore-rs --locked -- -D warnings
 
 # ── Per-app dev servers / production builds ───────────────────────────────────
-# fetch-ketcher must run from the app crate dir so the relative
-# `public/assets/ketcher` default lands inside apps/<app>/public,
-# not at the repo-root public/.
+# fetch-assets must run from the app crate dir so its relative asset
+# directories land inside apps/<app>/public, not at the repo-root public/.
 
 serve app="lotus-explore-rs":
-	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
-	cargo run --locked -p lotus-deploy --bin serve-with-source-map -- \
-		target/dx/{{app}}/debug/web/public/wasm/{{app}}_bg.wasm -- \
-		dx serve --package {{app}} --platform web --locked --open=false
+	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-assets
+	dx serve --package {{app}} --platform web --locked --open=false
 
 preview app="lotus-explore-rs":
-	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
+	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-assets
 	cd apps/{{app}} && BROWSERSLIST='chrome >= 100, firefox >= 100, safari >= 15' dx serve --package {{app}} --platform web --release --debug-symbols=false --locked --rustc-args=-Copt-level=z --open=false
 
 build app="lotus-explore-rs":
-	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
+	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-assets
 	cd apps/{{app}} && BROWSERSLIST='chrome >= 100, firefox >= 100, safari >= 15' dx build --release --package {{app}} --locked --debug-symbols=false --rustc-args=-Copt-level=z
 
 web-size:

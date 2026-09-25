@@ -75,34 +75,43 @@ server:
 just preview
 ```
 
-`just serve` intentionally serves the debug WASM bundle for hot reload and
-source maps.
+`just serve` intentionally serves the debug WASM bundle for hot reload.
 
 ## Setup: external assets
 
-RDKit.js and citation-js are loaded from CDN (no local download needed). The
-static `index.html` owns early metadata, CSS, and bootstrap discovery;
-`document_head::CurationScripts` adds the route-specific curation bridges.
+RDKit.js and the Scholia Citation.js bundle are fetched into
+`public/assets/vendor` by the deploy helper. `RDKIT_VERSION` defaults to
+`latest`, and `CITATION_JS_REF` defaults to Scholia's `main` branch; both can be
+overridden for reproducible or mirror-based builds. The curation bridges load
+the files on demand when needed. The static `index.html` owns early metadata,
+CSS, and bootstrap discovery; `document_head::CurationScripts` adds the
+route-specific curation bridges.
 
 ### CSS Build Dependencies (Tailwind)
 
 `dx serve` and `dx build` generate and watch Tailwind automatically. Node.js and
 npm are not required.
 
+### External asset refs
+
+The asset helper defaults to the latest Ketcher and RDKit releases and the
+Scholia `main` branch. Override them with `KETCHER_VERSION`, `RDKIT_VERSION`, or
+`CITATION_JS_REF` when a build needs a specific ref.
+
 ### Ketcher (115 MB)
 
-Ketcher must be fetched before serving or deploying:
+Ketcher and the curation assets must be fetched before serving or deploying:
 
 ```bash
 cd apps/lotus-explore-rs   # from repo root
-cargo run -p lotus-deploy --bin fetch-ketcher
+cargo run -p lotus-deploy --bin fetch-assets
 ```
 
-Or simply use the `just` recipes, which fetch Ketcher automatically:
+Or simply use the `just` recipes, which fetch the assets automatically:
 
 ```bash
-just build   # fetches Ketcher + dx build --release
-just serve   # fetches Ketcher + dx serve
+just build   # fetches external assets + dx build --release
+just serve   # fetches external assets + dx serve
 ```
 
 ## Citation

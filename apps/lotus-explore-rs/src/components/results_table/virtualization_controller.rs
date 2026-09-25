@@ -123,23 +123,26 @@ impl ResultsTableVirtualizationController {
         let current_row_height = *self.row_height_px.read();
         let row_height_for_frame = current_row_height;
 
-        // Defer row height measurement to rAF to avoid forced reflow.
-        // Reading offsetHeight after DOM mutations triggers synchronous layout.
         if !*self.row_height_measured.read() {
+            self.row_height_measured.set(true);
             let scroll_id = self.config.scroll_id;
             let mut row_height_px = self.row_height_px;
-            let mut row_height_measured = self.row_height_measured;
             let fallback = current_row_height;
             if let Some(win) = window() {
-                let cb = Closure::wrap(Box::new(move || {
-                    let measured = scroll_runtime::measure_row_height_px(scroll_id, fallback);
-                    if measured != fallback {
-                        row_height_px.set(measured);
+                let outer = Closure::wrap(Box::new(move || {
+                    let inner = Closure::wrap(Box::new(move || {
+                        let measured = scroll_runtime::measure_row_height_px(scroll_id, fallback);
+                        if measured != fallback {
+                            row_height_px.set(measured);
+                        }
+                    }) as Box<dyn FnMut()>);
+                    if let Some(win) = window() {
+                        let _ = win.request_animation_frame(inner.as_ref().unchecked_ref());
                     }
-                    row_height_measured.set(true);
+                    inner.forget();
                 }) as Box<dyn FnMut()>);
-                let _ = win.request_animation_frame(cb.as_ref().unchecked_ref());
-                cb.forget();
+                let _ = win.request_animation_frame(outer.as_ref().unchecked_ref());
+                outer.forget();
             }
         }
 

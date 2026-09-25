@@ -1,5 +1,6 @@
-# Ketcher assets (downloaded by fetch-ketcher)
+# Build-time frontend assets (downloaded by fetch-assets)
 public/assets/ketcher/
+public/assets/vendor/
 public/assets/lotus-explore.css
 
 # Build artifacts

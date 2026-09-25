@@ -1,4 +1,8 @@
-const CITATION_JS_SRC = "https://tools-static.wmflabs.org/scholia/js/citation.js";
+const CITATION_BASE_PATH = (() => {
+    const base = document.documentElement.getAttribute("data-lotus-base-path") || "/";
+    return base.endsWith("/") ? base : `${base}/`;
+})();
+const CITATION_JS_SRC = `${CITATION_BASE_PATH}assets/vendor/citation-js/citation.js`;
 let citationJsLoadPromise = null;
 
 function loadCitationJs() {

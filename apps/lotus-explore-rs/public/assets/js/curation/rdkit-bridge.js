@@ -1,4 +1,8 @@
-const RDKIT_JS_SRC = "https://unpkg.com/@rdkit/rdkit/dist/RDKit_minimal.js";
+const RDKIT_BASE_PATH = (() => {
+    const base = document.documentElement.getAttribute("data-lotus-base-path") || "/";
+    return base.endsWith("/") ? base : `${base}/`;
+})();
+const RDKIT_JS_SRC = `${RDKIT_BASE_PATH}assets/vendor/rdkit/RDKit_minimal.js`;
 let rdkitScriptLoadPromise = null;
 let rdkitReadyPromise = null;
 
