@@ -14,18 +14,30 @@ use std::sync::Arc;
 
 const NA_TEXT: &str = "n/a";
 
+fn status_badge_class(status: &CurationStatus) -> &'static str {
+    match status {
+        CurationStatus::ExistingComplete => {
+            "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-taxon"
+        }
+        CurationStatus::ExistingNeedsUpdates => {
+            "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-entries"
+        }
+        CurationStatus::NewCompound | CurationStatus::PendingDependencies => {
+            "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference"
+        }
+        CurationStatus::Error => {
+            "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-compound"
+        }
+    }
+}
+
 #[component]
 fn StatusSummaryBadges(locale: Locale, rows: Arc<[CurationResultRow]>) -> Element {
     rsx! {
         div { class: "flex flex-wrap gap-1.5",
             for (status, count) in status_counts(rows.as_ref()) {
                 span {
-                    class: match status {
-                        CurationStatus::ExistingComplete => "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-taxon",
-                        CurationStatus::ExistingNeedsUpdates => "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-entries",
-                        CurationStatus::NewCompound | CurationStatus::PendingDependencies => "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference",
-                        CurationStatus::Error => "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-compound",
-                    },
+                    class: status_badge_class(&status),
                     "{status_label(locale, &status)} ({count})"
                 }
             }
@@ -37,12 +49,7 @@ fn render_curation_result_cells(locale: Locale, row: &CurationResultRow) -> Elem
     rsx! {
         td { class: "border-b border-panel-border px-3 py-2.5 align-top text-ui text-text",
             span {
-                class: match row.status {
-                    CurationStatus::ExistingComplete => "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-taxon",
-                    CurationStatus::ExistingNeedsUpdates => "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-entries",
-                    CurationStatus::NewCompound | CurationStatus::PendingDependencies => "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-reference",
-                    CurationStatus::Error => "inline-flex items-center rounded-full border border-shell-border bg-shell-raised px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-wd-compound",
-                },
+                class: status_badge_class(&row.status),
                 "{status_label(locale, &row.status)}"
             }
             div { class: "mt-1 flex flex-wrap gap-1",

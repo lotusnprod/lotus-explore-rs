@@ -19,21 +19,16 @@ pub struct CardProps {
 pub fn Card(props: CardProps) -> Element {
     let custom_class = props.class;
 
-    if let Some(href) = &props.href {
-        rsx! {
-            article {
-                class: "flex flex-col gap-4 rounded-xl border border-shell-border bg-shell-raised p-4 {custom_class}",
+    rsx! {
+        article {
+            class: "flex flex-col gap-4 rounded-xl border border-shell-border bg-shell-raised p-4 {custom_class}",
+            if let Some(href) = &props.href {
                 a {
                     href: href,
                     class: "block",
                     {props.children}
                 }
-            }
-        }
-    } else {
-        rsx! {
-            article {
-                class: "flex flex-col gap-4 rounded-xl border border-shell-border bg-shell-raised p-4 {custom_class}",
+            } else {
                 {props.children}
             }
         }

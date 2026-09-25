@@ -68,6 +68,14 @@ mod tests {
     }
 
     #[test]
+    fn stats_group_is_not_navigation() {
+        let stat_bar_src =
+            include_str!("../components/results_table/table_toolbar_sections/stat_bar.rs");
+        assert!(stat_bar_src.contains("role: \"group\""));
+        assert!(!stat_bar_src.contains("nav {"));
+    }
+
+    #[test]
     fn boot_theme_uses_shared_tokens() {
         let index_src = include_str!("../../index.html");
         let logo_src = include_str!("../../public/favicon.svg");

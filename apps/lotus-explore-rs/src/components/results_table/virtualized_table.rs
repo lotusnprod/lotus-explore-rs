@@ -43,9 +43,7 @@ pub(super) fn VirtualizedResultsTable(
             role: "region",
             tabindex: "0",
             aria_label: "{t(locale, TextKey::TableTriplesAria)}",
-             class: "results-table-scroll scrollbar-hidden-x min-h-0 h-[min(78dvh,1120px)] w-full max-w-none max-h-[min(78dvh,1120px)] overflow-x-auto overflow-y-auto rounded-xl border border-shell-border bg-shell-raised",
-             style: "height: min(78dvh, 1120px); max-height: min(78dvh, 1120px); min-height: 0; overflow: auto; contain: layout paint;",
-
+             class: "results-table-scroll scrollbar-hidden-x w-full max-w-none rounded-xl border border-shell-border bg-shell-raised",
              onscroll: on_scroll,
 
             table {

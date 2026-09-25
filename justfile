@@ -52,7 +52,7 @@ clippy-wasm:
 
 serve app:
 	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher
-	dx serve --package {{app}} --wasm-split --features dioxus/wasm-split
+	dx serve --package {{app}} --locked
 
 build app:
 	cd apps/{{app}} && cargo run -p lotus-deploy --bin fetch-ketcher

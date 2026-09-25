@@ -20,8 +20,7 @@ pub fn SearchExamples() -> Element {
             "vocab": "https://schema.org/",
             "prefix": "wd: http://www.wikidata.org/entity/ wdt: http://www.wikidata.org/prop/direct/",
             class: "w-full",
-            div { class: "w-full",
-                Card {
+            Card {
                         class: "flex flex-col gap-3 pb-4 sm:pb-6",
                         h2 { class: "text-body font-semibold text-text", "{t(locale, TextKey::SearchExamples)}" }
                         details {
@@ -71,7 +70,6 @@ pub fn SearchExamples() -> Element {
                         }
                     }
                 }
-            }
     }
 }
 

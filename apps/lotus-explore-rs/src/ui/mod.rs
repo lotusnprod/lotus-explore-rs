@@ -6,7 +6,6 @@
 pub mod a11y_contract;
 mod a11y_smoke;
 pub mod common;
-pub mod document;
 pub mod notice;
 pub mod segmented_control;
 

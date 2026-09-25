@@ -2,7 +2,7 @@
   "name": "lotus-explore-rs",
   "private": true,
   "scripts": {
-    "dev": "dx serve --package lotus-explore-rs --platform web --wasm-split --features \"dioxus/wasm-split\"",
+    "dev": "dx serve --package lotus-explore-rs --platform web --locked",
     "build:release": "dx build --package lotus-explore-rs --platform web --release --debug-symbols=false --wasm-split --features \"dioxus/wasm-split\" --locked --rustc-args=-Copt-level=z",
     "build:css": "npx @tailwindcss/cli@4.3.3 -i ./tailwind/styles.css -o ./public/assets/lotus-explore.css --minify",
     "watch:css": "npx @tailwindcss/cli@4.3.3 -i ./tailwind/styles.css -o ./public/assets/lotus-explore.css --minify --watch"

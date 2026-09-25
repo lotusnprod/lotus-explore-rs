@@ -109,7 +109,7 @@ pub fn StatBar() -> Element {
     let entries_unique_value = stats.n_entries_unique;
 
     rsx! {
-        nav {
+        div {
             class: "stat-bar flex w-full min-w-0 flex-wrap items-stretch justify-center gap-3 px-0",
             role: "group",
             aria_label: "{t(locale, TextKey::DatasetStatistics)}",

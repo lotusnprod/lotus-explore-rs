@@ -2,7 +2,7 @@
 
 [![AGPL-3.0
 license](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
-[![Tests](https://img.shields.io/badge/tests-315-brightgreen)](https://github.com/lotusnprod/lotus-explore-rs/actions)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/lotusnprod/lotus-explore-rs/actions)
 
 `lotus-explore-rs` --- LOTUS Explorer.
 
@@ -68,9 +68,9 @@ cargo test --workspace --all-targets --locked
 
 ## Setup: external assets
 
-RDKit.js and citation-js are loaded from CDN (no local download needed). All
-document `<head>` metadata, scripts, and styles are managed in Rust via
-`ui::document::DocumentHead` --- see `src/document_head.rs`.
+RDKit.js and citation-js are loaded from CDN (no local download needed). The
+static `index.html` owns early metadata, CSS, and bootstrap discovery;
+`document_head::CurationScripts` adds the route-specific curation bridges.
 
 ### CSS Build Dependencies (Tailwind)
 
@@ -121,6 +121,9 @@ just serve lotus-explore-rs   # fetches Ketcher + dx serve
   | Local dev               | auto-detected `http://127.0.0.1:8787` | ✓ if server running |
   | Build-time              | `LOTUS_API_BASE` env var              | ✓                   |
   | Runtime override        | `?api_base=…` query param             | ✓                   |
+
+`api_base` must identify the LOTUS REST API; QLever/Wikidata SPARQL URLs are
+ignored and the explorer uses its direct SPARQL path instead.
 
 ## URL automation
 

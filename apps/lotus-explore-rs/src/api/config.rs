@@ -42,7 +42,15 @@ fn normalize_api_base(value: &str) -> Option<String> {
     if !trimmed.starts_with("http://") && !trimmed.starts_with("https://") {
         return None;
     }
+    if is_sparql_endpoint(trimmed) {
+        return None;
+    }
     Some(trimmed.to_string())
+}
+
+fn is_sparql_endpoint(value: &str) -> bool {
+    let value = value.to_ascii_lowercase();
+    value.contains("qlever") || value.contains("query.wikidata.org") || value.ends_with("/wikidata")
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -83,5 +91,15 @@ mod tests {
     fn normalize_base_rejects_non_http_scheme() {
         assert_eq!(normalize_api_base("ftp://api.example.org"), None);
         assert_eq!(normalize_api_base("api.example.org"), None);
+    }
+
+    #[test]
+    fn normalize_base_rejects_sparql_endpoints() {
+        assert_eq!(normalize_api_base("https://api/wikidata"), None);
+        assert_eq!(normalize_api_base("https://qlever.dev/api/wikidata"), None);
+        assert_eq!(
+            normalize_api_base("https://query.wikidata.org/sparql"),
+            None
+        );
     }
 }

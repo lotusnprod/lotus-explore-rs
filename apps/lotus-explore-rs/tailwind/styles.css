@@ -234,11 +234,11 @@ video {
     --color-text-wd-entries: var(--footer-wd-entries);
     --color-text-wd-structure: var(--footer-wd-structure);
 
-    --font-sans: var(--sans), "Segoe UI", "Helvetica Neue", sans-serif;
-    --font-mono: var(--mono), ui-monospace, monospace;
+    --font-sans: "Segoe UI", "Helvetica Neue", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
     --text-micro: var(--fs-micro);
-    --text-ui: var(--fs-0);
+    --text-ui: var(--fs-ui);
     --text-body: var(--fs-body);
     --text-title: var(--fs-2);
     --text-display: var(--fs-3);
@@ -267,13 +267,10 @@ video {
 /* Typography scale — fluid sizes consumed by the --text-* utilities above and by
    component CSS (var(--fs-body), var(--fs-ui), ...). */
 :root {
-    --fs-micro: clamp(0.70rem, 0.68rem + 0.11vw, 0.76rem);
-    --fs-0:     clamp(0.70rem, 0.68rem + 0.11vw, 0.76rem);
     --fs-ui:    clamp(0.70rem, 0.68rem + 0.11vw, 0.76rem);
-    --fs-1:     clamp(0.76rem, 0.74rem + 0.13vw, 0.82rem);
-    --fs-body:  clamp(0.875rem, 0.85rem + 0.15vw, 1rem);
-    --fs-label: clamp(0.59rem, 0.57rem + 0.09vw, 0.66rem);
-    --fs-2:     clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+    --fs-micro: var(--fs-ui);
+     --fs-body:  clamp(0.875rem, 0.85rem + 0.15vw, 1rem);
+     --fs-2:     clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
     --fs-3:     clamp(1.125rem, 1rem + 0.4vw, 1.375rem);
     --fs-4:     clamp(1.375rem, 1.15rem + 0.6vw, 1.625rem);
     --fs-stat:  clamp(1rem, 0.95rem + 0.36vw, 1.15rem);
@@ -283,7 +280,7 @@ video {
 body {
     background: var(--shell-page-bg);
     color: var(--text);
-    font-family: var(--sans), sans-serif;
+    font-family: var(--font-sans, sans-serif);
     font-size: var(--fs-body);
     line-height: 1.6;
     min-height: 100vh;
@@ -331,8 +328,6 @@ legend {
 /* Main layout containers - reserve space to prevent CLS */
 .app-shell { display: flex; flex-direction: column; min-height: 100dvh; }
 .main-content { min-height: 400px; }
-.page-header { min-height: 46px; }
-footer { min-height: 80px; }
 .search-panel { min-height: 300px; }
 .stat-bar { min-height: 70px; }
 
@@ -378,35 +373,26 @@ footer { min-height: 80px; }
 
 /* Very small screens: full-width view/lang switches */
 @media (max-width: 480px) {
-    .page-header .view-switch,
-    .page-header .lang-switch {
+    .view-switch,
+    .lang-switch {
         width: 100%;
     }
-    .page-header .view-switch [role="group"],
-    .page-header .lang-switch [role="group"] {
+    .view-switch [role="group"],
+    .lang-switch [role="group"] {
         width: 100%;
         justify-content: center;
     }
-    .page-header .view-switch button,
-    .page-header .lang-switch button {
+    .view-switch button,
+    .lang-switch button {
         flex: 1 1 0;
         min-width: 0;
         padding: 6px 8px;
         font-size: var(--fs-micro);
+        line-height: 1.2;
     }
 }
 
 
-/* Font loading fallback sizing to prevent CLS */
-@font-face {
-    font-family: 'Inter';
-    font-display: swap;
-    src: local('Inter');
-    size-adjust: 100%;
-    ascent-override: 90%;
-    descent-override: 20%;
-    line-gap-override: 0%;
-}
 
 /* ========================================
    ACCESSIBILITY UTILITIES (complex, not expressible in Tailwind)
@@ -491,6 +477,7 @@ footer { min-height: 80px; }
     min-height: 0;
     height: min(78dvh, 1120px);
     max-height: min(78dvh, 1120px);
+    overflow: auto;
     contain: layout paint;
 }
 
@@ -574,7 +561,6 @@ footer { min-height: 80px; }
 }
 
 /* Curation table */
-.curation-results-table { width: 100%; }
 .curation-results-table th,
 .curation-results-table td { white-space: nowrap; }
 .curation-results-table td:last-child { white-space: normal; }
@@ -586,40 +572,11 @@ footer { min-height: 80px; }
     width: 100%;
     max-width: 1600px;
     margin-inline: auto;
-    box-sizing: border-box;
 }
 
-
 @media (min-width: 1024px) {
-    .page-header,
     .results-wrap {
         padding-left: 32px;
         padding-right: 32px;
     }
-}
-
-/* Explicit radius utilities (bypass content scanning for Rust-interpolated classes) */
-@utility rounded-xs {
-  border-radius: var(--radius-xs);
-}
-@utility rounded-sm {
-  border-radius: var(--radius-sm);
-}
-@utility rounded-md {
-  border-radius: var(--radius-md);
-}
-@utility rounded-lg {
-  border-radius: var(--radius-lg);
-}
-@utility rounded-xl {
-  border-radius: var(--radius-xl);
-}
-@utility rounded-2xl {
-  border-radius: var(--radius-2xl);
-}
-@utility rounded-3xl {
-  border-radius: var(--radius-3xl);
-}
-@utility rounded-full {
-  border-radius: var(--radius-full);
 }
